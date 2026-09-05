@@ -128,7 +128,8 @@
   --secondary-foreground: oklch(32% 0.03 55deg);
   --muted: oklch(92.5% 0.016 80deg);
   --muted-foreground: oklch(47% 0.022 58deg);
-  --accent: oklch(73% 0.12 74deg);
+  /* Subtle warm surface (shadcn 'accent' = hover/panel tint, NOT the brand amber). */
+  --accent: oklch(93% 0.02 80deg);
   --accent-foreground: oklch(27% 0.03 52deg);
   --destructive: oklch(54% 0.17 28deg);
   --destructive-foreground: oklch(97% 0.014 84deg);
@@ -176,8 +177,8 @@
   --secondary-foreground: oklch(93% 0.012 84deg);
   --muted: oklch(27% 0.016 55deg);
   --muted-foreground: oklch(72% 0.018 70deg);
-  --accent: oklch(76% 0.12 76deg);
-  --accent-foreground: oklch(22% 0.03 52deg);
+  --accent: oklch(28% 0.02 55deg);
+  --accent-foreground: oklch(93% 0.012 84deg);
   --destructive: oklch(50% 0.16 28deg);
   --destructive-foreground: oklch(95% 0.01 84deg);
   --border: oklch(30% 0.016 55deg);
