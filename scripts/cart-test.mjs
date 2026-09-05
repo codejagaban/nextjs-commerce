@@ -10,19 +10,15 @@ const page = await browser.newPage({
 })
 const log = (m) => console.log('[cart-test]', m)
 
-await page.goto('http://localhost:3000/products/arbequina-extra-virgin', { waitUntil: 'load' })
+await page.goto('http://localhost:3000/products/gentle-foaming-cleanser', { waitUntil: 'load' })
 await page.waitForTimeout(1500)
-
-log('selecting size 250ml')
-await page.getByRole('button', { name: '250ml' }).first().click()
-await page.waitForTimeout(700)
 
 log('clicking add to cart')
 await page.getByRole('button', { name: 'Add to cart' }).click()
 await page.waitForTimeout(2500)
 
 log('opening cart')
-await page.getByRole('button', { name: /Cart/i }).first().click()
+await page.getByRole('button', { name: /open cart/i }).first().click()
 await page.waitForTimeout(1800)
 
 await page.screenshot({ path: out })
