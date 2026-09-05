@@ -48,18 +48,16 @@ export const ProductGridItem: React.FC<Props> = ({ product, priority }) => {
       </div>
 
       <div className="mt-4">
-        {category ? <p className="mb-1 text-xs text-muted-foreground">{category}</p> : null}
-        <div className="flex items-start justify-between gap-3">
-          <h3 className="font-display text-lg leading-snug text-foreground line-clamp-2">
-            {title}
-          </h3>
-          {typeof price === 'number' && (
-            <div className="flex shrink-0 items-baseline gap-1 pt-0.5 text-sm text-muted-foreground tabular-nums">
-              {enableVariants ? <span className="text-xs">From</span> : null}
-              <Price amount={price} as="span" className="text-foreground" />
-            </div>
-          )}
-        </div>
+        {category ? <p className="text-xs text-muted-foreground">{category}</p> : null}
+        <h3 className="mt-1 font-display text-lg leading-snug text-foreground line-clamp-2">
+          {title}
+        </h3>
+        {typeof price === 'number' && (
+          <p className="mt-1.5 flex items-baseline gap-1 text-sm text-muted-foreground tabular-nums">
+            {enableVariants ? <span className="text-xs">From</span> : null}
+            <Price amount={price} as="span" className="text-foreground" />
+          </p>
+        )}
       </div>
     </Link>
   )
