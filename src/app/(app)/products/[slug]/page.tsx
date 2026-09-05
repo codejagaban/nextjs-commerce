@@ -10,7 +10,6 @@ import { draftMode } from 'next/headers'
 import Link from 'next/link'
 import { notFound } from 'next/navigation'
 import React, { Suspense } from 'react'
-import { Button } from '@/components/ui/button'
 import { ChevronLeftIcon } from 'lucide-react'
 import { Metadata } from 'next'
 
@@ -117,25 +116,26 @@ export default async function ProductPage({ params }: Args) {
         }}
         type="application/ld+json"
       />
-      <div className="container pt-8 pb-8">
-        <Button asChild variant="ghost" className="mb-4">
-          <Link href="/shop">
-            <ChevronLeftIcon />
-            All products
-          </Link>
-        </Button>
-        <div className="flex flex-col gap-12 rounded-lg border p-8 md:py-12 lg:flex-row lg:gap-8 bg-primary-foreground">
-          <div className="h-full w-full basis-full lg:basis-1/2">
+      <div className="container pt-8 pb-20">
+        <Link
+          href="/shop"
+          className="mb-8 inline-flex items-center gap-1 text-sm text-muted-foreground transition-colors hover:text-foreground"
+        >
+          <ChevronLeftIcon className="h-4 w-4" />
+          All products
+        </Link>
+        <div className="grid gap-10 lg:grid-cols-2 lg:gap-16">
+          <div>
             <Suspense
               fallback={
-                <div className="relative aspect-square h-full max-h-[550px] w-full overflow-hidden" />
+                <div className="relative aspect-[4/5] w-full overflow-hidden rounded-2xl bg-card" />
               }
             >
               {Boolean(gallery?.length) && <Gallery gallery={gallery} />}
             </Suspense>
           </div>
 
-          <div className="basis-full lg:basis-1/2">
+          <div className="lg:sticky lg:top-28 lg:self-start">
             <ProductDescription product={product} />
           </div>
         </div>
@@ -159,7 +159,7 @@ function RelatedProducts({ products }: { products: Product[] }) {
 
   return (
     <div className="py-8">
-      <h2 className="mb-4 text-2xl font-bold">Related Products</h2>
+      <h2 className="mb-6 font-display text-2xl text-foreground">You may also like</h2>
       <ul className="flex w-full gap-4 overflow-x-auto pt-1">
         {products.map((product) => (
           <li
