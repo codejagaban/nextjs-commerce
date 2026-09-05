@@ -6,7 +6,6 @@ import { generateMeta } from '@/utilities/generateMeta'
 import configPromise from '@payload-config'
 import { getPayload } from 'payload'
 import { draftMode } from 'next/headers'
-import { homeStaticData } from '@/endpoints/seed/home-static'
 import React from 'react'
 
 import type { Page } from '@/payload-types'
@@ -46,14 +45,9 @@ export default async function Page({ params }: Args) {
   const { slug = 'home' } = await params
   const url = '/' + slug
 
-  let page = await queryPageBySlug({
+  const page = await queryPageBySlug({
     slug,
   })
-
-  // Remove this code once your website is seeded
-  if (!page && slug === 'home') {
-    page = homeStaticData() as Page
-  }
 
   if (!page) {
     return notFound()

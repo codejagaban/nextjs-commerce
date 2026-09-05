@@ -1,15 +1,66 @@
-import type { CollectionSlug, GlobalSlug, Payload, PayloadRequest, File } from 'payload'
+import type { CollectionSlug, File, GlobalSlug, Payload, PayloadRequest } from 'payload'
+import fs from 'fs'
+import path from 'path'
+import { fileURLToPath } from 'url'
 
-import { contactFormData } from './contact-form'
-import { contactPageData } from './contact-page'
-import { productHatData } from './product-hat'
-import { productTshirtData, productTshirtVariant } from './product-tshirt'
-import { homePageData } from './home'
-import { imageHatData } from './image-hat'
-import { imageTshirtBlackData } from './image-tshirt-black'
-import { imageTshirtWhiteData } from './image-tshirt-white'
-import { imageHero1Data } from './image-hero-1'
-import { Address, Transaction, VariantOption } from '@/payload-types'
+const dirname = path.dirname(fileURLToPath(import.meta.url))
+
+/* -------------------------------------------------------------------------- */
+/*  Lexical rich-text helpers (keeps the seed readable instead of 1000 lines)  */
+/* -------------------------------------------------------------------------- */
+
+const txt = (text: string, format = 0) => ({
+  type: 'text',
+  detail: 0,
+  format,
+  mode: 'normal',
+  style: '',
+  text,
+  version: 1,
+})
+
+const para = (children: any) => ({
+  type: 'paragraph',
+  direction: 'ltr',
+  format: '',
+  indent: 0,
+  textFormat: 0,
+  version: 1,
+  children: typeof children === 'string' ? [txt(children)] : children,
+})
+
+const heading = (tag: 'h1' | 'h2' | 'h3' | 'h4', text: string) => ({
+  type: 'heading',
+  tag,
+  direction: 'ltr',
+  format: '',
+  indent: 0,
+  version: 1,
+  children: [txt(text)],
+})
+
+const link = (text: string, url: string, newTab = false) => ({
+  type: 'link',
+  direction: 'ltr',
+  format: '',
+  indent: 0,
+  version: 3,
+  fields: { linkType: 'custom', newTab, url },
+  children: [txt(text)],
+})
+
+const root = (children: any[]): any => ({
+  root: { type: 'root', direction: 'ltr', format: '', indent: 0, version: 1, children },
+})
+
+const credit = (name: string): any =>
+  root([para(`Photograph by ${name} on Unsplash.`)])
+
+/* -------------------------------------------------------------------------- */
+/*  Data definitions                                                           */
+/* -------------------------------------------------------------------------- */
+
+const usd = (dollars: number) => Math.round(dollars * 100)
 
 const collections: CollectionSlug[] = [
   'categories',
@@ -27,51 +78,130 @@ const collections: CollectionSlug[] = [
   'orders',
 ]
 
-const categories = ['Accessories', 'T-Shirts', 'Hats']
-
-const sizeVariantOptions = [
-  { label: 'Small', value: 'small' },
-  { label: 'Medium', value: 'medium' },
-  { label: 'Large', value: 'large' },
-  { label: 'X Large', value: 'xlarge' },
-]
-
-const colorVariantOptions = [
-  { label: 'Black', value: 'black' },
-  { label: 'White', value: 'white' },
-]
-
 const globals: GlobalSlug[] = ['header', 'footer']
 
-const baseAddressUSData: Transaction['billingAddress'] = {
-  title: 'Dr.',
-  firstName: 'Otto',
-  lastName: 'Octavius',
-  phone: '1234567890',
-  company: 'Oscorp',
-  addressLine1: '123 Main St',
-  addressLine2: 'Suite 100',
-  city: 'New York',
-  state: 'NY',
-  postalCode: '10001',
-  country: 'US',
-}
+type MediaDef = { file: string; alt: string; by: string }
 
-const baseAddressUKData: Transaction['billingAddress'] = {
-  title: 'Mr.',
-  firstName: 'Oliver',
-  lastName: 'Twist',
-  phone: '1234567890',
-  addressLine1: '48 Great Portland St',
-  city: 'London',
-  postalCode: 'W1W 7ND',
-  country: 'GB',
-}
+const mediaDefs: MediaDef[] = [
+  { file: 'landscape-hero-01.jpg', alt: 'Sunlit Mediterranean hillside olive grove at golden hour', by: 'Luca Micheli' },
+  { file: 'landscape-hero-02.jpg', alt: 'Rows of olive trees stretching toward warm horizon light', by: 'Chris Weiher' },
+  { file: 'landscape-hero-03.jpg', alt: 'Terraced olive grove bathed in late afternoon sun', by: 'Danilo Rios' },
+  { file: 'olive-grove-01.jpg', alt: 'Gnarled olive trees in a quiet estate grove', by: 'Roberto Nickson' },
+  { file: 'olive-grove-02.jpg', alt: 'Silver-green olive foliage catching the light', by: 'Susana Bartolome' },
+  { file: 'olive-oil-bottle-01.jpg', alt: 'Bottle of extra virgin olive oil on a warm surface', by: 'Kelly Sikkema' },
+  { file: 'olive-oil-bottle-02.jpg', alt: 'Amber glass olive oil bottle, studio light', by: 'Zoshua Colah' },
+  { file: 'olive-oil-bottle-03.jpg', alt: 'Estate olive oil bottle beside fresh produce', by: 'Christin Hume' },
+  { file: 'olives-closeup-01.jpg', alt: 'Ripe green olives on the branch', by: 'Sixteen Miles Out' },
+  { file: 'olives-closeup-02.jpg', alt: 'Freshly harvested olives in close detail', by: 'Kelis' },
+  { file: 'olives-closeup-03.jpg', alt: 'Olives ripening in warm sunlight', by: 'Mohamed Fsili' },
+  { file: 'olive-oil-drizzle-01.jpg', alt: 'Golden olive oil poured over a dish', by: 'Ahmet Koç' },
+  { file: 'olive-oil-drizzle-02.jpg', alt: 'Olive oil drizzling onto rustic bread', by: 'Karolina Ferretis' },
+  { file: 'sea-salt-01.jpg', alt: 'Flaky hand-harvested sea salt', by: 'Jason Tuinstra' },
+  { file: 'honey-01.jpg', alt: 'Raw honey with a wooden dipper', by: 'Arwin Neil Baichoo' },
+  { file: 'pantry-bottles-01.jpg', alt: 'Dark pantry bottles in a warm still life', by: 'Annie Spratt' },
+  { file: 'table-spread-01.jpg', alt: 'Mediterranean table spread in warm tones', by: 'Victoria Morgan' },
+  { file: 'table-spread-02.jpg', alt: 'Rustic shared meal of Mediterranean dishes', by: 'Anya Chernykh' },
+]
 
-// Next.js revalidation errors are normal when seeding the database without a server running
-// i.e. running `yarn seed` locally instead of using the admin UI within an active app
-// The app is not running to revalidate the pages and so the API routes are not available
-// These error messages can be ignored: `Error hitting revalidate route for...`
+const categoryDefs = [
+  { title: 'Olive Oil', slug: 'olive-oil' },
+  { title: 'Vinegar', slug: 'vinegar' },
+  { title: 'Pantry', slug: 'pantry' },
+  { title: 'Honey', slug: 'honey' },
+  { title: 'Gifts', slug: 'gifts' },
+]
+
+const sizeOptions = [
+  { label: '250ml', value: '250ml' },
+  { label: '500ml', value: '500ml' },
+  { label: '1L', value: '1l' },
+]
+
+// Oils carry a size axis; prices are per size.
+const oilDefs = [
+  {
+    title: 'Arbequina Extra Virgin Olive Oil',
+    slug: 'arbequina-extra-virgin',
+    category: 'olive-oil',
+    gallery: ['olive-oil-bottle-01.jpg', 'olive-oil-drizzle-01.jpg'],
+    description:
+      'Soft and buttery, with almond and ripe apple. Our most approachable oil — the one we reach for every day.',
+    prices: { '250ml': 19, '500ml': 32, '1l': 54 },
+  },
+  {
+    title: 'Koroneiki Robust Olive Oil',
+    slug: 'koroneiki-robust',
+    category: 'olive-oil',
+    gallery: ['olive-oil-bottle-02.jpg', 'olives-closeup-01.jpg'],
+    description:
+      'Green, peppery and bold, with a herbaceous bite that lingers. Pressed within hours of the harvest.',
+    prices: { '250ml': 21, '500ml': 36, '1l': 60 },
+  },
+  {
+    title: 'Picual Estate Reserve',
+    slug: 'picual-estate-reserve',
+    category: 'olive-oil',
+    gallery: ['olive-oil-bottle-03.jpg', 'olive-grove-01.jpg'],
+    description:
+      'Our single-grove reserve: fig leaf, tomato vine and a warm, grassy finish. A limited pressing each year.',
+    prices: { '250ml': 24, '500ml': 42, '1l': 68 },
+  },
+  {
+    title: 'Hojiblanca Delicate',
+    slug: 'hojiblanca-delicate',
+    category: 'olive-oil',
+    gallery: ['olive-oil-drizzle-02.jpg', 'olives-closeup-02.jpg'],
+    description:
+      'Gentle and golden, with almond blossom and a clean, sweet close. Finishing oil for fish and fresh greens.',
+    prices: { '250ml': 20, '500ml': 34, '1l': 56 },
+  },
+]
+
+// Simple pantry goods, single price.
+const pantryDefs = [
+  {
+    title: 'Barrel-Aged Red Wine Vinegar',
+    slug: 'barrel-aged-red-wine-vinegar',
+    category: 'vinegar',
+    gallery: ['pantry-bottles-01.jpg'],
+    description: 'Aged in oak for a mellow, rounded acidity. Bright enough to lift a salad, soft enough to sip.',
+    price: 18,
+    inventory: 120,
+  },
+  {
+    title: 'Hand-Harvested Sea Salt Flakes',
+    slug: 'sea-salt-flakes',
+    category: 'pantry',
+    gallery: ['sea-salt-01.jpg'],
+    description: 'Pyramid flakes raked by hand from coastal pans. A final, crunchy flourish for everything.',
+    price: 12,
+    inventory: 200,
+  },
+  {
+    title: 'Wildflower Raw Honey',
+    slug: 'wildflower-raw-honey',
+    category: 'honey',
+    gallery: ['honey-01.jpg'],
+    description: 'Unfiltered and unheated, gathered from hillside wildflowers. Floral, amber and slow to pour.',
+    price: 16,
+    inventory: 150,
+  },
+  {
+    title: 'The Harvest Gift Box',
+    slug: 'harvest-gift-box',
+    category: 'gifts',
+    gallery: ['table-spread-01.jpg', 'table-spread-02.jpg'],
+    description:
+      'Our story in one box: a 500ml Arbequina, sea salt, wildflower honey and barrel-aged vinegar, in a linen wrap.',
+    price: 78,
+    inventory: 40,
+  },
+]
+
+/* -------------------------------------------------------------------------- */
+/*  Seed                                                                        */
+/* -------------------------------------------------------------------------- */
+
 export const seed = async ({
   payload,
   req,
@@ -79,519 +209,259 @@ export const seed = async ({
   payload: Payload
   req: PayloadRequest
 }): Promise<void> => {
-  payload.logger.info('Seeding database...')
+  payload.logger.info('Seeding Marisol demo data…')
 
-  // we need to clear the media directory before seeding
-  // as well as the collections and globals
-  // this is because while `yarn seed` drops the database
-  // the custom `/api/seed` endpoint does not
-  payload.logger.info(`— Clearing collections and globals...`)
-
-  // clear the database
+  payload.logger.info('— Clearing collections and globals…')
   await Promise.all(
     globals.map((global) =>
       payload.updateGlobal({
         slug: global,
-        data: {
-          navItems: [],
-        },
+        data: { navItems: [] } as any,
         depth: 0,
-        context: {
-          disableRevalidate: true,
-        },
+        context: { disableRevalidate: true },
       }),
     ),
   )
 
   for (const collection of collections) {
     await payload.db.deleteMany({ collection, req, where: {} })
-    if (payload.collections[collection].config.versions) {
+    if (payload.collections[collection]?.config.versions) {
       await payload.db.deleteVersions({ collection, req, where: {} })
     }
   }
 
-  payload.logger.info(`— Seeding customer and customer data...`)
-
+  // Remove demo users so re-seeding is idempotent (keep any real admins you made).
   await payload.delete({
     collection: 'users',
     depth: 0,
-    where: {
-      email: {
-        equals: 'customer@example.com',
-      },
-    },
+    where: { email: { in: ['customer@example.com', 'admin@marisol.store'] } },
   })
 
-  payload.logger.info(`— Seeding media...`)
-
-  const [imageHatBuffer, imageTshirtBlackBuffer, imageTshirtWhiteBuffer, heroBuffer] =
-    await Promise.all([
-      fetchFileByURL(
-        'https://raw.githubusercontent.com/payloadcms/payload/refs/heads/3.x/templates/ecommerce/src/endpoints/seed/hat-logo.png',
-      ),
-      fetchFileByURL(
-        'https://raw.githubusercontent.com/payloadcms/payload/refs/heads/3.x/templates/ecommerce/src/endpoints/seed/tshirt-black.png',
-      ),
-      fetchFileByURL(
-        'https://raw.githubusercontent.com/payloadcms/payload/refs/heads/3.x/templates/ecommerce/src/endpoints/seed/tshirt-white.png',
-      ),
-      fetchFileByURL(
-        'https://raw.githubusercontent.com/payloadcms/payload/refs/heads/3.x/templates/website/src/endpoints/seed/image-hero1.webp',
-      ),
-    ])
-
-  const [
-    customer,
-    imageHat,
-    imageTshirtBlack,
-    imageTshirtWhite,
-    imageHero,
-    accessoriesCategory,
-    tshirtsCategory,
-    hatsCategory,
-  ] = await Promise.all([
-    payload.create({
-      collection: 'users',
-      data: {
-        name: 'Customer',
-        email: 'customer@example.com',
-        password: 'password',
-        roles: ['customer'],
-      },
-    }),
-    payload.create({
-      collection: 'media',
-      data: imageHatData,
-      file: imageHatBuffer,
-    }),
-    payload.create({
-      collection: 'media',
-      data: imageTshirtBlackData,
-      file: imageTshirtBlackBuffer,
-    }),
-    payload.create({
-      collection: 'media',
-      data: imageTshirtWhiteData,
-      file: imageTshirtWhiteBuffer,
-    }),
-    payload.create({
-      collection: 'media',
-      data: imageHero1Data,
-      file: heroBuffer,
-    }),
-    ...categories.map((category) =>
-      payload.create({
-        collection: 'categories',
-        data: {
-          title: category,
-          slug: category,
-        },
-      }),
-    ),
-  ])
-
-  payload.logger.info(`— Seeding variant types and options...`)
-
-  const sizeVariantType = await payload.create({
-    collection: 'variantTypes',
+  payload.logger.info('— Seeding users…')
+  await payload.create({
+    collection: 'users',
     data: {
-      name: 'size',
-      label: 'Size',
-    },
+      name: 'Marisol Admin',
+      email: 'admin@marisol.store',
+      password: 'marisol-admin',
+      roles: ['admin'],
+    } as any,
+  })
+  const customer = await payload.create({
+    collection: 'users',
+    data: {
+      name: 'Customer',
+      email: 'customer@example.com',
+      password: 'password',
+      roles: ['customer'],
+    } as any,
   })
 
-  const sizeVariantOptionsResults: VariantOption[] = []
-
-  for (const option of sizeVariantOptions) {
-    const result = await payload.create({
-      collection: 'variantOptions',
-      data: {
-        ...option,
-        variantType: sizeVariantType.id,
-      },
+  payload.logger.info('— Seeding media…')
+  const media: Record<string, any> = {}
+  for (const def of mediaDefs) {
+    const filePath = path.resolve(dirname, 'assets', def.file)
+    const data = fs.readFileSync(filePath)
+    const file: File = {
+      name: def.file,
+      data,
+      mimetype: 'image/jpeg',
+      size: data.byteLength,
+    }
+    media[def.file] = await payload.create({
+      collection: 'media',
+      data: { alt: def.alt, caption: credit(def.by) } as any,
+      file,
     })
-    sizeVariantOptionsResults.push(result)
   }
 
-  const [small, medium, large, xlarge] = sizeVariantOptionsResults
+  payload.logger.info('— Seeding categories…')
+  const categories: Record<string, any> = {}
+  for (const def of categoryDefs) {
+    categories[def.slug] = await payload.create({
+      collection: 'categories',
+      data: { title: def.title, slug: def.slug } as any,
+    })
+  }
 
-  const colorVariantType = await payload.create({
+  payload.logger.info('— Seeding variant types and options…')
+  const sizeType = await payload.create({
     collection: 'variantTypes',
-    data: {
-      name: 'color',
-      label: 'Color',
-    },
+    data: { name: 'size', label: 'Size' } as any,
   })
+  const sizeOptionDocs: Record<string, any> = {}
+  for (const opt of sizeOptions) {
+    sizeOptionDocs[opt.value] = await payload.create({
+      collection: 'variantOptions',
+      data: { ...opt, variantType: sizeType.id } as any,
+    })
+  }
 
-  const [black, white] = await Promise.all(
-    colorVariantOptions.map((option) => {
-      return payload.create({
-        collection: 'variantOptions',
+  payload.logger.info('— Seeding products…')
+
+  // Oils (with size variants)
+  for (const def of oilDefs) {
+    const product = await payload.create({
+      collection: 'products',
+      depth: 0,
+      data: {
+        title: def.title,
+        slug: def.slug,
+        _status: 'published',
+        enableVariants: true,
+        variantTypes: [sizeType.id],
+        inventory: 0,
+        priceInUSDEnabled: true,
+        priceInUSD: usd(def.prices['250ml']),
+        categories: [categories[def.category].id],
+        description: root([para(def.description)]),
+        gallery: def.gallery.map((f) => ({ image: media[f].id })),
+        meta: {
+          title: `${def.title} | Marisol`,
+          description: def.description,
+          image: media[def.gallery[0]].id,
+        },
+      } as any,
+    })
+
+    for (const opt of sizeOptions) {
+      await payload.create({
+        collection: 'variants',
+        depth: 0,
         data: {
-          ...option,
-          variantType: colorVariantType.id,
-        },
+          product: product.id,
+          options: [sizeOptionDocs[opt.value].id],
+          inventory: 80,
+          priceInUSDEnabled: true,
+          priceInUSD: usd((def.prices as any)[opt.value]),
+          _status: 'published',
+        } as any,
       })
-    }),
-  )
-
-  payload.logger.info(`— Seeding products...`)
-
-  const productHat = await payload.create({
-    collection: 'products',
-    depth: 0,
-    data: productHatData({
-      galleryImage: imageHat,
-      metaImage: imageHat,
-      variantTypes: [colorVariantType],
-      categories: [hatsCategory],
-      relatedProducts: [],
-    }),
-  })
-
-  const productTshirt = await payload.create({
-    collection: 'products',
-    depth: 0,
-    data: productTshirtData({
-      galleryImages: [
-        { image: imageTshirtBlack, variantOption: black },
-        { image: imageTshirtWhite, variantOption: white },
-      ],
-      metaImage: imageTshirtBlack,
-      contentImage: imageHero,
-      variantTypes: [colorVariantType, sizeVariantType],
-      categories: [tshirtsCategory],
-      relatedProducts: [productHat],
-    }),
-  })
-
-  let hoodieID: number | string = productTshirt.id
-
-  if (payload.db.defaultIDType === 'text') {
-    hoodieID = `"${hoodieID}"`
+    }
   }
 
-  const [
-    smallTshirtHoodieVariant,
-    mediumTshirtHoodieVariant,
-    largeTshirtHoodieVariant,
-    xlargeTshirtHoodieVariant,
-  ] = await Promise.all(
-    [small, medium, large, xlarge].map((variantOption) =>
-      payload.create({
-        collection: 'variants',
-        depth: 0,
-        data: productTshirtVariant({
-          product: productTshirt,
-          variantOptions: [variantOption, white],
-        }),
-      }),
-    ),
-  )
-
-  await Promise.all(
-    [small, medium, large, xlarge].map((variantOption) =>
-      payload.create({
-        collection: 'variants',
-        depth: 0,
-        data: productTshirtVariant({
-          product: productTshirt,
-          variantOptions: [variantOption, black],
-          ...(variantOption.value === 'medium' ? { inventory: 0 } : {}),
-        }),
-      }),
-    ),
-  )
-
-  payload.logger.info(`— Seeding contact form...`)
-
-  const contactForm = await payload.create({
-    collection: 'forms',
-    depth: 0,
-    data: contactFormData(),
-  })
-
-  payload.logger.info(`— Seeding pages...`)
-
-  const [_, contactPage] = await Promise.all([
-    payload.create({
-      collection: 'pages',
+  // Pantry goods (no variants)
+  for (const def of pantryDefs) {
+    await payload.create({
+      collection: 'products',
       depth: 0,
-      data: homePageData({
-        contentImage: imageHero,
-        metaImage: imageHat,
-      }),
-    }),
-    payload.create({
-      collection: 'pages',
-      depth: 0,
-      data: contactPageData({
-        contactForm: contactForm,
-      }),
-    }),
-  ])
-
-  payload.logger.info(`— Seeding addresses...`)
-
-  const customerUSAddress = await payload.create({
-    collection: 'addresses',
-    depth: 0,
-    data: {
-      customer: customer.id,
-      ...(baseAddressUSData as Address),
-    },
-  })
-
-  const customerUKAddress = await payload.create({
-    collection: 'addresses',
-    depth: 0,
-    data: {
-      customer: customer.id,
-      ...(baseAddressUKData as Address),
-    },
-  })
-
-  payload.logger.info(`— Seeding transactions...`)
-
-  const pendingTransaction = await payload.create({
-    collection: 'transactions',
-    data: {
-      currency: 'USD',
-      customer: customer.id,
-      paymentMethod: 'stripe',
-      stripe: {
-        customerID: 'cus_123',
-        paymentIntentID: 'pi_123',
-      },
-      status: 'pending',
-      billingAddress: baseAddressUSData,
-    },
-  })
-
-  const succeededTransaction = await payload.create({
-    collection: 'transactions',
-    data: {
-      currency: 'USD',
-      customer: customer.id,
-      paymentMethod: 'stripe',
-      stripe: {
-        customerID: 'cus_123',
-        paymentIntentID: 'pi_123',
-      },
-      status: 'succeeded',
-      billingAddress: baseAddressUSData,
-    },
-  })
-
-  let succeededTransactionID: number | string = succeededTransaction.id
-
-  if (payload.db.defaultIDType === 'text') {
-    succeededTransactionID = `"${succeededTransactionID}"`
+      data: {
+        title: def.title,
+        slug: def.slug,
+        _status: 'published',
+        enableVariants: false,
+        inventory: def.inventory,
+        priceInUSDEnabled: true,
+        priceInUSD: usd(def.price),
+        categories: [categories[def.category].id],
+        description: root([para(def.description)]),
+        gallery: def.gallery.map((f) => ({ image: media[f].id })),
+        meta: {
+          title: `${def.title} | Marisol`,
+          description: def.description,
+          image: media[def.gallery[0]].id,
+        },
+      } as any,
+    })
   }
 
-  payload.logger.info(`— Seeding carts...`)
-
-  // This cart is open as it's created now
-  const openCart = await payload.create({
-    collection: 'carts',
+  payload.logger.info('— Seeding pages…')
+  await payload.create({
+    collection: 'pages',
+    depth: 0,
+    context: { disableRevalidate: true },
     data: {
-      customer: customer.id,
-      currency: 'USD',
-      items: [
+      slug: 'about',
+      _status: 'published',
+      title: 'Our Story',
+      hero: {
+        type: 'lowImpact',
+        richText: root([
+          heading('h1', 'From one grove, pressed the same day it is picked.'),
+          para(
+            'Marisol began on a single terraced hillside above the sea. We still harvest by hand and press within hours, because that is the only way to keep the fruit in the bottle.',
+          ),
+        ]),
+        links: [],
+      },
+      layout: [
         {
-          product: productTshirt.id,
-          variant: mediumTshirtHoodieVariant.id,
-          quantity: 1,
+          blockType: 'mediaBlock',
+          blockName: 'Grove',
+          media: media['olive-grove-01.jpg'].id,
+        },
+        {
+          blockType: 'content',
+          blockName: 'Philosophy',
+          columns: [
+            {
+              size: 'half',
+              richText: root([
+                heading('h2', 'Slow by choice'),
+                para(
+                  'Small lots, real dates, nothing rushed. Every pressing is traceable to the week it left the tree.',
+                ),
+              ]),
+            },
+            {
+              size: 'half',
+              richText: root([
+                heading('h2', 'Grown, not sourced'),
+                para(
+                  'We farm what we sell. The oils, the salt cured on our coast, the honey from the hives at the grove’s edge.',
+                ),
+              ]),
+            },
+          ],
+        },
+        {
+          blockType: 'cta',
+          blockName: 'Shop CTA',
+          richText: root([
+            heading('h3', 'Taste this season’s harvest'),
+            para('The current pressing is bottled and ready. It changes with the year — this is how it tastes now.'),
+          ]),
+          links: [
+            {
+              link: { type: 'custom', appearance: 'default', label: 'Shop the harvest', url: '/shop' },
+            },
+          ],
         },
       ],
-    },
+      meta: {
+        title: 'Our Story | Marisol',
+        description:
+          'Single-estate olive oil and Mediterranean pantry, harvested by hand and pressed the same day.',
+        image: media['landscape-hero-01.jpg'].id,
+      },
+    } as any,
   })
 
-  const oldTimestamp = new Date('2023-01-01T00:00:00Z').toISOString()
-
-  // Cart is abandoned because it was created long in the past
-  const abandonedCart = await payload.create({
-    collection: 'carts',
-    data: {
-      currency: 'USD',
-      createdAt: oldTimestamp,
-      items: [
-        {
-          product: productHat.id,
-          quantity: 1,
-        },
-      ],
-    },
-  })
-
-  // Cart is purchased because it has a purchasedAt date
-  const completedCart = await payload.create({
-    collection: 'carts',
-    data: {
-      customer: customer.id,
-      currency: 'USD',
-      purchasedAt: new Date().toISOString(),
-      subtotal: 7499,
-      items: [
-        {
-          product: productTshirt.id,
-          variant: smallTshirtHoodieVariant.id,
-          quantity: 1,
-        },
-        {
-          product: productTshirt.id,
-          variant: mediumTshirtHoodieVariant.id,
-          quantity: 1,
-        },
-      ],
-    },
-  })
-
-  let completedCartID: number | string = completedCart.id
-
-  if (payload.db.defaultIDType === 'text') {
-    completedCartID = `"${completedCartID}"`
-  }
-
-  payload.logger.info(`— Seeding orders...`)
-
-  const orderInCompleted = await payload.create({
-    collection: 'orders',
-    data: {
-      amount: 7499,
-      currency: 'USD',
-      customer: customer.id,
-      shippingAddress: baseAddressUSData,
-      items: [
-        {
-          product: productTshirt.id,
-          variant: smallTshirtHoodieVariant.id,
-          quantity: 1,
-        },
-        {
-          product: productTshirt.id,
-          variant: mediumTshirtHoodieVariant.id,
-          quantity: 1,
-        },
-      ],
-      status: 'completed',
-      transactions: [succeededTransaction.id],
-    },
-  })
-
-  const orderInProcessing = await payload.create({
-    collection: 'orders',
-    data: {
-      amount: 7499,
-      currency: 'USD',
-      customer: customer.id,
-      shippingAddress: baseAddressUSData,
-      items: [
-        {
-          product: productTshirt.id,
-          variant: smallTshirtHoodieVariant.id,
-          quantity: 1,
-        },
-        {
-          product: productTshirt.id,
-          variant: mediumTshirtHoodieVariant.id,
-          quantity: 1,
-        },
-      ],
-      status: 'processing',
-      transactions: [succeededTransaction.id],
-    },
-  })
-
-  payload.logger.info(`— Seeding globals...`)
-
+  payload.logger.info('— Seeding globals…')
   await Promise.all([
     payload.updateGlobal({
       slug: 'header',
       data: {
         navItems: [
-          {
-            link: {
-              type: 'custom',
-              label: 'Home',
-              url: '/',
-            },
-          },
-          {
-            link: {
-              type: 'custom',
-              label: 'Shop',
-              url: '/shop',
-            },
-          },
-          {
-            link: {
-              type: 'custom',
-              label: 'Account',
-              url: '/account',
-            },
-          },
+          { link: { type: 'custom', label: 'Shop', url: '/shop' } },
+          { link: { type: 'custom', label: 'Olive Oil', url: '/shop?category=olive-oil' } },
+          { link: { type: 'custom', label: 'Our Story', url: '/about' } },
         ],
-      },
+      } as any,
     }),
     payload.updateGlobal({
       slug: 'footer',
       data: {
         navItems: [
-          {
-            link: {
-              type: 'custom',
-              label: 'Admin',
-              url: '/admin',
-            },
-          },
-          {
-            link: {
-              type: 'custom',
-              label: 'Find my order',
-              url: '/find-order',
-            },
-          },
-          {
-            link: {
-              type: 'custom',
-              label: 'Source Code',
-              newTab: true,
-              url: 'https://github.com/payloadcms/payload/tree/3.x/templates/website',
-            },
-          },
-          {
-            link: {
-              type: 'custom',
-              label: 'Payload',
-              newTab: true,
-              url: 'https://payloadcms.com/',
-            },
-          },
+          { link: { type: 'custom', label: 'Shop', url: '/shop' } },
+          { link: { type: 'custom', label: 'Our Story', url: '/about' } },
+          { link: { type: 'custom', label: 'Find my order', url: '/find-order' } },
+          { link: { type: 'custom', label: 'Admin', url: '/admin' } },
         ],
-      },
+      } as any,
     }),
   ])
 
-  payload.logger.info('Seeded database successfully!')
-}
-
-async function fetchFileByURL(url: string): Promise<File> {
-  const res = await fetch(url, {
-    credentials: 'include',
-    method: 'GET',
-  })
-
-  if (!res.ok) {
-    throw new Error(`Failed to fetch file from ${url}, status: ${res.status}`)
-  }
-
-  const data = await res.arrayBuffer()
-
-  return {
-    name: url.split('/').pop() || `file-${Date.now()}`,
-    data: Buffer.from(data),
-    mimetype: `image/${url.split('.').pop()}`,
-    size: data.byteLength,
-  }
+  payload.logger.info('Seeded Marisol demo data successfully.')
+  void customer
 }
