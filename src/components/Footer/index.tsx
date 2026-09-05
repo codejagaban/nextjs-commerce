@@ -1,66 +1,103 @@
 import type { Footer } from '@/payload-types'
 
-import { FooterMenu } from '@/components/Footer/menu'
+import { CMSLink } from '@/components/Link'
 import { ThemeSelector } from '@/providers/Theme/ThemeSelector'
 import { getCachedGlobal } from '@/utilities/getGlobals'
 import Link from 'next/link'
-import React, { Suspense } from 'react'
-import { LogoIcon } from '@/components/icons/logo'
+import React from 'react'
+import { SunMark } from '@/components/Logo/MarisolMark'
 
 const { COMPANY_NAME, SITE_NAME } = process.env
+
+const shopLinks = [
+  { label: 'Olive Oil', url: '/shop?category=olive-oil' },
+  { label: 'Vinegar', url: '/shop?category=vinegar' },
+  { label: 'Pantry', url: '/shop?category=pantry' },
+  { label: 'Honey', url: '/shop?category=honey' },
+  { label: 'Gifts', url: '/shop?category=gifts' },
+]
 
 export async function Footer() {
   const footer: Footer = await getCachedGlobal('footer', 1)()
   const menu = footer.navItems || []
   const currentYear = new Date().getFullYear()
-  const copyrightDate = 2023 + (currentYear > 2023 ? `-${currentYear}` : '')
-  const skeleton = 'w-full h-6 animate-pulse rounded bg-neutral-200 dark:bg-neutral-700'
-
-  const copyrightName = COMPANY_NAME || SITE_NAME || ''
+  const name = COMPANY_NAME || SITE_NAME || 'Marisol'
 
   return (
-    <footer className="text-sm text-neutral-500 dark:text-neutral-400">
-      <div className="container">
-        <div className="flex w-full flex-col gap-6 border-t border-neutral-200 py-12 text-sm md:flex-row md:gap-12 dark:border-neutral-700">
-          <div>
-            <Link className="flex items-center gap-2 text-black md:pt-1 dark:text-white" href="/">
-              <LogoIcon className="w-6" />
-              <span className="sr-only">{SITE_NAME}</span>
+    <footer className="relative mt-28 overflow-hidden border-t border-border bg-secondary/50 grain">
+      <div className="container relative z-10">
+        <div className="grid grid-cols-2 gap-10 py-16 md:grid-cols-12 md:gap-8">
+          {/* brand */}
+          <div className="col-span-2 md:col-span-5">
+            <Link href="/" aria-label="Marisol — home" className="inline-flex items-center gap-2.5">
+              <SunMark className="h-7 w-7" />
+              <span className="font-display text-2xl leading-none tracking-[0.02em] text-foreground">
+                Marisol
+              </span>
             </Link>
+            <p className="mt-5 max-w-xs text-sm leading-relaxed text-muted-foreground">
+              Single-estate olive oil and Mediterranean pantry. Harvested by hand, pressed the same
+              day, bottled by the season.
+            </p>
           </div>
-          <Suspense
-            fallback={
-              <div className="flex h-[188px] w-[200px] flex-col gap-2">
-                <div className={skeleton} />
-                <div className={skeleton} />
-                <div className={skeleton} />
-                <div className={skeleton} />
-                <div className={skeleton} />
-                <div className={skeleton} />
-              </div>
-            }
-          >
-            <FooterMenu menu={menu} />
-          </Suspense>
-          <div className="md:ml-auto flex flex-col gap-4 items-end">
+
+          {/* shop */}
+          <div className="md:col-span-3">
+            <h2 className="text-xs uppercase tracking-[0.14em] text-muted-foreground">Shop</h2>
+            <ul className="mt-4 space-y-3">
+              {shopLinks.map((l) => (
+                <li key={l.url}>
+                  <Link
+                    href={l.url}
+                    className="text-sm text-foreground/80 transition-colors hover:text-foreground"
+                  >
+                    {l.label}
+                  </Link>
+                </li>
+              ))}
+            </ul>
+          </div>
+
+          {/* explore */}
+          <div className="md:col-span-2">
+            <h2 className="text-xs uppercase tracking-[0.14em] text-muted-foreground">Explore</h2>
+            <ul className="mt-4 space-y-3">
+              {menu.map((item) => (
+                <li key={item.id}>
+                  <CMSLink
+                    {...item.link}
+                    appearance="inline"
+                    className="text-sm text-foreground/80 transition-colors hover:text-foreground"
+                  />
+                </li>
+              ))}
+            </ul>
+          </div>
+
+          {/* theme */}
+          <div className="flex items-start md:col-span-2 md:justify-end">
             <ThemeSelector />
           </div>
         </div>
-      </div>
-      <div className="border-t border-neutral-200 py-6 text-sm dark:border-neutral-700">
-        <div className="container mx-auto flex w-full flex-col items-center gap-1 md:flex-row md:gap-0">
+
+        {/* colophon */}
+        <div className="flex flex-col gap-2 border-t border-border/70 py-6 text-sm text-muted-foreground md:flex-row md:items-center">
           <p>
-            &copy; {copyrightDate} {copyrightName}
-            {copyrightName.length && !copyrightName.endsWith('.') ? '.' : ''} All rights reserved.
+            &copy; {currentYear} {name}. All rights reserved.
           </p>
-          <hr className="mx-4 hidden h-4 w-px border-l border-neutral-400 md:inline-block" />
-          <p>Designed in Michigan</p>
-          <p className="md:ml-auto">
-            <a className="text-black dark:text-white" href="https://payloadcms.com">
-              Crafted by Payload
-            </a>
-          </p>
+          <p className="md:ml-auto">A Payload CMS + Next.js commerce template.</p>
         </div>
+      </div>
+
+      {/* oversized wordmark — anchored to the bottom edge, on top of the surface,
+          padded clear at the top so the caps are never sliced. */}
+      <div
+        aria-hidden="true"
+        className="pointer-events-none relative z-10 flex justify-center px-4 pt-4"
+      >
+        <span className="block translate-y-[0.14em] select-none font-display text-[22vw] leading-[0.8] tracking-[0.01em] text-foreground/[0.06] md:text-[20vw]">
+          Marisol
+        </span>
       </div>
     </footer>
   )
