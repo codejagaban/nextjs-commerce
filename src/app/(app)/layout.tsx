@@ -1,3 +1,4 @@
+import type { Metadata } from 'next'
 import type { ReactNode } from 'react'
 
 import { AdminBar } from '@/components/AdminBar'
@@ -23,32 +24,38 @@ const sentient = localFont({
   display: 'swap',
 })
 
-/* const { SITE_NAME, TWITTER_CREATOR, TWITTER_SITE } = process.env
-const baseUrl = process.env.NEXT_PUBLIC_VERCEL_URL
-  ? `https://${process.env.NEXT_PUBLIC_VERCEL_URL}`
-  : 'http://localhost:3000'
+const SITE_NAME = process.env.SITE_NAME || 'Marisol'
+const TWITTER_CREATOR = process.env.TWITTER_CREATOR
+const TWITTER_SITE = process.env.TWITTER_SITE
+const baseUrl = process.env.NEXT_PUBLIC_SERVER_URL || 'http://localhost:3000'
 const twitterCreator = TWITTER_CREATOR ? ensureStartsWith(TWITTER_CREATOR, '@') : undefined
 const twitterSite = TWITTER_SITE ? ensureStartsWith(TWITTER_SITE, 'https://') : undefined
- */
-/* export const metadata = {
+
+export const metadata: Metadata = {
   metadataBase: new URL(baseUrl),
-  robots: {
-    follow: true,
-    index: true,
-  },
   title: {
-    default: SITE_NAME,
+    default: `${SITE_NAME} — Single-estate olive oil & Mediterranean pantry`,
     template: `%s | ${SITE_NAME}`,
   },
-  ...(twitterCreator &&
-    twitterSite && {
-      twitter: {
-        card: 'summary_large_image',
-        creator: twitterCreator,
-        site: twitterSite,
-      },
-    }),
-} */
+  description:
+    'Cold-pressed single-estate olive oil, hand-harvested and bottled by the season, with a small Mediterranean pantry of salt, honey and vinegar.',
+  openGraph: {
+    type: 'website',
+    siteName: SITE_NAME,
+    title: SITE_NAME,
+    url: baseUrl,
+  },
+  robots: { follow: true, index: true },
+  ...(twitterCreator && twitterSite
+    ? {
+        twitter: {
+          card: 'summary_large_image',
+          creator: twitterCreator,
+          site: twitterSite,
+        },
+      }
+    : {}),
+}
 
 export default async function RootLayout({ children }: { children: ReactNode }) {
   return (
