@@ -83,113 +83,124 @@ const globals: GlobalSlug[] = ['header', 'footer']
 type MediaDef = { file: string; alt: string; by: string }
 
 const mediaDefs: MediaDef[] = [
-  { file: 'landscape-hero-01.jpg', alt: 'Sunlit Mediterranean hillside at golden hour', by: 'Luca Micheli' },
-  { file: 'landscape-hero-02.jpg', alt: 'Rolling countryside stretching toward warm horizon light', by: 'Chris Weiher' },
-  { file: 'landscape-hero-03.jpg', alt: 'Olive trees on the estate bathed in late afternoon sun', by: 'Danilo Rios' },
-  { file: 'olive-grove-02.jpg', alt: 'Silver-green olive foliage catching the light', by: 'Susana Bartolome' },
-  { file: 'olives-closeup-01.jpg', alt: 'Olive branch in soft light', by: 'Sixteen Miles Out' },
-  { file: 'olives-closeup-02.jpg', alt: 'Freshly harvested olives on the branch', by: 'Kelis' },
-  { file: 'olives-closeup-03.jpg', alt: 'Olives ripening in warm sunlight', by: 'Mohamed Fsili' },
-  { file: 'olive-oil-drizzle-01.jpg', alt: 'Golden olive oil poured over a dish', by: 'Ahmet Koç' },
-  { file: 'sea-salt-01.jpg', alt: 'Flaky hand-harvested sea salt on a wooden spoon', by: 'Jason Tuinstra' },
-  { file: 'honey-01.jpg', alt: 'Raw honey with a wooden dipper', by: 'Arwin Neil Baichoo' },
-  { file: 'pantry-bottles-01.jpg', alt: 'Rustic pantry shelf of bottles and jars', by: 'Annie Spratt' },
-  { file: 'table-spread-01.jpg', alt: 'Mediterranean table spread in warm tones', by: 'Victoria Morgan' },
-  { file: 'table-spread-02.jpg', alt: 'Olives and linen on a quiet table', by: 'Anya Chernykh' },
+  { file: 'model-portrait-01.jpg', alt: 'Model with glowing, healthy skin in soft light', by: 'Laura Jaeger' },
+  { file: 'model-portrait-02.jpg', alt: 'Applying moisturiser to the cheek', by: 'Leighann Blackwood' },
+  { file: 'model-portrait-03.jpg', alt: 'Applying a facial serum with a dropper', by: 'CRYSTALWEED cannabis' },
+  { file: 'model-portrait-04.jpg', alt: 'Holding a dropper of facial oil', by: 'Mathilde Langevin' },
+  { file: 'serum-01.jpg', alt: 'Amber facial oil with dropper on a soft pink background', by: 'Maria Lupan' },
+  { file: 'serum-02.jpg', alt: 'Matte dropper serum bottle in studio light', by: 'Mockup Free' },
+  { file: 'serum-03.jpg', alt: 'Amber serum bottle catching soft shadows', by: 'Kadarius Seegars' },
+  { file: 'serum-04.jpg', alt: 'White dropper serum bottle on marble', by: 'Content Pixie' },
+  { file: 'cream-jar-01.jpg', alt: 'Moisturiser jar beside fresh flowers', by: 'Keity' },
+  { file: 'cream-jar-02.jpg', alt: 'Premium night cream jar, softly lit', by: 'Pavlo Talpa' },
+  { file: 'pump-01.jpg', alt: 'Pump bottle floating on a cream background', by: 'Mockup Free' },
+  { file: 'pump-02.jpg', alt: 'Skincare tube resting on a magazine', by: 'Ana Nogrey' },
+  { file: 'pump-03.jpg', alt: 'Matte pump bottle in studio light', by: 'Mockup Free' },
+  { file: 'still-life-01.jpg', alt: 'Serum textures in glass dishes with a leaf', by: 'ibnu ihza' },
+  { file: 'still-life-02.jpg', alt: 'Gel textures and botanicals, flat lay', by: 'ibnu ihza' },
+  { file: 'lifestyle-01.jpg', alt: 'Cream swatch on a warm background', by: 'Kelsey Curtis' },
+  { file: 'lifestyle-02.jpg', alt: 'Skincare in the hand under soft pink light', by: 'ian dooley' },
+  { file: 'lifestyle-03.jpg', alt: 'Smiling person applying cream, wearing a headband', by: 'Cheyenne Doig' },
 ]
 
 const categoryDefs = [
-  { title: 'Olive Oil', slug: 'olive-oil' },
-  { title: 'Vinegar', slug: 'vinegar' },
-  { title: 'Pantry', slug: 'pantry' },
-  { title: 'Honey', slug: 'honey' },
-  { title: 'Gifts', slug: 'gifts' },
+  { title: 'Skin Care', slug: 'skin-care' },
+  { title: 'Body Products', slug: 'body' },
+  { title: 'Anti-aging Care', slug: 'anti-aging' },
+  { title: 'Organic Products', slug: 'organic' },
 ]
 
 const sizeOptions = [
-  { label: '250ml', value: '250ml' },
-  { label: '500ml', value: '500ml' },
-  { label: '1L', value: '1l' },
+  { label: '30ml', value: '30ml' },
+  { label: '50ml', value: '50ml' },
 ]
 
-// Oils carry a size axis; prices are per size.
+// Serums carry a size axis; prices are per size. (kept as `oilDefs` for the loop below)
 const oilDefs = [
   {
-    title: 'Arbequina Extra Virgin Olive Oil',
-    slug: 'arbequina-extra-virgin',
-    category: 'olive-oil',
-    gallery: ['olives-closeup-01.jpg', 'olive-oil-drizzle-01.jpg'],
+    title: 'Vitamin C Brightening Serum',
+    slug: 'vitamin-c-brightening-serum',
+    category: 'skin-care',
+    gallery: ['serum-03.jpg', 'lifestyle-01.jpg'],
     description:
-      'Soft and buttery, with almond and ripe apple. Our most approachable oil — the one we reach for every day.',
-    prices: { '250ml': 19, '500ml': 32, '1l': 54 },
+      'A stable 15% vitamin C that evens tone and lends skin a lit-from-within glow. Light, fast-absorbing, non-greasy.',
+    prices: { '30ml': 38, '50ml': 54 },
   },
   {
-    title: 'Koroneiki Robust Olive Oil',
-    slug: 'koroneiki-robust',
-    category: 'olive-oil',
-    gallery: ['olives-closeup-03.jpg', 'olives-closeup-02.jpg'],
+    title: 'Hyaluronic Hydra Serum',
+    slug: 'hyaluronic-hydra-serum',
+    category: 'skin-care',
+    gallery: ['serum-04.jpg', 'still-life-01.jpg'],
     description:
-      'Green, peppery and bold, with a herbaceous bite that lingers. Pressed within hours of the harvest.',
-    prices: { '250ml': 21, '500ml': 36, '1l': 60 },
-  },
-  {
-    title: 'Picual Estate Reserve',
-    slug: 'picual-estate-reserve',
-    category: 'olive-oil',
-    gallery: ['landscape-hero-03.jpg', 'olive-grove-02.jpg'],
-    description:
-      'Our single-grove reserve: fig leaf, tomato vine and a warm, grassy finish. A limited pressing each year.',
-    prices: { '250ml': 24, '500ml': 42, '1l': 68 },
-  },
-  {
-    title: 'Hojiblanca Delicate',
-    slug: 'hojiblanca-delicate',
-    category: 'olive-oil',
-    gallery: ['olive-grove-02.jpg', 'olives-closeup-02.jpg'],
-    description:
-      'Gentle and golden, with almond blossom and a clean, sweet close. Finishing oil for fish and fresh greens.',
-    prices: { '250ml': 20, '500ml': 34, '1l': 56 },
+      'Multi-weight hyaluronic acid draws moisture deep into the skin for a plump, dewy finish that lasts all day.',
+    prices: { '30ml': 34, '50ml': 48 },
   },
 ]
 
-// Simple pantry goods, single price.
+// Simple products, single price. (kept as `pantryDefs` for the loop below)
 const pantryDefs = [
   {
-    title: 'Barrel-Aged Red Wine Vinegar',
-    slug: 'barrel-aged-red-wine-vinegar',
-    category: 'vinegar',
-    gallery: ['pantry-bottles-01.jpg'],
-    description: 'Aged in oak for a mellow, rounded acidity. Bright enough to lift a salad, soft enough to sip.',
-    price: 18,
-    inventory: 120,
+    title: 'Niacinamide Oil Booster',
+    slug: 'niacinamide-oil-booster',
+    category: 'skin-care',
+    gallery: ['serum-02.jpg', 'lifestyle-02.jpg'],
+    description: 'A 5% niacinamide booster that refines pores and calms redness, worn alone or mixed into your cream.',
+    price: 32,
+    inventory: 140,
   },
   {
-    title: 'Hand-Harvested Sea Salt Flakes',
-    slug: 'sea-salt-flakes',
-    category: 'pantry',
-    gallery: ['sea-salt-01.jpg'],
-    description: 'Pyramid flakes raked by hand from coastal pans. A final, crunchy flourish for everything.',
-    price: 12,
-    inventory: 200,
+    title: 'Rosehip Facial Oil',
+    slug: 'rosehip-facial-oil',
+    category: 'organic',
+    gallery: ['serum-01.jpg', 'lifestyle-02.jpg'],
+    description: 'Cold-pressed organic rosehip, rich in omegas, to nourish and soften while you sleep. One dropper is plenty.',
+    price: 28,
+    inventory: 160,
   },
   {
-    title: 'Wildflower Raw Honey',
-    slug: 'wildflower-raw-honey',
-    category: 'honey',
-    gallery: ['honey-01.jpg'],
-    description: 'Unfiltered and unheated, gathered from hillside wildflowers. Floral, amber and slow to pour.',
-    price: 16,
+    title: 'Retinol Renewal Night Cream',
+    slug: 'retinol-renewal-night-cream',
+    category: 'anti-aging',
+    gallery: ['cream-jar-02.jpg'],
+    description: 'Encapsulated retinol smooths fine lines overnight, buffered with ceramides so skin wakes calm, not tight.',
+    price: 46,
+    inventory: 90,
+  },
+  {
+    title: 'Hydrating Day Moisturiser',
+    slug: 'hydrating-day-moisturiser',
+    category: 'skin-care',
+    gallery: ['cream-jar-01.jpg'],
+    description: 'A weightless daily moisturiser with squalane and glycerin that sits beautifully under sunscreen and makeup.',
+    price: 30,
+    inventory: 180,
+  },
+  {
+    title: 'Gentle Foaming Cleanser',
+    slug: 'gentle-foaming-cleanser',
+    category: 'skin-care',
+    gallery: ['pump-03.jpg'],
+    description: 'A soft, sulphate-free foam that lifts away the day without stripping. Leaves skin clean, never squeaky.',
+    price: 22,
+    inventory: 220,
+  },
+  {
+    title: 'Marine Mineral Body Lotion',
+    slug: 'marine-mineral-body-lotion',
+    category: 'body',
+    gallery: ['pump-02.jpg'],
+    description: 'A fast-sinking body lotion with sea minerals and shea, for skin that feels smooth from shoulders to toes.',
+    price: 24,
     inventory: 150,
   },
   {
-    title: 'The Harvest Gift Box',
-    slug: 'harvest-gift-box',
-    category: 'gifts',
-    gallery: ['table-spread-01.jpg', 'table-spread-02.jpg'],
-    description:
-      'Our story in one box: a 500ml Arbequina, sea salt, wildflower honey and barrel-aged vinegar, in a linen wrap.',
-    price: 78,
-    inventory: 40,
+    title: 'Nourishing Body Wash',
+    slug: 'nourishing-body-wash',
+    category: 'body',
+    gallery: ['pump-01.jpg'],
+    description: 'A creamy, low-foam wash that cleanses and conditions in one step, leaving a soft botanical scent.',
+    price: 18,
+    inventory: 200,
   },
 ]
 
@@ -307,7 +318,7 @@ export const seed = async ({
         variantTypes: [sizeType.id],
         inventory: 0,
         priceInUSDEnabled: true,
-        priceInUSD: usd(def.prices['250ml']),
+        priceInUSD: usd(def.prices['30ml']),
         categories: [categories[def.category].id],
         description: root([para(def.description)]),
         gallery: def.gallery.map((f) => ({ image: media[f].id })),
@@ -372,9 +383,9 @@ export const seed = async ({
       hero: {
         type: 'lowImpact',
         richText: root([
-          heading('h1', 'From one grove, pressed the same day it is picked.'),
+          heading('h1', 'Clean skincare for your skin’s natural radiance.'),
           para(
-            'Marisol began on a single terraced hillside above the sea. We still harvest by hand and press within hours, because that is the only way to keep the fruit in the bottle.',
+            'Marisol makes gentle, effective skincare with naturally-derived ingredients. No harsh fillers, no empty claims. Just formulas that help your skin look like the best version of itself.',
           ),
         ]),
         links: [],
@@ -382,8 +393,8 @@ export const seed = async ({
       layout: [
         {
           blockType: 'mediaBlock',
-          blockName: 'Grove',
-          media: media['landscape-hero-03.jpg'].id,
+          blockName: 'Skin',
+          media: media['model-portrait-02.jpg'].id,
         },
         {
           blockType: 'content',
@@ -392,18 +403,18 @@ export const seed = async ({
             {
               size: 'half',
               richText: root([
-                heading('h2', 'Slow by choice'),
+                heading('h2', 'Pure ingredients'),
                 para(
-                  'Small lots, real dates, nothing rushed. Every pressing is traceable to the week it left the tree.',
+                  'Only clean, safe and carefully selected actives, at levels that actually do something. Every ingredient earns its place.',
                 ),
               ]),
             },
             {
               size: 'half',
               richText: root([
-                heading('h2', 'Grown, not sourced'),
+                heading('h2', 'Kind to skin and planet'),
                 para(
-                  'We farm what we sell. The oils, the salt cured on our coast, the honey from the hives at the grove’s edge.',
+                  'Dermatologist-tested, cruelty-free formulas in recyclable packaging. Beauty that is good to your skin and gentle on the world.',
                 ),
               ]),
             },
@@ -413,12 +424,12 @@ export const seed = async ({
           blockType: 'cta',
           blockName: 'Shop CTA',
           richText: root([
-            heading('h3', 'Taste this season’s harvest'),
-            para('The current pressing is bottled and ready. It changes with the year — this is how it tastes now.'),
+            heading('h3', 'Build your ritual'),
+            para('Cleanse, treat, hydrate. Start with a few essentials and grow your routine from there.'),
           ]),
           links: [
             {
-              link: { type: 'custom', appearance: 'default', label: 'Shop the harvest', url: '/shop' },
+              link: { type: 'custom', appearance: 'default', label: 'Shop skincare', url: '/shop' },
             },
           ],
         },
@@ -426,8 +437,8 @@ export const seed = async ({
       meta: {
         title: 'Our Story | Marisol',
         description:
-          'Single-estate olive oil and Mediterranean pantry, harvested by hand and pressed the same day.',
-        image: media['landscape-hero-01.jpg'].id,
+          'Clean, effective skincare made with naturally-derived ingredients, for skin’s natural radiance.',
+        image: media['model-portrait-01.jpg'].id,
       },
     } as any,
   })
@@ -438,8 +449,8 @@ export const seed = async ({
       slug: 'header',
       data: {
         navItems: [
-          { link: { type: 'custom', label: 'Shop', url: '/shop' } },
-          { link: { type: 'custom', label: 'Olive Oil', url: '/shop?category=olive-oil' } },
+          { link: { type: 'custom', label: 'Shop all', url: '/shop' } },
+          { link: { type: 'custom', label: 'Skin care', url: '/shop?category=skin-care' } },
           { link: { type: 'custom', label: 'Our Story', url: '/about' } },
         ],
       } as any,
