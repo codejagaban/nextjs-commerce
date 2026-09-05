@@ -9,8 +9,19 @@ import { Providers } from '@/providers'
 import { InitTheme } from '@/providers/Theme/InitTheme'
 import { GeistSans } from 'geist/font/sans'
 import { GeistMono } from 'geist/font/mono'
+import localFont from 'next/font/local'
 import React from 'react'
 import './globals.css'
+
+// Editorial display serif (self-hosted from Fontshare — off the Google slop shelf).
+const sentient = localFont({
+  src: [
+    { path: '../../fonts/Sentient-Variable.woff2', style: 'normal', weight: '200 800' },
+    { path: '../../fonts/Sentient-VariableItalic.woff2', style: 'italic', weight: '200 800' },
+  ],
+  variable: '--font-sentient',
+  display: 'swap',
+})
 
 /* const { SITE_NAME, TWITTER_CREATOR, TWITTER_SITE } = process.env
 const baseUrl = process.env.NEXT_PUBLIC_VERCEL_URL
@@ -42,7 +53,9 @@ const twitterSite = TWITTER_SITE ? ensureStartsWith(TWITTER_SITE, 'https://') : 
 export default async function RootLayout({ children }: { children: ReactNode }) {
   return (
     <html
-      className={[GeistSans.variable, GeistMono.variable].filter(Boolean).join(' ')}
+      className={[GeistSans.variable, GeistMono.variable, sentient.variable]
+        .filter(Boolean)
+        .join(' ')}
       lang="en"
       suppressHydrationWarning
     >
