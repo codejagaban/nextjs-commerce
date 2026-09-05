@@ -52,40 +52,43 @@ export function ProductDescription({ product }: { product: Product }) {
   }
 
   return (
-    <div className="flex flex-col gap-6">
-      <div className="flex flex-col lg:flex-row lg:items-center lg:justify-between">
-        <h1 className="text-2xl font-medium">{product.title}</h1>
-        <div className="uppercase font-mono">
-          {hasVariants ? (
-            <Price highestAmount={highestAmount} lowestAmount={lowestAmount} />
-          ) : (
-            <Price amount={amount} />
-          )}
-        </div>
+    <div className="flex flex-col">
+      <h1 className="font-display text-3xl leading-tight text-foreground md:text-4xl">
+        {product.title}
+      </h1>
+      <div className="mt-3 text-xl text-foreground tabular-nums">
+        {hasVariants ? (
+          <Price highestAmount={highestAmount} lowestAmount={lowestAmount} />
+        ) : (
+          <Price amount={amount} />
+        )}
       </div>
+
       {product.description ? (
-        <RichText className="" data={product.description} enableGutter={false} />
+        <RichText
+          className="mt-6 max-w-prose text-muted-foreground"
+          data={product.description}
+          enableGutter={false}
+        />
       ) : null}
-      <hr />
+
       {hasVariants && (
-        <>
+        <div className="mt-8 border-t border-border/70 pt-8">
           <Suspense fallback={null}>
             <VariantSelector product={product} />
           </Suspense>
-
-          <hr />
-        </>
+        </div>
       )}
-      <div className="flex items-center justify-between">
+
+      <div className="mt-8 border-t border-border/70 pt-8">
         <Suspense fallback={null}>
           <StockIndicator product={product} />
         </Suspense>
-      </div>
-
-      <div className="flex items-center justify-between">
-        <Suspense fallback={null}>
-          <AddToCart product={product} />
-        </Suspense>
+        <div className="mt-4">
+          <Suspense fallback={null}>
+            <AddToCart product={product} />
+          </Suspense>
+        </div>
       </div>
     </div>
   )

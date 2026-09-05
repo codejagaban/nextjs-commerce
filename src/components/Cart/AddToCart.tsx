@@ -94,18 +94,25 @@ export function AddToCart({ product }: Props) {
     return false
   }, [selectedVariant, cart?.items, product])
 
+  const needsVariant = product.enableVariants && !selectedVariant
+  const soldOut = product.enableVariants
+    ? selectedVariant?.inventory === 0
+    : product.inventory === 0
+  const label = soldOut ? 'Sold out' : needsVariant ? 'Select a size' : 'Add to cart'
+
   return (
     <Button
       aria-label="Add to cart"
-      variant={'outline'}
-      className={clsx({
-        'hover:opacity-90': true,
-      })}
+      variant={'default'}
+      size="lg"
+      className={clsx(
+        'h-12 w-full rounded-full text-sm font-medium sm:w-auto sm:min-w-[220px]',
+      )}
       disabled={disabled || isLoading}
       onClick={addToCart}
       type="submit"
     >
-      Add To Cart
+      {label}
     </Button>
   )
 }
