@@ -1,0 +1,7 @@
+# Standalone project (not a monorepo). This file exists solely to approve
+# native post-install build scripts under pnpm 10+.
+allowBuilds:
+  '@vercel/git-hooks': false
+  esbuild: true
+  sharp: true
+  unrs-resolver: true
