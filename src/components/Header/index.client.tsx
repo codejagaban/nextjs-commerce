@@ -8,7 +8,6 @@ import React, { Suspense } from 'react'
 import { MobileMenu } from './MobileMenu'
 import type { Header } from 'src/payload-types'
 
-import { MarisolLogo } from '@/components/Logo/MarisolMark'
 import { usePathname } from 'next/navigation'
 import { cn } from '@/utilities/cn'
 
@@ -24,44 +23,48 @@ export function HeaderClient({ header }: Props) {
     url && url !== '/' ? pathname.startsWith(url.split('?')[0]) : false
 
   return (
-    <header className="sticky top-0 z-40 border-b border-border/70 bg-background/85 backdrop-blur-md supports-[backdrop-filter]:bg-background/70">
+    <header className="sticky top-0 z-40 border-b border-border/70 bg-background/90 backdrop-blur-md">
       <nav className="container grid grid-cols-[1fr_auto_1fr] items-center gap-4 py-4">
-        {/* left: mobile menu + wordmark */}
-        <div className="flex items-center gap-3">
+        {/* left: nav (desktop) / hamburger (mobile) */}
+        <div className="flex items-center gap-6">
           <div className="md:hidden">
             <Suspense fallback={null}>
               <MobileMenu menu={menu} />
             </Suspense>
           </div>
-          <Link href="/" aria-label="Marisol — home">
-            <MarisolLogo />
-          </Link>
+          {menu.length ? (
+            <ul className="hidden items-center gap-7 md:flex">
+              {menu.map((item) => {
+                const active = isActive(item.link.url)
+                return (
+                  <li key={item.id}>
+                    <CMSLink
+                      {...item.link}
+                      appearance="inline"
+                      className={cn(
+                        'text-sm transition-colors',
+                        active
+                          ? 'text-foreground'
+                          : 'text-muted-foreground hover:text-foreground',
+                      )}
+                    />
+                  </li>
+                )
+              })}
+            </ul>
+          ) : (
+            <span />
+          )}
         </div>
 
-        {/* center: primary nav */}
-        {menu.length ? (
-          <ul className="hidden items-center gap-8 md:flex">
-            {menu.map((item) => {
-              const active = isActive(item.link.url)
-              return (
-                <li key={item.id}>
-                  <CMSLink
-                    {...item.link}
-                    appearance="inline"
-                    className={cn(
-                      'text-sm transition-colors',
-                      active
-                        ? 'font-medium text-foreground'
-                        : 'text-muted-foreground hover:text-foreground',
-                    )}
-                  />
-                </li>
-              )
-            })}
-          </ul>
-        ) : (
-          <span />
-        )}
+        {/* center: wordmark */}
+        <Link
+          href="/"
+          aria-label="Marisol — home"
+          className="justify-self-center font-display text-2xl tracking-[0.06em] text-foreground"
+        >
+          Marisol
+        </Link>
 
         {/* right: cart */}
         <div className="flex items-center justify-end gap-4">
