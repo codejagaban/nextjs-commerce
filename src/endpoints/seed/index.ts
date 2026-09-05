@@ -83,24 +83,19 @@ const globals: GlobalSlug[] = ['header', 'footer']
 type MediaDef = { file: string; alt: string; by: string }
 
 const mediaDefs: MediaDef[] = [
-  { file: 'landscape-hero-01.jpg', alt: 'Sunlit Mediterranean hillside olive grove at golden hour', by: 'Luca Micheli' },
-  { file: 'landscape-hero-02.jpg', alt: 'Rows of olive trees stretching toward warm horizon light', by: 'Chris Weiher' },
-  { file: 'landscape-hero-03.jpg', alt: 'Terraced olive grove bathed in late afternoon sun', by: 'Danilo Rios' },
-  { file: 'olive-grove-01.jpg', alt: 'Gnarled olive trees in a quiet estate grove', by: 'Roberto Nickson' },
+  { file: 'landscape-hero-01.jpg', alt: 'Sunlit Mediterranean hillside at golden hour', by: 'Luca Micheli' },
+  { file: 'landscape-hero-02.jpg', alt: 'Rolling countryside stretching toward warm horizon light', by: 'Chris Weiher' },
+  { file: 'landscape-hero-03.jpg', alt: 'Olive trees on the estate bathed in late afternoon sun', by: 'Danilo Rios' },
   { file: 'olive-grove-02.jpg', alt: 'Silver-green olive foliage catching the light', by: 'Susana Bartolome' },
-  { file: 'olive-oil-bottle-01.jpg', alt: 'Bottle of extra virgin olive oil on a warm surface', by: 'Kelly Sikkema' },
-  { file: 'olive-oil-bottle-02.jpg', alt: 'Amber glass olive oil bottle, studio light', by: 'Zoshua Colah' },
-  { file: 'olive-oil-bottle-03.jpg', alt: 'Estate olive oil bottle beside fresh produce', by: 'Christin Hume' },
-  { file: 'olives-closeup-01.jpg', alt: 'Ripe green olives on the branch', by: 'Sixteen Miles Out' },
-  { file: 'olives-closeup-02.jpg', alt: 'Freshly harvested olives in close detail', by: 'Kelis' },
+  { file: 'olives-closeup-01.jpg', alt: 'Olive branch in soft light', by: 'Sixteen Miles Out' },
+  { file: 'olives-closeup-02.jpg', alt: 'Freshly harvested olives on the branch', by: 'Kelis' },
   { file: 'olives-closeup-03.jpg', alt: 'Olives ripening in warm sunlight', by: 'Mohamed Fsili' },
   { file: 'olive-oil-drizzle-01.jpg', alt: 'Golden olive oil poured over a dish', by: 'Ahmet Koç' },
-  { file: 'olive-oil-drizzle-02.jpg', alt: 'Olive oil drizzling onto rustic bread', by: 'Karolina Ferretis' },
-  { file: 'sea-salt-01.jpg', alt: 'Flaky hand-harvested sea salt', by: 'Jason Tuinstra' },
+  { file: 'sea-salt-01.jpg', alt: 'Flaky hand-harvested sea salt on a wooden spoon', by: 'Jason Tuinstra' },
   { file: 'honey-01.jpg', alt: 'Raw honey with a wooden dipper', by: 'Arwin Neil Baichoo' },
-  { file: 'pantry-bottles-01.jpg', alt: 'Dark pantry bottles in a warm still life', by: 'Annie Spratt' },
+  { file: 'pantry-bottles-01.jpg', alt: 'Rustic pantry shelf of bottles and jars', by: 'Annie Spratt' },
   { file: 'table-spread-01.jpg', alt: 'Mediterranean table spread in warm tones', by: 'Victoria Morgan' },
-  { file: 'table-spread-02.jpg', alt: 'Rustic shared meal of Mediterranean dishes', by: 'Anya Chernykh' },
+  { file: 'table-spread-02.jpg', alt: 'Olives and linen on a quiet table', by: 'Anya Chernykh' },
 ]
 
 const categoryDefs = [
@@ -123,7 +118,7 @@ const oilDefs = [
     title: 'Arbequina Extra Virgin Olive Oil',
     slug: 'arbequina-extra-virgin',
     category: 'olive-oil',
-    gallery: ['olive-oil-bottle-01.jpg', 'olive-oil-drizzle-01.jpg'],
+    gallery: ['olives-closeup-01.jpg', 'olive-oil-drizzle-01.jpg'],
     description:
       'Soft and buttery, with almond and ripe apple. Our most approachable oil — the one we reach for every day.',
     prices: { '250ml': 19, '500ml': 32, '1l': 54 },
@@ -132,7 +127,7 @@ const oilDefs = [
     title: 'Koroneiki Robust Olive Oil',
     slug: 'koroneiki-robust',
     category: 'olive-oil',
-    gallery: ['olive-oil-bottle-02.jpg', 'olives-closeup-01.jpg'],
+    gallery: ['olives-closeup-03.jpg', 'olives-closeup-02.jpg'],
     description:
       'Green, peppery and bold, with a herbaceous bite that lingers. Pressed within hours of the harvest.',
     prices: { '250ml': 21, '500ml': 36, '1l': 60 },
@@ -141,7 +136,7 @@ const oilDefs = [
     title: 'Picual Estate Reserve',
     slug: 'picual-estate-reserve',
     category: 'olive-oil',
-    gallery: ['olive-oil-bottle-03.jpg', 'olive-grove-01.jpg'],
+    gallery: ['landscape-hero-03.jpg', 'olive-grove-02.jpg'],
     description:
       'Our single-grove reserve: fig leaf, tomato vine and a warm, grassy finish. A limited pressing each year.',
     prices: { '250ml': 24, '500ml': 42, '1l': 68 },
@@ -150,7 +145,7 @@ const oilDefs = [
     title: 'Hojiblanca Delicate',
     slug: 'hojiblanca-delicate',
     category: 'olive-oil',
-    gallery: ['olive-oil-drizzle-02.jpg', 'olives-closeup-02.jpg'],
+    gallery: ['olive-grove-02.jpg', 'olives-closeup-02.jpg'],
     description:
       'Gentle and golden, with almond blossom and a clean, sweet close. Finishing oil for fish and fresh greens.',
     prices: { '250ml': 20, '500ml': 34, '1l': 56 },
@@ -388,7 +383,7 @@ export const seed = async ({
         {
           blockType: 'mediaBlock',
           blockName: 'Grove',
-          media: media['olive-grove-01.jpg'].id,
+          media: media['landscape-hero-03.jpg'].id,
         },
         {
           blockType: 'content',
