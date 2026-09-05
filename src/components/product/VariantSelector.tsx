@@ -1,6 +1,5 @@
 'use client'
 
-import { Button } from '@/components/ui/button'
 import type { Product } from '@/payload-types'
 
 import { createUrl } from '@/utilities/createUrl'
@@ -95,12 +94,15 @@ export function VariantSelector({ product }: { product: Product }) {
                 searchParams.get(optionKeyLowerCase) === String(optionID)
 
               return (
-                <Button
-                  variant={'ghost'}
+                <button
                   aria-disabled={!isAvailableForSale}
-                  className={clsx('px-2', {
-                    'bg-primary/5 text-primary': isActive,
-                  })}
+                  className={clsx(
+                    'min-w-[68px] rounded-full border px-4 py-2 text-sm transition-colors',
+                    isActive
+                      ? 'border-primary bg-primary text-primary-foreground'
+                      : 'border-border text-foreground hover:border-foreground/40',
+                    !isAvailableForSale && 'cursor-not-allowed text-muted-foreground line-through opacity-50',
+                  )}
                   disabled={!isAvailableForSale}
                   key={option.id}
                   onClick={() => {
@@ -109,9 +111,10 @@ export function VariantSelector({ product }: { product: Product }) {
                     })
                   }}
                   title={`${option.label} ${!isAvailableForSale ? ' (Out of Stock)' : ''}`}
+                  type="button"
                 >
                   {option.label}
-                </Button>
+                </button>
               )
             })}
           </React.Fragment>
