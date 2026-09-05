@@ -8,7 +8,7 @@ import React, { Suspense } from 'react'
 import { MobileMenu } from './MobileMenu'
 import type { Header } from 'src/payload-types'
 
-import { LogoIcon } from '@/components/icons/logo'
+import { MarisolLogo } from '@/components/Logo/MarisolMark'
 import { usePathname } from 'next/navigation'
 import { cn } from '@/utilities/cn'
 
@@ -20,47 +20,56 @@ export function HeaderClient({ header }: Props) {
   const menu = header.navItems || []
   const pathname = usePathname()
 
-  return (
-    <div className="relative z-20 border-b">
-      <nav className="flex items-center md:items-end justify-between container pt-2">
-        <div className="block flex-none md:hidden">
-          <Suspense fallback={null}>
-            <MobileMenu menu={menu} />
-          </Suspense>
-        </div>
-        <div className="flex w-full items-end justify-between">
-          <div className="flex w-full items-end gap-6 md:w-1/3">
-            <Link className="flex w-full items-center justify-center pt-4 pb-4 md:w-auto" href="/">
-              <LogoIcon className="w-6 h-auto" />
-            </Link>
-            {menu.length ? (
-              <ul className="hidden gap-4 text-sm md:flex md:items-center">
-                {menu.map((item) => (
-                  <li key={item.id}>
-                    <CMSLink
-                      {...item.link}
-                      size={'clear'}
-                      className={cn('relative navLink', {
-                        active:
-                          item.link.url && item.link.url !== '/'
-                            ? pathname.includes(item.link.url)
-                            : false,
-                      })}
-                      appearance="nav"
-                    />
-                  </li>
-                ))}
-              </ul>
-            ) : null}
-          </div>
+  const isActive = (url?: string | null) =>
+    url && url !== '/' ? pathname.startsWith(url.split('?')[0]) : false
 
-          <div className="flex justify-end md:w-1/3 gap-4">
-            <Suspense fallback={<OpenCartButton />}>
-              <Cart />
+  return (
+    <header className="sticky top-0 z-40 border-b border-border/70 bg-background/85 backdrop-blur-md supports-[backdrop-filter]:bg-background/70">
+      <nav className="container grid grid-cols-[1fr_auto_1fr] items-center gap-4 py-4">
+        {/* left: mobile menu + wordmark */}
+        <div className="flex items-center gap-3">
+          <div className="md:hidden">
+            <Suspense fallback={null}>
+              <MobileMenu menu={menu} />
             </Suspense>
           </div>
+          <Link href="/" aria-label="Marisol — home">
+            <MarisolLogo />
+          </Link>
+        </div>
+
+        {/* center: primary nav */}
+        {menu.length ? (
+          <ul className="hidden items-center gap-8 md:flex">
+            {menu.map((item) => {
+              const active = isActive(item.link.url)
+              return (
+                <li key={item.id}>
+                  <CMSLink
+                    {...item.link}
+                    appearance="inline"
+                    className={cn(
+                      'text-sm transition-colors',
+                      active
+                        ? 'font-medium text-foreground'
+                        : 'text-muted-foreground hover:text-foreground',
+                    )}
+                  />
+                </li>
+              )
+            })}
+          </ul>
+        ) : (
+          <span />
+        )}
+
+        {/* right: cart */}
+        <div className="flex items-center justify-end gap-4">
+          <Suspense fallback={<OpenCartButton />}>
+            <Cart />
+          </Suspense>
         </div>
       </nav>
-    </div>
+    </header>
   )
 }
