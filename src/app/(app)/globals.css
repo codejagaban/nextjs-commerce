@@ -115,41 +115,50 @@
 }
 
 :root {
-  /* Marisol — warm editorial. Bone base, warm-charcoal ink, olive + amber. */
-  --background: oklch(96.8% 0.014 84deg);
-  --foreground: oklch(27% 0.022 52deg);
-  --card: oklch(94.5% 0.017 80deg);
-  --card-foreground: oklch(27% 0.022 52deg);
-  --popover: oklch(98% 0.01 85deg);
-  --popover-foreground: oklch(27% 0.022 52deg);
-  --primary: oklch(41% 0.062 138deg);
-  --primary-foreground: oklch(97% 0.014 84deg);
-  --secondary: oklch(91% 0.02 78deg);
-  --secondary-foreground: oklch(32% 0.03 55deg);
-  --muted: oklch(92.5% 0.016 80deg);
-  --muted-foreground: oklch(47% 0.022 58deg);
-  /* Subtle warm surface (shadcn 'accent' = hover/panel tint, NOT the brand amber). */
-  --accent: oklch(93% 0.02 80deg);
-  --accent-foreground: oklch(27% 0.03 52deg);
-  --destructive: oklch(54% 0.17 28deg);
-  --destructive-foreground: oklch(97% 0.014 84deg);
-  --border: oklch(87.5% 0.016 78deg);
-  --input: oklch(89% 0.016 78deg);
-  --ring: oklch(41% 0.062 138deg);
+  /* Marisol skincare — warm terracotta + cream + soft pastels, near-black ink. */
+  --background: oklch(98.6% 0.006 70deg);
+  --foreground: oklch(24% 0.008 50deg);
+  --card: oklch(99.2% 0.003 70deg);
+  --card-foreground: oklch(24% 0.008 50deg);
+  --popover: oklch(99.5% 0.002 70deg);
+  --popover-foreground: oklch(24% 0.008 50deg);
+  /* Buttons are near-black pills. */
+  --primary: oklch(26% 0.012 45deg);
+  --primary-foreground: oklch(98.5% 0.006 70deg);
+  --secondary: oklch(95% 0.012 62deg);
+  --secondary-foreground: oklch(30% 0.01 50deg);
+  --muted: oklch(95.5% 0.01 65deg);
+  --muted-foreground: oklch(50% 0.012 50deg);
+  /* Subtle warm surface (shadcn 'accent' = hover/panel tint). */
+  --accent: oklch(94% 0.014 55deg);
+  --accent-foreground: oklch(26% 0.012 45deg);
+  /* Sale / error red. */
+  --destructive: oklch(57% 0.2 25deg);
+  --destructive-foreground: oklch(98.5% 0.006 70deg);
+  --border: oklch(91% 0.008 65deg);
+  --input: oklch(91% 0.008 65deg);
+  --ring: oklch(56% 0.12 40deg);
 
-  /* Brand tokens (exposed as bg-olive / text-amber / … via @theme inline). */
-  --olive: oklch(41% 0.062 138deg);
-  --amber: oklch(73% 0.12 74deg);
-  --terracotta: oklch(55% 0.115 39deg);
-  --bone: oklch(96.8% 0.014 84deg);
-  --ink: oklch(27% 0.022 52deg);
+  /* Brand tokens. */
+  --terracotta: oklch(56% 0.12 40deg);
+  --terracotta-deep: oklch(46% 0.11 37deg);
+  --blush: oklch(89% 0.045 25deg);
+  --mauve: oklch(84% 0.045 355deg);
+  --lilac: oklch(83% 0.055 305deg);
+  --sand: oklch(90% 0.035 70deg);
+  --cream: oklch(95.5% 0.014 66deg);
+  --ink: oklch(24% 0.008 50deg);
+  /* Back-compat aliases (older components referenced these). */
+  --olive: oklch(46% 0.11 37deg);
+  --amber: oklch(62% 0.11 45deg);
+  --bone: oklch(98.6% 0.006 70deg);
 
   --chart-1: oklch(64.6% 0.222 41.116deg);
   --chart-2: oklch(60% 0.118 184.704deg);
   --chart-3: oklch(39.8% 0.07 227.392deg);
   --chart-4: oklch(82.8% 0.189 84.429deg);
   --chart-5: oklch(76.9% 0.188 70.08deg);
-  --radius: 0.5rem;
+  --radius: 0.75rem;
   --sidebar: oklch(98.5% 0 0deg);
   --sidebar-foreground: oklch(14.5% 0 0deg);
   --sidebar-primary: oklch(20.5% 0 0deg);
@@ -164,32 +173,39 @@
 }
 
 [data-theme='dark'] {
-  /* Warm charcoal — deliberately NOT the cool blue-charcoal dark default. */
-  --background: oklch(19% 0.014 55deg);
-  --foreground: oklch(93% 0.012 84deg);
-  --card: oklch(22.5% 0.016 54deg);
-  --card-foreground: oklch(93% 0.012 84deg);
-  --popover: oklch(19% 0.014 55deg);
-  --popover-foreground: oklch(93% 0.012 84deg);
-  --primary: oklch(72% 0.08 140deg);
-  --primary-foreground: oklch(20% 0.02 55deg);
-  --secondary: oklch(28% 0.02 55deg);
-  --secondary-foreground: oklch(93% 0.012 84deg);
-  --muted: oklch(27% 0.016 55deg);
-  --muted-foreground: oklch(72% 0.018 70deg);
-  --accent: oklch(28% 0.02 55deg);
-  --accent-foreground: oklch(93% 0.012 84deg);
-  --destructive: oklch(50% 0.16 28deg);
-  --destructive-foreground: oklch(95% 0.01 84deg);
-  --border: oklch(30% 0.016 55deg);
-  --input: oklch(30% 0.016 55deg);
-  --ring: oklch(72% 0.08 140deg);
+  /* Warm charcoal dark, tinted toward the terracotta brand. */
+  --background: oklch(20% 0.012 40deg);
+  --foreground: oklch(94% 0.008 65deg);
+  --card: oklch(23.5% 0.014 40deg);
+  --card-foreground: oklch(94% 0.008 65deg);
+  --popover: oklch(20% 0.012 40deg);
+  --popover-foreground: oklch(94% 0.008 65deg);
+  /* On dark, buttons invert to a warm near-white pill. */
+  --primary: oklch(95% 0.008 65deg);
+  --primary-foreground: oklch(24% 0.012 45deg);
+  --secondary: oklch(28% 0.016 42deg);
+  --secondary-foreground: oklch(94% 0.008 65deg);
+  --muted: oklch(27% 0.014 42deg);
+  --muted-foreground: oklch(72% 0.014 60deg);
+  --accent: oklch(28% 0.016 42deg);
+  --accent-foreground: oklch(94% 0.008 65deg);
+  --destructive: oklch(60% 0.18 25deg);
+  --destructive-foreground: oklch(96% 0.008 65deg);
+  --border: oklch(31% 0.014 42deg);
+  --input: oklch(31% 0.014 42deg);
+  --ring: oklch(64% 0.12 40deg);
 
-  --olive: oklch(72% 0.08 140deg);
-  --amber: oklch(76% 0.12 76deg);
-  --terracotta: oklch(62% 0.12 40deg);
-  --bone: oklch(93% 0.012 84deg);
-  --ink: oklch(19% 0.014 55deg);
+  --terracotta: oklch(64% 0.12 40deg);
+  --terracotta-deep: oklch(54% 0.11 38deg);
+  --blush: oklch(46% 0.05 25deg);
+  --mauve: oklch(44% 0.05 355deg);
+  --lilac: oklch(44% 0.06 305deg);
+  --sand: oklch(44% 0.03 70deg);
+  --cream: oklch(28% 0.014 55deg);
+  --ink: oklch(20% 0.012 40deg);
+  --olive: oklch(54% 0.11 38deg);
+  --amber: oklch(66% 0.11 45deg);
+  --bone: oklch(94% 0.008 65deg);
 
   --chart-1: oklch(48.8% 0.243 264.376deg);
   --chart-2: oklch(69.6% 0.17 162.48deg);
@@ -233,6 +249,12 @@
   --color-olive: var(--olive);
   --color-amber: var(--amber);
   --color-terracotta: var(--terracotta);
+  --color-terracotta-deep: var(--terracotta-deep);
+  --color-blush: var(--blush);
+  --color-mauve: var(--mauve);
+  --color-lilac: var(--lilac);
+  --color-sand: var(--sand);
+  --color-cream: var(--cream);
   --color-bone: var(--bone);
   --color-ink: var(--ink);
 
