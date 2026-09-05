@@ -139,8 +139,8 @@ export default async function HomePage() {
       <section className="container grid items-center gap-10 pb-24 md:grid-cols-2 md:gap-16">
         <div className="relative order-2 aspect-[5/6] overflow-hidden rounded-2xl border border-border/60 md:order-1">
           <Image
-            src="/brand/olive-grove-01.jpg"
-            alt="Gnarled olive trees in the Marisol estate grove"
+            src="/brand/landscape-hero-03.jpg"
+            alt="Olive trees on the Marisol estate at golden hour"
             fill
             sizes="(min-width: 768px) 45vw, 90vw"
             className="object-cover"
