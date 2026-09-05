@@ -48,8 +48,11 @@ export const Image: React.FC<MediaProps> = (props) => {
     alt = altFromResource
 
     const filename = fullFilename
+    void filename
 
-    src = `${process.env.NEXT_PUBLIC_SERVER_URL}${url}`
+    // Media is served same-origin; use the relative URL so next/image treats it
+    // as a local asset (localPatterns) rather than a remote host + port.
+    src = url && /^https?:\/\//.test(url) ? url : url || ''
   }
 
   // NOTE: this is used by the browser to determine which image to download at different screen sizes
