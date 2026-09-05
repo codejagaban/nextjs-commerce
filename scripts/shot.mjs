@@ -15,11 +15,39 @@ const page = await browser.newPage({
   deviceScaleFactor: 2,
 })
 await page.goto(url, { waitUntil: 'load', timeout: 120000 })
-// settle fonts/images/lazy content
-await page.evaluate(() => window.scrollTo(0, document.body.scrollHeight))
-await page.waitForTimeout(1500)
-await page.evaluate(() => window.scrollTo(0, 0))
-await page.waitForTimeout(600)
+// step-scroll so every lazy-loaded image is triggered and finishes
+await page.evaluate(async () => {
+  const vh = window.innerHeight
+  const total = document.body.scrollHeight
+  for (let y = 0; y < total; y += Math.floor(vh * 0.8)) {
+    window.scrollTo(0, y)
+    await new Promise((r) => setTimeout(r, 350))
+  }
+  window.scrollTo(0, 0)
+})
+// wait for all <img> to report complete
+await page
+  .evaluate(
+    () =>
+      new Promise((resolve) => {
+        const imgs = Array.from(document.images)
+        let pending = imgs.filter((i) => !i.complete).length
+        if (!pending) return resolve(true)
+        imgs
+          .filter((i) => !i.complete)
+          .forEach((i) => {
+            const done = () => {
+              pending -= 1
+              if (pending <= 0) resolve(true)
+            }
+            i.addEventListener('load', done)
+            i.addEventListener('error', done)
+          })
+        setTimeout(() => resolve(true), 6000)
+      }),
+  )
+  .catch(() => {})
+await page.waitForTimeout(800)
 await page.screenshot({ path: out, fullPage: (Number(height) || 0) === 0 })
 await browser.close()
 console.log('shot ->', out)
