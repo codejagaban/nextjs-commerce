@@ -67,7 +67,7 @@ export default async function HomePage() {
             .
           </h1>
           <p className="mt-7 max-w-xl text-lg leading-relaxed text-muted-foreground text-pretty">
-            Cold-pressed from a single terraced grove above the sea — hand-harvested, bottled by the
+            Cold-pressed from a single terraced grove above the sea. Hand-harvested, bottled by the
             season, and shipped while it&rsquo;s still bright.
           </p>
           <div className="mt-9 flex items-center gap-6">
@@ -152,7 +152,7 @@ export default async function HomePage() {
           </h2>
           <p className="mt-6 max-w-md text-base leading-relaxed text-muted-foreground text-pretty">
             We farm what we sell. The fruit goes from the tree to the press within hours, because
-            that is the only way to keep the grove in the bottle — green, peppery and alive.
+            that is the only way to keep the grove in the bottle: green, peppery and alive.
           </p>
           <Link
             href="/about"
