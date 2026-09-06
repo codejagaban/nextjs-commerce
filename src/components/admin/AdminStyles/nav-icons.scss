@@ -20,8 +20,10 @@
     flex: 0 0 auto;
     width: 1.05rem;
     height: 1.05rem;
-    background-color: currentColor;
     opacity: 0.72;
+    background-repeat: no-repeat;
+    background-position: center;
+    background-size: contain;
     -webkit-mask-repeat: no-repeat;
     mask-repeat: no-repeat;
     -webkit-mask-position: center;
@@ -30,20 +32,41 @@
     mask-size: contain;
   }
 
+  /* Only tint the box once we know a mask will cut the shape out of it.
+     Filling it unconditionally is what turns an unmasked icon into a solid
+     block, so this stays behind the guard. */
+  @supports ((-webkit-mask-image: url('')) or (mask-image: url(''))) {
+    &::before {
+      background-color: currentColor;
+    }
+  }
+
   &:hover::before,
   &--active::before {
     opacity: 1;
   }
 }
 
+/**
+ * Each icon ships twice: a painted image that any browser can render, and a mask
+ * that browsers supporting it use instead so the icon takes `currentColor` and
+ * follows the theme. The painted one is a neutral ink that reads on both grounds.
+ */
 @mixin icon($svg) {
   &::before {
-    -webkit-mask-image: url("data:image/svg+xml,#{$svg}");
-    mask-image: url("data:image/svg+xml,#{$svg}");
+    background-image: url("data:image/svg+xml,#{$svg}");
+  }
+
+  @supports ((-webkit-mask-image: url('')) or (mask-image: url(''))) {
+    &::before {
+      background-image: none;
+      -webkit-mask-image: url("data:image/svg+xml,#{$svg}");
+      mask-image: url("data:image/svg+xml,#{$svg}");
+    }
   }
 }
 
-$open: "%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%23000' stroke-width='1.6' stroke-linecap='round' stroke-linejoin='round'%3E";
+$open: "%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%23808080' stroke-width='1.6' stroke-linecap='round' stroke-linejoin='round'%3E";
 $close: "%3C/svg%3E";
 
 /* --- Globals ------------------------------------------------------------ */
