@@ -1,5 +1,5 @@
 'use client'
-import React, { useCallback } from 'react'
+import React, { useCallback, useState } from 'react'
 import { useForm } from 'react-hook-form'
 import { Input } from '@/components/ui/input'
 import { Label } from '@/components/ui/label'
@@ -60,18 +60,31 @@ export const AddressForm: React.FC<Props> = ({
   })
 
   const { createAddress, updateAddress } = useAddresses()
+  const [submitError, setSubmitError] = useState<string | undefined>()
+  const [isSubmitting, setIsSubmitting] = useState(false)
 
   const onSubmit = useCallback(
     async (data: AddressFormValues) => {
       const newData = deepMergeSimple(initialData || {}, data)
 
+      setSubmitError(undefined)
+      setIsSubmitting(true)
+
       if (!skipSubmission) {
-        if (addressID) {
-          await updateAddress(addressID, newData)
-        } else {
-          await createAddress(newData)
+        try {
+          if (addressID) {
+            await updateAddress(addressID, newData)
+          } else {
+            await createAddress(newData)
+          }
+        } catch {
+          setIsSubmitting(false)
+          setSubmitError('We could not save this address. Please try again.')
+          return
         }
       }
+
+      setIsSubmitting(false)
 
       if (callback) {
         callback(newData)
@@ -220,7 +233,11 @@ export const AddressForm: React.FC<Props> = ({
         </FormItem>
       </div>
 
-      <Button type="submit">Submit</Button>
+      {submitError && <FormError className="mb-3" message={submitError} />}
+
+      <Button type="submit" disabled={isSubmitting}>
+        {isSubmitting ? 'Saving…' : 'Submit'}
+      </Button>
     </form>
   )
 }
