@@ -1,6 +1,7 @@
 import type { Metadata } from 'next'
 
 import { RenderParams } from '@/components/RenderParams'
+import { AuthShell } from '@/components/auth/AuthShell'
 import { mergeOpenGraph } from '@/utilities/mergeOpenGraph'
 import React from 'react'
 import { headers as getHeaders } from 'next/headers'
@@ -20,11 +21,13 @@ export default async function CreateAccount() {
   }
 
   return (
-    <div className="container py-16">
-      <h1 className="text-xl mb-4">Create Account</h1>
+    <AuthShell
+      title="Create your account"
+      subtitle="Save your details for faster checkout and to keep track of every order."
+    >
       <RenderParams />
       <CreateAccountForm />
-    </div>
+    </AuthShell>
   )
 }
 

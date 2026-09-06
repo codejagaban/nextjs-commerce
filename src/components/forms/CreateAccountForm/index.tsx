@@ -72,23 +72,15 @@ export const CreateAccountForm: React.FC = () => {
   )
 
   return (
-    <form className="max-w-lg py-4" onSubmit={handleSubmit(onSubmit)}>
-      <div className="prose dark:prose-invert mb-6">
-        <p>
-          {`This is where new customers can signup and create a new account. To manage all users, `}
-          <Link href="/admin/collections/users">login to the admin dashboard</Link>.
-        </p>
-      </div>
-
+    <form onSubmit={handleSubmit(onSubmit)}>
       <Message error={error} />
 
-      <div className="flex flex-col gap-8 mb-8">
+      <div className="flex flex-col gap-5">
         <FormItem>
-          <Label htmlFor="email" className="mb-2">
-            Email Address
-          </Label>
+          <Label htmlFor="email">Email</Label>
           <Input
             id="email"
+            placeholder="you@email.com"
             {...register('email', { required: 'Email is required.' })}
             type="email"
           />
@@ -96,9 +88,7 @@ export const CreateAccountForm: React.FC = () => {
         </FormItem>
 
         <FormItem>
-          <Label htmlFor="password" className="mb-2">
-            New password
-          </Label>
+          <Label htmlFor="password">Password</Label>
           <Input
             id="password"
             {...register('password', { required: 'Password is required.' })}
@@ -108,9 +98,7 @@ export const CreateAccountForm: React.FC = () => {
         </FormItem>
 
         <FormItem>
-          <Label htmlFor="passwordConfirm" className="mb-2">
-            Confirm Password
-          </Label>
+          <Label htmlFor="passwordConfirm">Confirm password</Label>
           <Input
             id="passwordConfirm"
             {...register('passwordConfirm', {
@@ -121,17 +109,26 @@ export const CreateAccountForm: React.FC = () => {
           />
           {errors.passwordConfirm && <FormError message={errors.passwordConfirm.message} />}
         </FormItem>
-      </div>
-      <Button disabled={loading} type="submit" variant="default">
-        {loading ? 'Processing' : 'Create Account'}
-      </Button>
 
-      <div className="prose dark:prose-invert mt-8">
-        <p>
-          {'Already have an account? '}
-          <Link href={`/login${allParams}`}>Login</Link>
-        </p>
+        <Button
+          className="h-12 w-full rounded-full"
+          disabled={loading}
+          type="submit"
+          variant="default"
+        >
+          {loading ? 'Creating account…' : 'Create account'}
+        </Button>
       </div>
+
+      <p className="mt-6 text-center text-sm text-muted-foreground">
+        Already have an account?{' '}
+        <Link
+          href={`/login${allParams}`}
+          className="font-medium text-foreground underline underline-offset-4"
+        >
+          Log in
+        </Link>
+      </p>
     </form>
   )
 }
