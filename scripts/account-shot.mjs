@@ -2,6 +2,8 @@
 // Usage: node scripts/account-shot.mjs <path> <out> [height]
 import { chromium } from '@playwright/test'
 
+const BASE = process.env.BASE_URL || 'http://localhost:3002'
+
 const [, , path = '/account', out = 'account.png', height = '0'] = process.argv
 const browser = await chromium.launch({ channel: 'chrome' })
 const page = await browser.newPage({
@@ -11,14 +13,14 @@ const page = await browser.newPage({
 })
 const log = (m) => console.log('[account-shot]', m)
 
-await page.goto('http://localhost:3000/login', { waitUntil: 'load' })
+await page.goto(BASE + '/login', { waitUntil: 'load' })
 await page.waitForTimeout(1200)
 await page.locator('#email').fill('customer@example.com')
 await page.locator('#password').fill('password')
 await page.getByRole('button', { name: 'Log in' }).click()
 await page.waitForTimeout(3500)
 log('logged in, going to ' + path)
-await page.goto('http://localhost:3000' + path, { waitUntil: 'load' })
+await page.goto(BASE + path, { waitUntil: 'load' })
 await page.waitForTimeout(2500)
 await page.screenshot({ path: out, fullPage: (Number(height) || 0) === 0 })
 log('screenshot -> ' + out)
