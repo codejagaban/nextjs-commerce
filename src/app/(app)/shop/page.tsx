@@ -1,5 +1,6 @@
 import { Grid } from '@/components/Grid'
 import { ProductGridItem } from '@/components/ProductGridItem'
+import { ShopEmptyState } from '@/components/shop/EmptyState'
 import configPromise from '@payload-config'
 import { getPayload } from 'payload'
 import React from 'react'
@@ -95,30 +96,67 @@ export default async function ShopPage({ searchParams }: Props) {
   })
 
   const resultsText = products.docs.length > 1 ? 'results' : 'result'
+  const isEmpty = products.docs.length === 0
+  const activeFilters = [...categorySlugs, ...tagSlugs]
+
+  // Recovery links: each drops one concern and keeps the other, so a shopper can
+  // widen the search without losing the filters they set, or the reverse.
+  const buildHref = (params: Record<string, string | undefined>) => {
+    const sp = new URLSearchParams()
+    Object.entries(params).forEach(([k, v]) => {
+      if (v) sp.set(k, v)
+    })
+    const qs = sp.toString()
+    return qs ? `/shop?${qs}` : '/shop'
+  }
+  const sortValue = typeof sort === 'string' ? sort : undefined
+  const clearSearchHref = buildHref({
+    category: categorySlugs.join(',') || undefined,
+    tag: tagSlugs.join(',') || undefined,
+    sort: sortValue,
+  })
+  const clearFiltersHref = buildHref({
+    q: typeof searchValue === 'string' ? searchValue : undefined,
+    sort: sortValue,
+  })
+
+  // Only fetched when there is nothing to show, so a normal page pays no cost.
+  const suggestions = isEmpty
+    ? (
+        await payload.find({
+          collection: 'categories',
+          depth: 0,
+          limit: 5,
+          sort: 'title',
+        })
+      ).docs
+    : []
 
   return (
     <div>
-      {searchValue ? (
+      {searchValue && !isEmpty ? (
         <p className="mb-4">
-          {products.docs?.length === 0
-            ? 'There are no products that match '
-            : `Showing ${products.docs.length} ${resultsText} for `}
+          {`Showing ${products.docs.length} ${resultsText} for `}
           <span className="font-bold">&quot;{searchValue}&quot;</span>
         </p>
       ) : null}
 
-      {!searchValue && products.docs?.length === 0 && (
-        <p className="mb-4">No products found. Please try different filters.</p>
-      )}
-
-      {products?.docs.length > 0 ? (
+      {isEmpty ? (
+        <ShopEmptyState
+          activeFilters={activeFilters}
+          clearFiltersHref={clearFiltersHref}
+          clearSearchHref={clearSearchHref}
+          searchValue={typeof searchValue === 'string' ? searchValue : undefined}
+          suggestions={suggestions}
+        />
+      ) : (
         <Grid className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
           {products.docs.map((product, i) => {
             // The first row is above the fold, so it carries the LCP image.
             return <ProductGridItem key={product.id} product={product} priority={i < 3} />
           })}
         </Grid>
-      ) : null}
+      )}
     </div>
   )
 }
