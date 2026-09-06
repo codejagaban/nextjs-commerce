@@ -9,7 +9,9 @@ import React from 'react'
 
 import { ProductGridItem } from '@/components/ProductGridItem'
 import { NewsletterForm } from '@/components/NewsletterForm'
-import { Drop, Leaf, ShieldCheck } from '@phosphor-icons/react/dist/ssr'
+import { MarkDroplet, MarkLeaf, MarkTested } from '@/components/Marks'
+import { Horizon } from '@/components/Horizon'
+import { SunMark } from '@/components/Logo/MarisolMark'
 
 export const metadata: Metadata = {
   title: 'Marisol — Clean skincare for your natural radiance',
@@ -51,32 +53,35 @@ const features = [
   {
     title: 'Pure ingredients',
     body: 'Only clean, safe and carefully selected components to protect your skin and health.',
-    Icon: Drop,
+    Icon: MarkDroplet,
   },
   {
     title: 'Dermatologist approved',
     body: 'Every product is tested and recommended by experts for visible, lasting results.',
-    Icon: ShieldCheck,
+    Icon: MarkTested,
   },
   {
     title: 'Sustainable beauty',
     body: 'Eco-friendly packaging and cruelty-free formulas for conscious self-care.',
-    Icon: Leaf,
+    Icon: MarkLeaf,
   },
 ]
 
 const posts = [
   {
+    href: '/shop?tag=hydration',
     title: '5 signs that your skin lacks moisture',
     body: 'How to spot dehydration early, and the routine that brings your barrier back to balance.',
     image: '/brand/lifestyle-01.jpg',
   },
   {
+    href: '/shop?category=organic',
     title: 'Beauty from within: nutrition and skin health',
     body: 'The vitamins and habits that show up on your skin, and how to build them into your day.',
     image: '/brand/lifestyle-02.jpg',
   },
   {
+    href: '/shop?category=serums',
     title: 'How to layer actives without irritation',
     body: 'Vitamin C, retinol and acids can coexist. Here is the order that keeps skin calm.',
     image: '/brand/lifestyle-03.jpg',
@@ -96,48 +101,87 @@ export default async function HomePage() {
       {/* ---------------------------------------------------------------- */}
       {/* Hero                                                             */}
       {/* ---------------------------------------------------------------- */}
-      <section className="relative overflow-hidden bg-terracotta text-primary-foreground">
-        <div className="container grid items-center gap-8 py-14 md:grid-cols-2 md:gap-6 md:py-0">
-          <div className="order-2 max-w-lg md:order-1 md:py-24">
-            <h1 className="font-display text-4xl leading-[1.05] md:text-6xl">
-              Reveal your skin&rsquo;s natural radiance
-            </h1>
-            <p className="mt-5 max-w-md text-base leading-relaxed text-primary-foreground/85">
+      <section className="relative isolate flex min-h-svh flex-col justify-end overflow-hidden bg-terracotta-deep">
+        {/* The field: one low, warm light raking across from the upper right,
+            with real falloff. Not a symmetric bloom behind the subject. */}
+        <div
+          aria-hidden="true"
+          className="absolute inset-0"
+          style={{
+            background:
+              'radial-gradient(140% 105% at 80% -10%, oklch(68% 0.085 64deg) 0%, oklch(52% 0.082 44deg) 40%, oklch(37% 0.055 36deg) 76%, oklch(29% 0.035 34deg) 100%)',
+          }}
+        />
+
+        {/* The portrait sits in the field and bleeds off the right. Its left edge
+            dissolves into the light, so there is no seam down the middle. */}
+        <div className="absolute inset-y-0 right-0 w-[78%] md:w-[62%] lg:w-[56%]">
+          <Image
+            src="/brand/model-portrait-01.jpg"
+            alt="Model with glowing, healthy skin in low evening light"
+            fill
+            priority
+            sizes="(min-width: 1024px) 56vw, (min-width: 768px) 62vw, 78vw"
+            className="feather-left object-cover object-[38%_center]"
+          />
+        </div>
+        {/* A whisper of the field's warmth over the portrait, feathered on the
+            same curve as the image so the two never meet at an edge. */}
+        <div
+          aria-hidden="true"
+          className="feather-left absolute inset-y-0 right-0 w-[78%] opacity-40 mix-blend-soft-light md:w-[62%] lg:w-[56%]"
+          style={{ background: 'oklch(70% 0.1 56deg)' }}
+        />
+
+        {/* Grounds the type without becoming a band: fades out well before the edges. */}
+        <div
+          aria-hidden="true"
+          className="absolute inset-x-0 bottom-0 h-[78%]"
+          style={{
+            background:
+              'linear-gradient(to top, oklch(24% 0.04 38deg / 0.86) 0%, oklch(24% 0.04 38deg / 0.6) 30%, oklch(24% 0.04 38deg / 0.26) 58%, transparent 100%)',
+          }}
+        />
+
+        <div className="container relative z-10 pb-32 pt-32 md:pb-40">
+          <div className="mb-7 flex items-center gap-4">
+            <SunMark className="h-9 w-9 shrink-0" />
+            <span className="h-px w-24 bg-bone/40 md:w-40" />
+          </div>
+
+          {/* Overlaps the portrait's edge — the composition reads in layers. */}
+          <h1 className="max-w-[14ch] font-display text-[clamp(2.75rem,7.4vw,5.75rem)] leading-[0.96] text-bone">
+            Reveal your skin&rsquo;s natural radiance
+          </h1>
+
+          <div className="mt-9 flex max-w-md flex-col items-start gap-7">
+            <p className="text-base leading-relaxed text-bone/85">
               Naturally-derived serums, moisturisers and cleansers, made to give skin its own quiet
               glow.
             </p>
             <Link
               href="/shop"
-              className="mt-8 inline-flex h-12 items-center rounded-full bg-background px-8 text-sm font-medium text-foreground transition-transform hover:px-9"
+              className="inline-flex h-12 items-center rounded-full bg-bone px-8 text-sm font-medium text-[oklch(24%_0.008_50deg)] transition-colors hover:bg-amber"
             >
               Shop now
             </Link>
           </div>
-          <div className="relative order-1 h-[42vh] min-h-[300px] w-full md:order-2 md:h-[86vh]">
-            <Image
-              src="/brand/model-portrait-01.jpg"
-              alt="Model with glowing, healthy skin"
-              fill
-              priority
-              sizes="(min-width: 768px) 50vw, 100vw"
-              className="object-cover md:rounded-none"
-            />
-          </div>
         </div>
+
+        <Horizon className="relative z-10 -mb-px text-background" height={64} />
       </section>
 
+      {/* The page carries one continuous golden-hour surface from here down. */}
+      <div className="atmosphere-page grain relative">
       {/* ---------------------------------------------------------------- */}
       {/* New arrivals                                                     */}
       {/* ---------------------------------------------------------------- */}
       <section className="container py-20 md:py-24">
-        <div className="mb-12 flex items-center justify-between">
-          <span className="hidden w-24 md:block" />
-          <h2 className="text-center font-display text-3xl text-foreground md:text-4xl">
-            New arrivals
-          </h2>
+        <div className="mb-12 flex items-end justify-between gap-6">
+          <h2 className="font-display text-3xl text-foreground md:text-4xl">New arrivals</h2>
           <Link
             href="/shop"
-            className="text-sm text-muted-foreground transition-colors hover:text-foreground"
+            className="pb-1 text-sm text-muted-foreground transition-colors hover:text-terracotta"
           >
             View all
           </Link>
@@ -152,7 +196,7 @@ export default async function HomePage() {
       {/* ---------------------------------------------------------------- */}
       {/* Categories split                                                 */}
       {/* ---------------------------------------------------------------- */}
-      <section className="bg-secondary/50">
+      <section className="relative bg-secondary/40">
         <div className="container grid items-center gap-10 py-16 md:grid-cols-2 md:gap-16 md:py-20">
           <div className="relative aspect-[4/5] overflow-hidden rounded-2xl">
             <Image
@@ -196,17 +240,15 @@ export default async function HomePage() {
       {/* About / values                                                   */}
       {/* ---------------------------------------------------------------- */}
       <section className="container py-20 text-center md:py-28">
-        <p className="text-xs uppercase tracking-[0.18em] text-muted-foreground">About us</p>
-        <h2 className="mx-auto mt-5 max-w-3xl font-display text-3xl leading-tight text-foreground md:text-4xl">
+        <h2 className="mx-auto max-w-3xl font-display text-3xl leading-tight text-foreground md:text-4xl">
           We help you reveal your skin&rsquo;s natural radiance, selecting only the best from around
           the world.
         </h2>
         <div className="mx-auto mt-14 grid max-w-4xl gap-10 md:grid-cols-3">
           {features.map((f) => (
             <div key={f.title} className="flex flex-col items-center">
-              <span className="flex h-14 w-14 items-center justify-center rounded-full bg-secondary text-terracotta">
-                <f.Icon className="h-6 w-6" weight="light" />
-              </span>
+              {/* Bare mark, no tile behind it. */}
+              <f.Icon className="h-10 w-10 text-terracotta" />
               <h3 className="mt-5 font-display text-lg text-foreground">{f.title}</h3>
               <p className="mt-2 max-w-xs text-sm leading-relaxed text-muted-foreground">{f.body}</p>
             </div>
@@ -218,15 +260,22 @@ export default async function HomePage() {
       {/* Bestsellers image band                                           */}
       {/* ---------------------------------------------------------------- */}
       <section className="relative">
-        <div className="relative h-[62vh] min-h-[420px] w-full overflow-hidden">
+        <div className="relative h-[86vh] min-h-[560px] w-full">
           <Image
             src="/brand/still-life-01.jpg"
             alt="Marisol bestselling products"
             fill
             sizes="100vw"
-            className="object-cover"
+            className="feather-y object-cover"
           />
-          <div className="absolute inset-0 bg-gradient-to-r from-foreground/45 to-transparent" />
+          <div
+            aria-hidden="true"
+            className="feather-y absolute inset-0"
+            style={{
+              background:
+                'linear-gradient(to right, oklch(24% 0.04 38deg / 0.82) 0%, oklch(24% 0.04 38deg / 0.66) 26%, oklch(24% 0.04 38deg / 0.34) 46%, oklch(24% 0.04 38deg / 0.1) 62%, transparent 76%)',
+            }}
+          />
           <div className="container relative flex h-full items-center">
             <div className="max-w-md text-background">
               <h2 className="font-display text-4xl md:text-5xl">Bestsellers</h2>
@@ -235,7 +284,7 @@ export default async function HomePage() {
               </p>
               <Link
                 href="/shop"
-                className="mt-7 inline-flex h-12 items-center rounded-full bg-background px-8 text-sm font-medium text-foreground transition-transform hover:px-9"
+                className="mt-7 inline-flex h-12 items-center rounded-full bg-bone px-8 text-sm font-medium text-[oklch(24%_0.008_50deg)] transition-colors hover:bg-amber"
               >
                 Shop now
               </Link>
@@ -248,9 +297,10 @@ export default async function HomePage() {
       {/* Best sellers product row                                         */}
       {/* ---------------------------------------------------------------- */}
       <section className="container py-20 md:py-24">
-        <h2 className="mb-12 text-center font-display text-3xl text-foreground md:text-4xl">
-          Loved by everyone
-        </h2>
+        <div className="mb-12 flex items-end justify-between gap-6">
+          <h2 className="font-display text-3xl text-foreground md:text-4xl">Loved by everyone</h2>
+          <p className="pb-1 text-sm text-muted-foreground">The four we resupply most</p>
+        </div>
         <div className="grid grid-cols-2 gap-x-6 gap-y-10 lg:grid-cols-4">
           {bestsellers.map((p, i) => (
             <ProductGridItem key={p.id} product={p} tile={TILES[(i + 2) % TILES.length]} />
@@ -261,22 +311,14 @@ export default async function HomePage() {
       {/* ---------------------------------------------------------------- */}
       {/* Testimonial                                                      */}
       {/* ---------------------------------------------------------------- */}
-      <section className="bg-secondary/50">
+      <section className="relative bg-secondary/40">
         <div className="container grid items-center gap-10 py-16 md:grid-cols-2 md:gap-16 md:py-20">
           <div>
-            <div className="flex items-center gap-3">
-              <span className="flex h-11 w-11 items-center justify-center rounded-full bg-terracotta/15 font-display text-lg text-terracotta">
-                A
-              </span>
-              <div>
-                <p className="font-medium text-foreground">Ashley</p>
-                <p className="text-xs text-muted-foreground">Verified customer</p>
-              </div>
-            </div>
-            <blockquote className="mt-6 font-display text-2xl leading-snug text-foreground md:text-[1.75rem]">
-              &ldquo;I&rsquo;ve been using the night moisturiser for three weeks and my skin is
-              softer, calmer and genuinely glowing. It absorbs fast and never feels greasy.&rdquo;
+            <blockquote className="font-display text-2xl leading-snug text-foreground md:text-[2rem]">
+              I&rsquo;ve been using the night moisturiser for three weeks and my skin is softer,
+              calmer and genuinely glowing. It absorbs fast and never feels greasy.
             </blockquote>
+            <p className="mt-7 text-sm text-muted-foreground">Ashley, three weeks in</p>
           </div>
           <div className="relative aspect-[5/4] overflow-hidden rounded-2xl">
             <Image
@@ -294,12 +336,12 @@ export default async function HomePage() {
       {/* Journal / blog                                                   */}
       {/* ---------------------------------------------------------------- */}
       <section className="container py-20 md:py-24">
-        <h2 className="mb-12 text-center font-display text-3xl text-foreground md:text-4xl">
-          From the journal
+        <h2 className="mb-12 max-w-xl font-display text-2xl leading-snug text-foreground md:text-[1.75rem]">
+          Notes on looking after your skin
         </h2>
         <div className="grid gap-8 md:grid-cols-3">
           {posts.map((post) => (
-            <article key={post.title}>
+            <Link key={post.title} href={post.href} className="group block">
               <div className="relative aspect-[4/3] overflow-hidden rounded-2xl">
                 <Image
                   src={post.image}
@@ -313,10 +355,10 @@ export default async function HomePage() {
                 {post.title}
               </h3>
               <p className="mt-2 text-sm leading-relaxed text-muted-foreground">{post.body}</p>
-              <span className="mt-3 inline-block text-sm font-medium text-terracotta">
+              <span className="mt-3 inline-block text-sm font-medium text-terracotta transition-colors group-hover:text-terracotta-deep">
                 Read more
               </span>
-            </article>
+            </Link>
           ))}
         </div>
       </section>
@@ -325,16 +367,16 @@ export default async function HomePage() {
       {/* Newsletter band                                                  */}
       {/* ---------------------------------------------------------------- */}
       <section className="relative">
-        <div className="relative min-h-[440px] w-full overflow-hidden">
+        <div className="relative min-h-[620px] w-full">
           <Image
             src="/brand/still-life-02.jpg"
             alt=""
             fill
             sizes="100vw"
-            className="object-cover"
+            className="feather-y object-cover"
           />
           <div className="container relative flex min-h-[440px] items-center justify-end py-16">
-            <div className="w-full max-w-sm rounded-2xl bg-background p-8 shadow-sm">
+            <div className="w-full max-w-sm rounded-2xl bg-background p-8">
               <h2 className="font-display text-2xl text-foreground">
                 Subscribe to get <span className="text-terracotta">10% off</span>
               </h2>
@@ -346,6 +388,7 @@ export default async function HomePage() {
           </div>
         </div>
       </section>
+      </div>
     </>
   )
 }
