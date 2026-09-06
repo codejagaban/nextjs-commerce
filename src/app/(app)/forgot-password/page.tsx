@@ -4,12 +4,16 @@ import { mergeOpenGraph } from '@/utilities/mergeOpenGraph'
 import React from 'react'
 
 import { ForgotPasswordForm } from '@/components/forms/ForgotPasswordForm'
+import { AuthShell } from '@/components/auth/AuthShell'
 
 export default async function ForgotPasswordPage() {
   return (
-    <div className="container py-16">
+    <AuthShell
+      title="Reset your password"
+      subtitle="Enter your email and we'll send you a link to set a new password."
+    >
       <ForgotPasswordForm />
-    </div>
+    </AuthShell>
   )
 }
 

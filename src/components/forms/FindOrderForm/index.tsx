@@ -59,53 +59,45 @@ export const FindOrderForm: React.FC<Props> = ({ initialEmail }) => {
 
   if (success) {
     return (
-      <Fragment>
-        <h1 className="text-xl mb-4">Check your email</h1>
-        <div className="prose dark:prose-invert">
-          <p>
-            {`If an order exists with the provided email and order ID, we've sent you an email with a link to view your order details.`}
-          </p>
-        </div>
-      </Fragment>
+      <p className="text-center text-sm leading-relaxed text-muted-foreground">
+        If an order matches that email and order ID, we&rsquo;ve sent you an email with a link to
+        view its details.
+      </p>
     )
   }
 
   return (
-    <Fragment>
-      <h1 className="text-xl mb-4">Find my order</h1>
-      <div className="prose dark:prose-invert mb-8">
-        <p>{`Please enter your email and order ID below. We'll send you a link to view your order.`}</p>
-      </div>
-      <form className="max-w-lg flex flex-col gap-8" onSubmit={handleSubmit(onSubmit)}>
-        <FormItem>
-          <Label htmlFor="email" className="mb-2">
-            Email address
-          </Label>
-          <Input
-            id="email"
-            {...register('email', { required: 'Email is required.' })}
-            type="email"
-          />
-          {errors.email && <FormError message={errors.email.message} />}
-        </FormItem>
-        <FormItem>
-          <Label htmlFor="orderID" className="mb-2">
-            Order ID
-          </Label>
-          <Input
-            id="orderID"
-            {...register('orderID', {
-              required: 'Order ID is required.',
-            })}
-            type="text"
-          />
-          {errors.orderID && <FormError message={errors.orderID.message} />}
-        </FormItem>
-        {submitError && <FormError message={submitError} />}
-        <Button type="submit" className="self-start" variant="default" disabled={isSubmitting}>
-          {isSubmitting ? 'Sending...' : 'Find order'}
-        </Button>
-      </form>
-    </Fragment>
+    <form className="flex flex-col gap-5" onSubmit={handleSubmit(onSubmit)}>
+      <FormItem>
+        <Label htmlFor="email">Email</Label>
+        <Input
+          id="email"
+          placeholder="you@email.com"
+          {...register('email', { required: 'Email is required.' })}
+          type="email"
+        />
+        {errors.email && <FormError message={errors.email.message} />}
+      </FormItem>
+      <FormItem>
+        <Label htmlFor="orderID">Order ID</Label>
+        <Input
+          id="orderID"
+          {...register('orderID', {
+            required: 'Order ID is required.',
+          })}
+          type="text"
+        />
+        {errors.orderID && <FormError message={errors.orderID.message} />}
+      </FormItem>
+      {submitError && <FormError message={submitError} />}
+      <Button
+        type="submit"
+        className="h-12 w-full rounded-full"
+        variant="default"
+        disabled={isSubmitting}
+      >
+        {isSubmitting ? 'Sending…' : 'Find my order'}
+      </Button>
+    </form>
   )
 }

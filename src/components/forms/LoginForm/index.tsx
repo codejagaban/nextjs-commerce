@@ -45,21 +45,30 @@ export const LoginForm: React.FC = () => {
   )
 
   return (
-    <form className="" onSubmit={handleSubmit(onSubmit)}>
-      <Message className="classes.message" error={error} />
-      <div className="flex flex-col gap-8">
+    <form onSubmit={handleSubmit(onSubmit)}>
+      <Message error={error} />
+      <div className="flex flex-col gap-5">
         <FormItem>
           <Label htmlFor="email">Email</Label>
           <Input
             id="email"
             type="email"
+            placeholder="you@email.com"
             {...register('email', { required: 'Email is required.' })}
           />
           {errors.email && <FormError message={errors.email.message} />}
         </FormItem>
 
         <FormItem>
-          <Label htmlFor="password">Password</Label>
+          <div className="flex items-center justify-between">
+            <Label htmlFor="password">Password</Label>
+            <Link
+              href={`/forgot-password${allParams}`}
+              className="text-xs text-muted-foreground transition-colors hover:text-foreground"
+            >
+              Forgot password?
+            </Link>
+          </div>
           <Input
             id="password"
             type="password"
@@ -68,24 +77,25 @@ export const LoginForm: React.FC = () => {
           {errors.password && <FormError message={errors.password.message} />}
         </FormItem>
 
-        <div className="text-primary/70 mb-6 prose prose-a:hover:text-primary dark:prose-invert">
-          <p>
-            Forgot your password?{' '}
-            <Link href={`/forgot-password${allParams}`}>Click here to reset it</Link>
-          </p>
-        </div>
+        <Button
+          className="h-12 w-full rounded-full"
+          disabled={isLoading}
+          type="submit"
+          variant="default"
+        >
+          {isLoading ? 'Logging in…' : 'Log in'}
+        </Button>
       </div>
 
-      <div className="flex gap-4 justify-between">
-        <Button asChild variant="outline" size="lg">
-          <Link href={`/create-account${allParams}`} className="grow max-w-[50%]">
-            Create an account
-          </Link>
-        </Button>
-        <Button className="grow" disabled={isLoading} size="lg" type="submit" variant="default">
-          {isLoading ? 'Processing' : 'Continue'}
-        </Button>
-      </div>
+      <p className="mt-6 text-center text-sm text-muted-foreground">
+        New to Marisol?{' '}
+        <Link
+          href={`/create-account${allParams}`}
+          className="font-medium text-foreground underline underline-offset-4"
+        >
+          Create an account
+        </Link>
+      </p>
     </form>
   )
 }
