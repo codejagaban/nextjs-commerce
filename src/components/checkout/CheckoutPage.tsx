@@ -91,18 +91,44 @@ export const CheckoutPage: React.FC = () => {
           setPaymentData(paymentData)
         }
       } catch (error) {
-        const errorData = error instanceof Error ? JSON.parse(error.message) : {}
+        // The server may answer with a JSON body or a bare string, so parsing
+        // has to be tolerant — an unguarded JSON.parse here used to throw inside
+        // the catch, escape as an unhandled rejection, and destroy the real cause.
+        const raw = error instanceof Error ? error.message : String(error ?? '')
+        let errorData: { cause?: { code?: string }; message?: string } = {}
+
+        try {
+          const parsed = JSON.parse(raw)
+          if (parsed && typeof parsed === 'object') errorData = parsed
+        } catch {
+          // Not JSON — keep the raw text as the message.
+        }
+
         let errorMessage = 'An error occurred while initiating payment.'
 
         if (errorData?.cause?.code === 'OutOfStock') {
           errorMessage = 'One or more items in your cart are out of stock.'
+        } else {
+          const detail = (errorData.message || raw || '').trim()
+          if (detail) errorMessage = detail
         }
+
+        // eslint-disable-next-line no-console
+        console.error('initiatePayment failed:', raw)
 
         setError(errorMessage)
         toast.error(errorMessage)
       }
     },
-    [billingAddress, billingAddressSameAsShipping, shippingAddress],
+    // `email` and `initiatePayment` were missing, so the callback could close
+    // over a stale email and send the wrong customer to Stripe.
+    [
+      billingAddress,
+      billingAddressSameAsShipping,
+      shippingAddress,
+      email,
+      initiatePayment,
+    ],
   )
 
   if (!stripe) return null
