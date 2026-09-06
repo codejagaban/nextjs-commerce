@@ -93,26 +93,21 @@ export const AccountForm: React.FC = () => {
     <form className="max-w-xl" onSubmit={handleSubmit(onSubmit)}>
       {!changePassword ? (
         <Fragment>
-          <div className="prose dark:prose-invert mb-8">
-            <p className="">
-              {'Change your account details below, or '}
-              <Button
-                className="px-0 text-inherit underline hover:cursor-pointer"
-                onClick={() => setChangePassword(!changePassword)}
-                type="button"
-                variant="link"
-              >
-                click here
-              </Button>
-              {' to change your password.'}
-            </p>
-          </div>
+          <p className="mb-8 text-sm text-muted-foreground">
+            {'Update your account details below, or '}
+            <button
+              className="font-medium text-foreground underline underline-offset-4 hover:cursor-pointer"
+              onClick={() => setChangePassword(!changePassword)}
+              type="button"
+            >
+              change your password
+            </button>
+            {' instead.'}
+          </p>
 
-          <div className="flex flex-col gap-8 mb-8">
+          <div className="mb-8 flex flex-col gap-5">
             <FormItem>
-              <Label htmlFor="email" className="mb-2">
-                Email Address
-              </Label>
+              <Label htmlFor="email">Email address</Label>
               <Input
                 id="email"
                 {...register('email', { required: 'Please provide an email.' })}
@@ -122,9 +117,7 @@ export const AccountForm: React.FC = () => {
             </FormItem>
 
             <FormItem>
-              <Label htmlFor="name" className="mb-2">
-                Name
-              </Label>
+              <Label htmlFor="name">Name</Label>
               <Input
                 id="name"
                 {...register('name', { required: 'Please provide a name.' })}
@@ -136,26 +129,21 @@ export const AccountForm: React.FC = () => {
         </Fragment>
       ) : (
         <Fragment>
-          <div className="prose dark:prose-invert mb-8">
-            <p>
-              {'Change your password below, or '}
-              <Button
-                className="px-0 text-inherit underline hover:cursor-pointer"
-                onClick={() => setChangePassword(!changePassword)}
-                type="button"
-                variant="link"
-              >
-                cancel
-              </Button>
-              .
-            </p>
-          </div>
+          <p className="mb-8 text-sm text-muted-foreground">
+            {'Choose a new password below, or '}
+            <button
+              className="font-medium text-foreground underline underline-offset-4 hover:cursor-pointer"
+              onClick={() => setChangePassword(!changePassword)}
+              type="button"
+            >
+              cancel
+            </button>
+            {'.'}
+          </p>
 
-          <div className="flex flex-col gap-8 mb-8">
+          <div className="mb-8 flex flex-col gap-5">
             <FormItem>
-              <Label htmlFor="password" className="mb-2">
-                New password
-              </Label>
+              <Label htmlFor="password">New password</Label>
               <Input
                 id="password"
                 {...register('password', { required: 'Please provide a new password.' })}
@@ -165,9 +153,7 @@ export const AccountForm: React.FC = () => {
             </FormItem>
 
             <FormItem>
-              <Label htmlFor="passwordConfirm" className="mb-2">
-                Confirm password
-              </Label>
+              <Label htmlFor="passwordConfirm">Confirm password</Label>
               <Input
                 id="passwordConfirm"
                 {...register('passwordConfirm', {
@@ -181,12 +167,17 @@ export const AccountForm: React.FC = () => {
           </div>
         </Fragment>
       )}
-      <Button disabled={isLoading || isSubmitting || !isDirty} type="submit" variant="default">
+      <Button
+        disabled={isLoading || isSubmitting || !isDirty}
+        type="submit"
+        variant="default"
+        className="h-11 rounded-full px-6"
+      >
         {isLoading || isSubmitting
-          ? 'Processing'
+          ? 'Saving…'
           : changePassword
-            ? 'Change Password'
-            : 'Update Account'}
+            ? 'Change password'
+            : 'Update account'}
       </Button>
     </form>
   )
