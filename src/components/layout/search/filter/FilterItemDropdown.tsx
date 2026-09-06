@@ -42,7 +42,7 @@ export function FilterItemDropdown({ list }: { list: ListItem[] }) {
       <button
         type="button"
         aria-label="Sort products"
-        className="flex h-14 w-full items-center justify-between gap-3 rounded-full border border-border bg-transparent px-6 text-sm text-foreground transition-colors hover:border-foreground/40 sm:w-56"
+        className="flex h-14 w-full items-center justify-between gap-3 whitespace-nowrap rounded-full border border-border bg-transparent px-6 text-sm text-foreground transition-colors hover:border-foreground/40 sm:w-auto sm:min-w-[13rem]"
         onClick={() => {
           setOpenSelect(!openSelect)
         }}
