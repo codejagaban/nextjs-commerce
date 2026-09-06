@@ -31,7 +31,9 @@ export function HeaderClient({ header }: Props) {
     return () => window.removeEventListener('scroll', onScroll)
   }, [])
 
-  // On the homepage, float over the terracotta hero (light text) until scrolled.
+  // On the homepage, float over the photographic hero until scrolled. The hero
+  // is always dark behind the bar, so the bar stays light ink in both themes —
+  // `bone` does not flip the way `primary-foreground` does.
   const overlay = isHome && !scrolled
 
   const isActive = (url?: string | null) =>
@@ -43,7 +45,7 @@ export function HeaderClient({ header }: Props) {
         className={cn(
           'fixed inset-x-0 top-0 z-40 transition-colors duration-300',
           overlay
-            ? 'border-b border-transparent bg-transparent text-primary-foreground [&_a]:text-primary-foreground [&_button]:text-primary-foreground'
+            ? 'border-b border-transparent bg-transparent text-bone [&_a]:text-bone [&_button]:text-bone'
             : 'border-b border-border/70 bg-background/90 text-foreground backdrop-blur-md',
         )}
       >
