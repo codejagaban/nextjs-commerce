@@ -11,6 +11,10 @@ import Link from 'next/link'
 import { useRouter, useSearchParams } from 'next/navigation'
 import React, { useCallback, useRef } from 'react'
 import { useForm } from 'react-hook-form'
+import {
+  emailRules,
+  passwordSignInRules,
+} from '@/components/forms/validation'
 
 type FormData = {
   email: string
@@ -45,7 +49,7 @@ export const LoginForm: React.FC = () => {
   )
 
   return (
-    <form onSubmit={handleSubmit(onSubmit)}>
+    <form noValidate onSubmit={handleSubmit(onSubmit)}>
       <Message error={error} />
       <div className="flex flex-col gap-5">
         <FormItem>
@@ -54,7 +58,7 @@ export const LoginForm: React.FC = () => {
             id="email"
             type="email"
             placeholder="you@email.com"
-            {...register('email', { required: 'Email is required.' })}
+            {...register('email', emailRules)}
           />
           {errors.email && <FormError message={errors.email.message} />}
         </FormItem>
@@ -72,7 +76,7 @@ export const LoginForm: React.FC = () => {
           <Input
             id="password"
             type="password"
-            {...register('password', { required: 'Please provide a password.' })}
+            {...register('password', passwordSignInRules)}
           />
           {errors.password && <FormError message={errors.password.message} />}
         </FormItem>
