@@ -6,6 +6,7 @@ import React from 'react'
 import { HeaderThemeProvider } from './HeaderTheme'
 import { ThemeProvider } from './Theme'
 import { SonnerProvider } from '@/providers/Sonner'
+import { EcommerceSession } from '@/providers/EcommerceSession'
 
 export const Providers: React.FC<{
   children: React.ReactNode
@@ -40,6 +41,7 @@ export const Providers: React.FC<{
               }),
             ]}
           >
+            <EcommerceSession />
             {children}
           </EcommerceProvider>
         </HeaderThemeProvider>
