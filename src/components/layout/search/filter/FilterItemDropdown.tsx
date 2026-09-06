@@ -39,18 +39,23 @@ export function FilterItemDropdown({ list }: { list: ListItem[] }) {
 
   return (
     <div className="relative" ref={ref}>
-      <div
-        className="flex w-full items-center justify-between rounded border border-black/30 px-4 py-2 text-sm dark:border-white/30"
+      <button
+        type="button"
+        aria-label="Sort products"
+        className="flex h-11 w-full items-center justify-between gap-3 rounded-full border border-border bg-background px-5 text-sm text-foreground transition-colors hover:border-foreground/40 sm:w-56"
         onClick={() => {
           setOpenSelect(!openSelect)
         }}
       >
-        <div>{active}</div>
-        <CaretDown className="h-4" />
-      </div>
+        <span className="flex items-center gap-1.5">
+          <span className="text-muted-foreground">Sort</span>
+          <span>{active}</span>
+        </span>
+        <CaretDown className="h-4 w-4 text-muted-foreground" />
+      </button>
       {openSelect && (
         <div
-          className="absolute z-40 w-full rounded-b-md bg-white p-4 shadow-md dark:bg-black"
+          className="absolute right-0 z-40 mt-2 w-56 rounded-xl border border-border bg-popover p-3 shadow-lg"
           onClick={() => {
             setOpenSelect(false)
           }}
