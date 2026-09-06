@@ -14,7 +14,7 @@ import { ShoppingCart } from '@phosphor-icons/react/dist/ssr'
 import Image from 'next/image'
 import Link from 'next/link'
 import { usePathname } from 'next/navigation'
-import React, { useEffect, useMemo, useState } from 'react'
+import React, { useEffect, useMemo, useRef, useState } from 'react'
 
 import { DeleteItemButton } from './DeleteItemButton'
 import { EditItemQuantityButton } from './EditItemQuantityButton'
@@ -37,10 +37,38 @@ export function CartModal() {
     return cart.items.reduce((quantity, item) => (item.quantity || 0) + quantity, 0)
   }, [cart])
 
+  // When an item is added, slide the cart open and bump the icon.
+  // Ignore the initial hydration (0 -> N) by only arming after the cart settles.
+  const prevQtyRef = useRef<number>(0)
+  const readyRef = useRef(false)
+  const [bump, setBump] = useState(false)
+
+  useEffect(() => {
+    const t = setTimeout(() => {
+      prevQtyRef.current = totalQuantity ?? 0
+      readyRef.current = true
+    }, 800)
+    return () => clearTimeout(t)
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [])
+
+  useEffect(() => {
+    if (!readyRef.current) return
+    const prev = prevQtyRef.current
+    const curr = totalQuantity ?? 0
+    prevQtyRef.current = curr
+    if (curr > prev) {
+      setIsOpen(true)
+      setBump(true)
+      const t = setTimeout(() => setBump(false), 550)
+      return () => clearTimeout(t)
+    }
+  }, [totalQuantity])
+
   return (
     <Sheet onOpenChange={setIsOpen} open={isOpen}>
       <SheetTrigger asChild>
-        <OpenCartButton quantity={totalQuantity} />
+        <OpenCartButton quantity={totalQuantity} bump={bump} />
       </SheetTrigger>
 
       <SheetContent className="flex w-full flex-col sm:max-w-lg md:max-w-xl">
