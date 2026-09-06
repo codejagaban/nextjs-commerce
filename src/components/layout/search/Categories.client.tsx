@@ -14,9 +14,11 @@ export const CategoryItem: React.FC<Props> = ({ category }) => {
   const pathname = usePathname()
   const searchParams = useSearchParams()
 
+  const slug = category.slug || String(category.id)
+
   const isActive = useMemo(() => {
-    return searchParams.get('category') === String(category.id)
-  }, [category.id, searchParams])
+    return searchParams.get('category') === slug
+  }, [slug, searchParams])
 
   const setQuery = useCallback(() => {
     const params = new URLSearchParams(searchParams.toString())
@@ -24,19 +26,20 @@ export const CategoryItem: React.FC<Props> = ({ category }) => {
     if (isActive) {
       params.delete('category')
     } else {
-      params.set('category', String(category.id))
+      params.set('category', slug)
     }
 
     const newParams = params.toString()
 
-    router.push(pathname + '?' + newParams)
-  }, [category.id, isActive, pathname, router, searchParams])
+    router.push(newParams ? pathname + '?' + newParams : pathname)
+  }, [slug, isActive, pathname, router, searchParams])
 
   return (
     <button
       onClick={() => setQuery()}
-      className={clsx('hover:cursor-pointer', {
-        ' underline': isActive,
+      className={clsx('cursor-pointer text-sm transition-colors', {
+        'font-medium text-foreground': isActive,
+        'text-muted-foreground hover:text-foreground': !isActive,
       })}
     >
       {category.title}
