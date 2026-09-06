@@ -125,6 +125,103 @@
     background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='140' height='140'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.82' numOctaves='2' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E");
   }
 
+  /* The page's own light. A long, many-stopped warm wash that travels the whole
+     scroll — dawn at the top, bone through the middle, amber settling toward the
+     footer — so the page reads as one continuous surface instead of a stack of
+     flat bands. Many stops keep it from banding. */
+  .atmosphere-page {
+    background-image: linear-gradient(
+      to bottom,
+      oklch(97.6% 0.018 62deg) 0%,
+      oklch(98.2% 0.012 66deg) 9%,
+      oklch(98.6% 0.006 70deg) 22%,
+      oklch(98.4% 0.008 68deg) 34%,
+      oklch(98.6% 0.006 70deg) 46%,
+      oklch(98.2% 0.011 66deg) 58%,
+      oklch(97.7% 0.016 63deg) 70%,
+      oklch(97.2% 0.022 62deg) 82%,
+      oklch(96.6% 0.028 61deg) 92%,
+      oklch(96.2% 0.032 60deg) 100%
+    );
+  }
+
+  .dark .atmosphere-page {
+    background-image: linear-gradient(
+      to bottom,
+      oklch(21.5% 0.018 42deg) 0%,
+      oklch(20.8% 0.014 41deg) 9%,
+      oklch(20% 0.012 40deg) 22%,
+      oklch(20.4% 0.013 40deg) 34%,
+      oklch(20% 0.012 40deg) 46%,
+      oklch(20.8% 0.015 41deg) 58%,
+      oklch(21.6% 0.019 42deg) 70%,
+      oklch(22.4% 0.024 42deg) 82%,
+      oklch(23% 0.028 42deg) 92%,
+      oklch(23.6% 0.032 42deg) 100%
+    );
+  }
+
+  /* Dissolve an image's left edge into the surface beside it, so a portrait can
+     sit in a field without a hard vertical seam down the middle. */
+  .feather-left {
+    -webkit-mask-image: linear-gradient(
+      to right,
+      transparent 0%,
+      oklch(0% 0 0 / 0.1) 6%,
+      oklch(0% 0 0 / 0.34) 13%,
+      oklch(0% 0 0 / 0.62) 20%,
+      oklch(0% 0 0 / 0.86) 27%,
+      #000 36%,
+      #000 100%
+    );
+    mask-image: linear-gradient(
+      to right,
+      transparent 0%,
+      oklch(0% 0 0 / 0.1) 6%,
+      oklch(0% 0 0 / 0.34) 13%,
+      oklch(0% 0 0 / 0.62) 20%,
+      oklch(0% 0 0 / 0.86) 27%,
+      #000 36%,
+      #000 100%
+    );
+  }
+
+  /* Feather a full-bleed image into the page at both ends. Masks the image's own
+     pixels (an overlay would leave a visible join), over a long distance with
+     many stops so the ease never reads as a line. */
+  .feather-y {
+    -webkit-mask-image: linear-gradient(
+      to bottom,
+      transparent 0%,
+      oklch(0% 0 0 / 0.08) 4%,
+      oklch(0% 0 0 / 0.28) 9%,
+      oklch(0% 0 0 / 0.55) 15%,
+      oklch(0% 0 0 / 0.8) 21%,
+      #000 29%,
+      #000 68%,
+      oklch(0% 0 0 / 0.8) 79%,
+      oklch(0% 0 0 / 0.55) 86%,
+      oklch(0% 0 0 / 0.28) 92%,
+      oklch(0% 0 0 / 0.08) 97%,
+      transparent 100%
+    );
+    mask-image: linear-gradient(
+      to bottom,
+      transparent 0%,
+      oklch(0% 0 0 / 0.08) 4%,
+      oklch(0% 0 0 / 0.28) 9%,
+      oklch(0% 0 0 / 0.55) 15%,
+      oklch(0% 0 0 / 0.8) 21%,
+      #000 29%,
+      #000 68%,
+      oklch(0% 0 0 / 0.8) 79%,
+      oklch(0% 0 0 / 0.55) 86%,
+      oklch(0% 0 0 / 0.28) 92%,
+      oklch(0% 0 0 / 0.08) 97%,
+      transparent 100%
+    );
+  }
+
   /* Golden-hour atmosphere: a warm, directional wash that resolves into the
      page's own bone so adjacent sections hand off with no hard seam. */
   .atmosphere-warm {
