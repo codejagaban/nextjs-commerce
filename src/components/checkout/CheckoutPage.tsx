@@ -128,182 +128,192 @@ export const CheckoutPage: React.FC = () => {
   }
 
   return (
-    <div className="flex flex-col items-stretch justify-stretch my-8 md:flex-row grow gap-10 md:gap-6 lg:gap-8">
-      <div className="basis-full lg:basis-2/3 flex flex-col gap-8 justify-stretch">
-        <h2 className="font-medium text-3xl">Contact</h2>
-        {!user && (
-          <div className=" bg-accent dark:bg-black rounded-lg p-4 w-full flex items-center">
-            <div className="prose dark:prose-invert">
-              <Button asChild className="no-underline text-inherit" variant="outline">
-                <Link href="/login">Log in</Link>
-              </Button>
-              <p className="mt-0">
-                <span className="mx-2">or</span>
-                <Link href="/create-account">create an account</Link>
-              </p>
-            </div>
-          </div>
-        )}
-        {user ? (
-          <div className="bg-accent dark:bg-card rounded-lg p-4 ">
-            <div>
-              <p>{user.email}</p>{' '}
-              <p>
-                Not you?{' '}
-                <Link className="underline" href="/logout">
-                  Log out
-                </Link>
-              </p>
-            </div>
-          </div>
-        ) : (
-          <div className="bg-accent dark:bg-black rounded-lg p-4 ">
-            <div>
-              <p className="mb-4">Enter your email to checkout as a guest.</p>
+    <div className="grow w-full py-10">
+      <h1 className="font-display text-3xl text-foreground md:text-4xl">Checkout</h1>
 
-              <FormItem className="mb-6">
-                <Label htmlFor="email">Email Address</Label>
-                <Input
-                  disabled={!emailEditable}
-                  id="email"
-                  name="email"
-                  onChange={(e) => setEmail(e.target.value)}
-                  required
-                  type="email"
-                />
-              </FormItem>
-
-              <Button
-                disabled={!email || !emailEditable}
-                onClick={(e) => {
-                  e.preventDefault()
-                  setEmailEditable(false)
-                }}
-                variant="default"
-              >
-                Continue as guest
-              </Button>
-            </div>
-          </div>
-        )}
-
-        <h2 className="font-medium text-3xl">Address</h2>
-
-        {billingAddress ? (
-          <div>
-            <AddressItem
-              actions={
-                <Button
-                  variant={'outline'}
-                  disabled={Boolean(paymentData)}
-                  onClick={(e) => {
-                    e.preventDefault()
-                    setBillingAddress(undefined)
-                  }}
-                >
-                  Remove
-                </Button>
-              }
-              address={billingAddress}
-            />
-          </div>
-        ) : user ? (
-          <CheckoutAddresses heading="Billing address" setAddress={setBillingAddress} />
-        ) : (
-          <CreateAddressModal
-            disabled={!email || Boolean(emailEditable)}
-            callback={(address) => {
-              setBillingAddress(address)
-            }}
-            skipSubmission={true}
-          />
-        )}
-
-        <div className="flex gap-4 items-center">
-          <Checkbox
-            id="shippingTheSameAsBilling"
-            checked={billingAddressSameAsShipping}
-            disabled={Boolean(paymentData || (!user && (!email || Boolean(emailEditable))))}
-            onCheckedChange={(state) => {
-              setBillingAddressSameAsShipping(state as boolean)
-            }}
-          />
-          <Label htmlFor="shippingTheSameAsBilling">Shipping is the same as billing</Label>
-        </div>
-
-        {!billingAddressSameAsShipping && (
-          <>
-            {shippingAddress ? (
-              <div>
-                <AddressItem
-                  actions={
-                    <Button
-                      variant={'outline'}
-                      disabled={Boolean(paymentData)}
-                      onClick={(e) => {
-                        e.preventDefault()
-                        setShippingAddress(undefined)
-                      }}
-                    >
-                      Remove
+      <div className="mt-8 grid items-start gap-10 lg:grid-cols-[1fr_360px] lg:gap-16">
+        <div className="flex flex-col gap-10">
+          {/* Contact ------------------------------------------------------ */}
+          <section>
+            <h2 className="mb-4 font-display text-xl text-foreground">Contact</h2>
+            <div className="rounded-2xl border border-border bg-card p-6">
+              {user ? (
+                <div className="text-sm">
+                  <p className="font-medium text-foreground">{user.email}</p>
+                  <p className="mt-1 text-muted-foreground">
+                    Not you?{' '}
+                    <Link className="font-medium text-foreground underline underline-offset-4" href="/logout">
+                      Log out
+                    </Link>
+                  </p>
+                </div>
+              ) : (
+                <>
+                  <div className="mb-5 flex flex-wrap items-center gap-3 text-sm text-muted-foreground">
+                    <Button asChild variant="outline" className="h-10 rounded-full px-5">
+                      <Link href="/login">Log in</Link>
                     </Button>
-                  }
-                  address={shippingAddress}
-                />
-              </div>
-            ) : user ? (
-              <CheckoutAddresses
-                heading="Shipping address"
-                description="Please select a shipping address."
-                setAddress={setShippingAddress}
+                    <span>
+                      or{' '}
+                      <Link
+                        href="/create-account"
+                        className="font-medium text-foreground underline underline-offset-4"
+                      >
+                        create an account
+                      </Link>
+                    </span>
+                  </div>
+
+                  <FormItem>
+                    <Label htmlFor="email">Email address</Label>
+                    <Input
+                      className="h-11 rounded-lg"
+                      disabled={!emailEditable}
+                      id="email"
+                      name="email"
+                      onChange={(e) => setEmail(e.target.value)}
+                      placeholder="you@email.com"
+                      required
+                      type="email"
+                    />
+                  </FormItem>
+
+                  <Button
+                    className="mt-4 h-11 rounded-full px-6"
+                    disabled={!email || !emailEditable}
+                    onClick={(e) => {
+                      e.preventDefault()
+                      setEmailEditable(false)
+                    }}
+                    variant="default"
+                  >
+                    Continue as guest
+                  </Button>
+                </>
+              )}
+            </div>
+          </section>
+
+          {/* Address ------------------------------------------------------ */}
+          <section className="flex flex-col gap-5">
+            <h2 className="font-display text-xl text-foreground">Address</h2>
+
+            {billingAddress ? (
+              <AddressItem
+                actions={
+                  <Button
+                    variant={'outline'}
+                    className="h-9 rounded-full"
+                    disabled={Boolean(paymentData)}
+                    onClick={(e) => {
+                      e.preventDefault()
+                      setBillingAddress(undefined)
+                    }}
+                  >
+                    Remove
+                  </Button>
+                }
+                address={billingAddress}
               />
+            ) : user ? (
+              <CheckoutAddresses heading="Billing address" setAddress={setBillingAddress} />
             ) : (
               <CreateAddressModal
-                callback={(address) => {
-                  setShippingAddress(address)
-                }}
                 disabled={!email || Boolean(emailEditable)}
+                callback={(address) => {
+                  setBillingAddress(address)
+                }}
                 skipSubmission={true}
               />
             )}
-          </>
-        )}
 
-        {!paymentData && (
-          <Button
-            className="self-start"
-            disabled={!canGoToPayment}
-            onClick={(e) => {
-              e.preventDefault()
-              void initiatePaymentIntent('stripe')
-            }}
-          >
-            Go to payment
-          </Button>
-        )}
+            <div className="flex items-center gap-3">
+              <Checkbox
+                id="shippingTheSameAsBilling"
+                checked={billingAddressSameAsShipping}
+                disabled={Boolean(paymentData || (!user && (!email || Boolean(emailEditable))))}
+                onCheckedChange={(state) => {
+                  setBillingAddressSameAsShipping(state as boolean)
+                }}
+              />
+              <Label htmlFor="shippingTheSameAsBilling" className="font-normal">
+                Shipping is the same as billing
+              </Label>
+            </div>
 
-        {!paymentData?.['clientSecret'] && error && (
-          <div className="my-8">
-            <Message error={error} />
+            {!billingAddressSameAsShipping && (
+              <>
+                {shippingAddress ? (
+                  <AddressItem
+                    actions={
+                      <Button
+                        variant={'outline'}
+                        className="h-9 rounded-full"
+                        disabled={Boolean(paymentData)}
+                        onClick={(e) => {
+                          e.preventDefault()
+                          setShippingAddress(undefined)
+                        }}
+                      >
+                        Remove
+                      </Button>
+                    }
+                    address={shippingAddress}
+                  />
+                ) : user ? (
+                  <CheckoutAddresses
+                    heading="Shipping address"
+                    description="Please select a shipping address."
+                    setAddress={setShippingAddress}
+                  />
+                ) : (
+                  <CreateAddressModal
+                    callback={(address) => {
+                      setShippingAddress(address)
+                    }}
+                    disabled={!email || Boolean(emailEditable)}
+                    skipSubmission={true}
+                  />
+                )}
+              </>
+            )}
 
-            <Button
-              onClick={(e) => {
-                e.preventDefault()
-                router.refresh()
-              }}
-              variant="default"
-            >
-              Try again
-            </Button>
-          </div>
-        )}
+            {!paymentData && (
+              <Button
+                className="h-12 self-start rounded-full px-8"
+                disabled={!canGoToPayment}
+                onClick={(e) => {
+                  e.preventDefault()
+                  void initiatePaymentIntent('stripe')
+                }}
+              >
+                Go to payment
+              </Button>
+            )}
 
-        <Suspense fallback={<React.Fragment />}>
-          {/* @ts-ignore */}
-          {paymentData && paymentData?.['clientSecret'] && (
-            <div className="pb-16">
-              <h2 className="font-medium text-3xl">Payment</h2>
-              {error && <p>{`Error: ${error}`}</p>}
+            {!paymentData?.['clientSecret'] && error && (
+              <div>
+                <Message error={error} />
+                <Button
+                  className="mt-4 rounded-full"
+                  onClick={(e) => {
+                    e.preventDefault()
+                    router.refresh()
+                  }}
+                  variant="default"
+                >
+                  Try again
+                </Button>
+              </div>
+            )}
+          </section>
+
+          <Suspense fallback={<React.Fragment />}>
+            {/* @ts-ignore */}
+            {paymentData && paymentData?.['clientSecret'] && (
+              <section className="pb-8">
+                <h2 className="mb-4 font-display text-xl text-foreground">Payment</h2>
+                {error && <p className="mb-4 text-sm text-destructive">{`Error: ${error}`}</p>}
               <Elements
                 options={{
                   appearance: {
@@ -346,95 +356,95 @@ export const CheckoutPage: React.FC = () => {
                   </Button>
                 </div>
               </Elements>
-            </div>
+            </section>
           )}
         </Suspense>
       </div>
 
       {!cartIsEmpty && (
-        <div className="basis-full lg:basis-1/3 lg:pl-8 p-8 border-none bg-primary/5 flex flex-col gap-8 rounded-lg">
-          <h2 className="text-3xl font-medium">Your cart</h2>
-          {cart?.items?.map((item, index) => {
-            if (typeof item.product === 'object' && item.product) {
-              const {
-                product,
-                product: { id, meta, title, gallery },
-                quantity,
-                variant,
-              } = item
+        <aside className="h-fit rounded-2xl border border-border bg-card p-6 lg:sticky lg:top-24">
+          <h2 className="font-display text-xl text-foreground">Order summary</h2>
+          <ul className="mt-5 space-y-4">
+            {cart?.items?.map((item, index) => {
+              if (typeof item.product === 'object' && item.product) {
+                const {
+                  product,
+                  product: { meta, title, gallery },
+                  quantity,
+                  variant,
+                } = item
 
-              if (!quantity) return null
+                if (!quantity) return null
 
-              let image = gallery?.[0]?.image || meta?.image
-              let price = product?.priceInUSD
+                let image = gallery?.[0]?.image || meta?.image
+                let price = product?.priceInUSD
 
-              const isVariant = Boolean(variant) && typeof variant === 'object'
+                const isVariant = Boolean(variant) && typeof variant === 'object'
 
-              if (isVariant) {
-                price = variant?.priceInUSD
+                if (isVariant) {
+                  price = variant?.priceInUSD
 
-                const imageVariant = product.gallery?.find((item: any) => {
-                  if (!item.variantOption) return false
-                  const variantOptionID =
-                    typeof item.variantOption === 'object'
-                      ? item.variantOption.id
-                      : item.variantOption
+                  const imageVariant = product.gallery?.find((item: any) => {
+                    if (!item.variantOption) return false
+                    const variantOptionID =
+                      typeof item.variantOption === 'object'
+                        ? item.variantOption.id
+                        : item.variantOption
 
-                  const hasMatch = variant?.options?.some((option: any) => {
-                    if (typeof option === 'object') return option.id === variantOptionID
-                    else return option === variantOptionID
+                    const hasMatch = variant?.options?.some((option: any) => {
+                      if (typeof option === 'object') return option.id === variantOptionID
+                      else return option === variantOptionID
+                    })
+
+                    return hasMatch
                   })
 
-                  return hasMatch
-                })
-
-                if (imageVariant && typeof imageVariant.image !== 'string') {
-                  image = imageVariant.image
+                  if (imageVariant && typeof imageVariant.image !== 'string') {
+                    image = imageVariant.image
+                  }
                 }
-              }
 
-              return (
-                <div className="flex items-start gap-4" key={index}>
-                  <div className="flex items-stretch justify-stretch h-20 w-20 p-2 rounded-lg border">
-                    <div className="relative w-full h-full">
+                return (
+                  <li className="flex items-start gap-3" key={index}>
+                    <div className="relative h-16 w-16 shrink-0 overflow-hidden rounded-lg border border-border bg-secondary">
                       {image && typeof image !== 'string' && (
-                        <Media className="" fill imgClassName="rounded-lg" resource={image} />
+                        <Media fill imgClassName="object-cover" resource={image} />
                       )}
                     </div>
-                  </div>
-                  <div className="flex grow justify-between items-center">
-                    <div className="flex flex-col gap-1">
-                      <p className="font-medium text-lg">{title}</p>
+                    <div className="min-w-0 flex-1">
+                      <p className="text-sm font-medium leading-snug text-foreground">{title}</p>
                       {variant && typeof variant === 'object' && (
-                        <p className="text-sm font-mono text-primary/50 tracking-widest">
+                        <p className="mt-0.5 text-xs text-muted-foreground">
                           {variant.options
-                            ?.map((option: any) => {
-                              if (typeof option === 'object') return option.label
-                              return null
-                            })
+                            ?.map((option: any) => (typeof option === 'object' ? option.label : null))
+                            .filter(Boolean)
                             .join(', ')}
                         </p>
                       )}
-                      <div>
-                        {'x'}
-                        {quantity}
-                      </div>
+                      <p className="mt-0.5 text-xs text-muted-foreground">Qty {quantity}</p>
                     </div>
-
-                    {typeof price === 'number' && <Price amount={price} />}
-                  </div>
-                </div>
-              )
-            }
-            return null
-          })}
-          <hr />
-          <div className="flex justify-between items-center gap-2">
-            <span className="uppercase">Total</span>{' '}
-            <Price className="text-3xl font-medium" amount={cart.subtotal || 0} />
+                    {typeof price === 'number' && (
+                      <Price
+                        amount={price}
+                        className="shrink-0 text-sm text-foreground tabular-nums"
+                      />
+                    )}
+                  </li>
+                )
+              }
+              return null
+            })}
+          </ul>
+          <div className="mt-6 flex items-center justify-between border-t border-border pt-4">
+            <span className="text-sm text-muted-foreground">Total</span>
+            <Price
+              className="font-display text-2xl text-foreground tabular-nums"
+              amount={cart.subtotal || 0}
+            />
           </div>
-        </div>
+        </aside>
       )}
+      </div>
     </div>
   )
 }
