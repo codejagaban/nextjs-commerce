@@ -5,23 +5,12 @@ import React from 'react'
 import { Media } from '@/components/Media'
 import { Price } from '@/components/Price'
 import { QuickAddButton } from '@/components/QuickAddButton'
-import { Star } from '@phosphor-icons/react/dist/ssr'
 
 type Props = {
   product: Partial<Product>
   priority?: boolean
   /** soft pastel tile background, cycled by the grid for variety */
   tile?: string
-}
-
-function Stars() {
-  return (
-    <span className="inline-flex items-center gap-0.5 text-terracotta" aria-hidden="true">
-      {Array.from({ length: 5 }).map((_, i) => (
-        <Star key={i} weight="fill" className="h-3.5 w-3.5" />
-      ))}
-    </span>
-  )
 }
 
 export const ProductGridItem: React.FC<Props> = ({ product, priority, tile }) => {
@@ -65,13 +54,12 @@ export const ProductGridItem: React.FC<Props> = ({ product, priority, tile }) =>
         )}
       </Link>
 
-      <div className="mt-3 flex items-center justify-between gap-3">
+      <div className="mt-3">
         <QuickAddButton
           productId={product.id!}
           hasVariants={Boolean(enableVariants)}
           slug={product.slug}
         />
-        <Stars />
       </div>
     </div>
   )
