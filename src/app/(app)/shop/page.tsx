@@ -58,7 +58,11 @@ export default async function ShopPage({ searchParams }: Props) {
                           },
                         },
                         {
-                          description: {
+                          // `description` is richText (Lexical JSON) and cannot be
+                          // matched with `like` — including it made the whole query
+                          // throw, so every search returned nothing. `meta.description`
+                          // holds the same copy as plain text and is queryable.
+                          'meta.description': {
                             like: searchValue,
                           },
                         },
