@@ -12,6 +12,7 @@ import { useRouter } from 'next/navigation'
 import React, { Fragment, useCallback, useEffect, useRef, useState } from 'react'
 import { useForm } from 'react-hook-form'
 import { toast } from 'sonner'
+import { emailRules, passwordRules, passwordConfirmRules, requiredRule } from '@/components/forms/validation'
 
 type FormData = {
   email: string
@@ -90,7 +91,7 @@ export const AccountForm: React.FC = () => {
   }, [user, router, reset, changePassword])
 
   return (
-    <form className="max-w-xl" onSubmit={handleSubmit(onSubmit)}>
+    <form noValidate className="max-w-xl" onSubmit={handleSubmit(onSubmit)}>
       {!changePassword ? (
         <Fragment>
           <p className="mb-8 text-sm text-muted-foreground">
@@ -110,7 +111,7 @@ export const AccountForm: React.FC = () => {
               <Label htmlFor="email">Email address</Label>
               <Input
                 id="email"
-                {...register('email', { required: 'Please provide an email.' })}
+                {...register('email', emailRules)}
                 type="email"
               />
               {errors.email && <FormError message={errors.email.message} />}
@@ -120,7 +121,7 @@ export const AccountForm: React.FC = () => {
               <Label htmlFor="name">Name</Label>
               <Input
                 id="name"
-                {...register('name', { required: 'Please provide a name.' })}
+                {...register('name', requiredRule('Name'))}
                 type="text"
               />
               {errors.name && <FormError message={errors.name.message} />}
@@ -146,7 +147,7 @@ export const AccountForm: React.FC = () => {
               <Label htmlFor="password">New password</Label>
               <Input
                 id="password"
-                {...register('password', { required: 'Please provide a new password.' })}
+                {...register('password', passwordRules)}
                 type="password"
               />
               {errors.password && <FormError message={errors.password.message} />}

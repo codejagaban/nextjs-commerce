@@ -9,6 +9,9 @@ import { Label } from '@/components/ui/label'
 import Link from 'next/link'
 import React, { Fragment, useCallback, useState } from 'react'
 import { useForm } from 'react-hook-form'
+import {
+  emailRules,
+} from '@/components/forms/validation'
 
 type FormData = {
   email: string
@@ -49,7 +52,7 @@ export const ForgotPasswordForm: React.FC = () => {
   return (
     <Fragment>
       {!success && (
-        <form onSubmit={handleSubmit(onSubmit)}>
+        <form noValidate onSubmit={handleSubmit(onSubmit)}>
           <Message className="mb-5" error={error} />
 
           <div className="flex flex-col gap-5">
@@ -58,7 +61,7 @@ export const ForgotPasswordForm: React.FC = () => {
               <Input
                 id="email"
                 placeholder="you@email.com"
-                {...register('email', { required: 'Please provide your email.' })}
+                {...register('email', emailRules)}
                 type="email"
               />
               {errors.email && <FormError message={errors.email.message} />}

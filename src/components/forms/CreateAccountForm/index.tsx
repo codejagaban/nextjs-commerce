@@ -11,6 +11,11 @@ import Link from 'next/link'
 import { useRouter, useSearchParams } from 'next/navigation'
 import React, { useCallback, useRef, useState } from 'react'
 import { useForm } from 'react-hook-form'
+import {
+  emailRules,
+  passwordRules,
+  passwordConfirmRules,
+} from '@/components/forms/validation'
 
 type FormData = {
   email: string
@@ -33,7 +38,7 @@ export const CreateAccountForm: React.FC = () => {
     watch,
   } = useForm<FormData>()
 
-  const password = useRef({})
+  const password = useRef<string>('')
   password.current = watch('password', '')
 
   const onSubmit = useCallback(
@@ -72,7 +77,7 @@ export const CreateAccountForm: React.FC = () => {
   )
 
   return (
-    <form onSubmit={handleSubmit(onSubmit)}>
+    <form noValidate onSubmit={handleSubmit(onSubmit)}>
       <Message error={error} />
 
       <div className="flex flex-col gap-5">
@@ -81,7 +86,7 @@ export const CreateAccountForm: React.FC = () => {
           <Input
             id="email"
             placeholder="you@email.com"
-            {...register('email', { required: 'Email is required.' })}
+            {...register('email', emailRules)}
             type="email"
           />
           {errors.email && <FormError message={errors.email.message} />}
@@ -91,7 +96,7 @@ export const CreateAccountForm: React.FC = () => {
           <Label htmlFor="password">Password</Label>
           <Input
             id="password"
-            {...register('password', { required: 'Password is required.' })}
+            {...register('password', passwordRules)}
             type="password"
           />
           {errors.password && <FormError message={errors.password.message} />}
@@ -101,10 +106,7 @@ export const CreateAccountForm: React.FC = () => {
           <Label htmlFor="passwordConfirm">Confirm password</Label>
           <Input
             id="passwordConfirm"
-            {...register('passwordConfirm', {
-              required: 'Please confirm your password.',
-              validate: (value) => value === password.current || 'The passwords do not match',
-            })}
+            {...register('passwordConfirm', passwordConfirmRules(() => password.current))}
             type="password"
           />
           {errors.passwordConfirm && <FormError message={errors.passwordConfirm.message} />}

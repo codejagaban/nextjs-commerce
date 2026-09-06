@@ -9,6 +9,10 @@ import { useAuth } from '@/providers/Auth'
 import React, { Fragment, useCallback, useState } from 'react'
 import { useForm } from 'react-hook-form'
 import { sendOrderAccessEmail } from './sendOrderAccessEmail'
+import {
+  emailRules,
+  requiredRule,
+} from '@/components/forms/validation'
 
 type FormData = {
   email: string
@@ -67,13 +71,13 @@ export const FindOrderForm: React.FC<Props> = ({ initialEmail }) => {
   }
 
   return (
-    <form className="flex flex-col gap-5" onSubmit={handleSubmit(onSubmit)}>
+    <form noValidate className="flex flex-col gap-5" onSubmit={handleSubmit(onSubmit)}>
       <FormItem>
         <Label htmlFor="email">Email</Label>
         <Input
           id="email"
           placeholder="you@email.com"
-          {...register('email', { required: 'Email is required.' })}
+          {...register('email', emailRules)}
           type="email"
         />
         {errors.email && <FormError message={errors.email.message} />}
@@ -83,7 +87,7 @@ export const FindOrderForm: React.FC<Props> = ({ initialEmail }) => {
         <Input
           id="orderID"
           {...register('orderID', {
-            required: 'Order ID is required.',
+            ...requiredRule('Order ID'),
           })}
           type="text"
         />
