@@ -62,22 +62,6 @@ function PaymentMethods() {
           AMEX
         </text>
       </svg>
-      {/* PayPal */}
-      <svg viewBox="0 0 40 26" className={tile} role="img" aria-label="PayPal">
-        <rect width="40" height="26" rx="4" fill="#fff" stroke="#e6e0d6" />
-        <text
-          x="20"
-          y="17"
-          textAnchor="middle"
-          fontFamily="Arial, sans-serif"
-          fontStyle="italic"
-          fontWeight="700"
-          fontSize="9"
-        >
-          <tspan fill="#003087">Pay</tspan>
-          <tspan fill="#009CDE">Pal</tspan>
-        </text>
-      </svg>
       {/* Apple Pay */}
       <svg viewBox="0 0 40 26" className={tile} role="img" aria-label="Apple Pay">
         <rect width="40" height="26" rx="4" fill="#fff" stroke="#e6e0d6" />
