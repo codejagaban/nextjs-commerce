@@ -1,6 +1,8 @@
 // Drive the add-to-cart flow and screenshot the cart. Usage: node scripts/cart-test.mjs <out>
 import { chromium } from '@playwright/test'
 
+const BASE = process.env.BASE_URL || 'http://localhost:3002'
+
 const out = process.argv[2] || 'cart.png'
 const browser = await chromium.launch({ channel: 'chrome' })
 const page = await browser.newPage({
@@ -10,7 +12,7 @@ const page = await browser.newPage({
 })
 const log = (m) => console.log('[cart-test]', m)
 
-await page.goto('http://localhost:3000/products/gentle-foaming-cleanser', { waitUntil: 'load' })
+await page.goto(BASE + '/products/gentle-foaming-cleanser', { waitUntil: 'load' })
 await page.waitForTimeout(1500)
 
 log('clicking add to cart')
