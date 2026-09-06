@@ -6,6 +6,7 @@ import { AddToCart } from '@/components/Cart/AddToCart'
 import { Price } from '@/components/Price'
 import React, { Suspense } from 'react'
 
+import { ProductPrice } from './ProductPrice'
 import { VariantSelector } from './VariantSelector'
 import { useCurrency } from '@payloadcms/plugin-ecommerce/client/react'
 import { StockIndicator } from '@/components/product/StockIndicator'
@@ -58,7 +59,13 @@ export function ProductDescription({ product }: { product: Product }) {
       </h1>
       <div className="mt-3 text-xl text-foreground tabular-nums">
         {hasVariants ? (
-          <Price highestAmount={highestAmount} lowestAmount={lowestAmount} />
+          <Suspense fallback={<Price highestAmount={highestAmount} lowestAmount={lowestAmount} />}>
+            <ProductPrice
+              product={product}
+              highestAmount={highestAmount}
+              lowestAmount={lowestAmount}
+            />
+          </Suspense>
         ) : (
           <Price amount={amount} />
         )}
