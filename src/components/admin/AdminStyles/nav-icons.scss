@@ -65,6 +65,12 @@
 $open: "%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%23808080' stroke-width='1.6' stroke-linecap='round' stroke-linejoin='round'%3E";
 $close: "%3C/svg%3E";
 
+/* --- Home --------------------------------------------------------------- */
+
+#nav-dashboard {
+  @include icon("#{$open}%3Crect x='3.2' y='3.2' width='7.4' height='7.4' rx='1.6'/%3E%3Crect x='13.4' y='3.2' width='7.4' height='7.4' rx='1.6'/%3E%3Crect x='3.2' y='13.4' width='7.4' height='7.4' rx='1.6'/%3E%3Crect x='13.4' y='13.4' width='7.4' height='7.4' rx='1.6'/%3E#{$close}");
+}
+
 /* --- Globals ------------------------------------------------------------ */
 
 #nav-global-header {
