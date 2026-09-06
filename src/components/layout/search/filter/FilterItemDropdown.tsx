@@ -1,6 +1,6 @@
 'use client'
 
-import { ChevronDownIcon } from 'lucide-react'
+import { CaretDown } from '@phosphor-icons/react/dist/ssr'
 import { usePathname, useSearchParams } from 'next/navigation'
 import React, { useEffect, useRef, useState } from 'react'
 
@@ -46,7 +46,7 @@ export function FilterItemDropdown({ list }: { list: ListItem[] }) {
         }}
       >
         <div>{active}</div>
-        <ChevronDownIcon className="h-4" />
+        <CaretDown className="h-4" />
       </div>
       {openSelect && (
         <div

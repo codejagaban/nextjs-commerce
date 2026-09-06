@@ -10,6 +10,7 @@ import type { Header } from 'src/payload-types'
 
 import { usePathname } from 'next/navigation'
 import { cn } from '@/utilities/cn'
+import { MagnifyingGlass } from '@phosphor-icons/react/dist/ssr'
 
 type Props = {
   header: Header
@@ -88,8 +89,15 @@ export function HeaderClient({ header }: Props) {
             Marisol
           </Link>
 
-          {/* right: cart */}
+          {/* right: search + cart */}
           <div className="flex items-center justify-end gap-4">
+            <Link
+              href="/shop"
+              aria-label="Search products"
+              className="transition-opacity hover:opacity-70"
+            >
+              <MagnifyingGlass className="h-5 w-5" weight="light" />
+            </Link>
             <Suspense fallback={<OpenCartButton />}>
               <Cart />
             </Suspense>

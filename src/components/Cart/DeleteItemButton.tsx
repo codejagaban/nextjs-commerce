@@ -3,7 +3,7 @@
 import type { CartItem } from '@/components/Cart'
 import { useCart } from '@payloadcms/plugin-ecommerce/client/react'
 import clsx from 'clsx'
-import { XIcon } from 'lucide-react'
+import { X } from '@phosphor-icons/react/dist/ssr'
 import React from 'react'
 
 export function DeleteItemButton({ item }: { item: CartItem }) {
@@ -27,7 +27,7 @@ export function DeleteItemButton({ item }: { item: CartItem }) {
         }}
         type="button"
       >
-        <XIcon className="hover:text-accent-3 mx-px h-4 w-4 text-white dark:text-black" />
+        <X className="hover:text-accent-3 mx-px h-4 w-4 text-white dark:text-black" />
       </button>
     </form>
   )

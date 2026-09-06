@@ -7,7 +7,7 @@ import { formatDateTime } from '@/utilities/formatDateTime'
 import { mergeOpenGraph } from '@/utilities/mergeOpenGraph'
 import Link from 'next/link'
 import { notFound } from 'next/navigation'
-import { ChevronLeftIcon } from 'lucide-react'
+import { CaretLeft } from '@phosphor-icons/react/dist/ssr'
 import { ProductItem } from '@/components/ProductItem'
 import { headers as getHeaders } from 'next/headers.js'
 import configPromise from '@payload-config'
@@ -119,7 +119,7 @@ export default async function Order({ params, searchParams }: PageProps) {
           <div className="flex gap-4">
             <Button asChild variant="ghost">
               <Link href="/orders">
-                <ChevronLeftIcon />
+                <CaretLeft />
                 All orders
               </Link>
             </Button>

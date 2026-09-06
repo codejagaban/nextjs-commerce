@@ -10,7 +10,7 @@ import {
   SheetTrigger,
 } from '@/components/ui/sheet'
 import { useCart } from '@payloadcms/plugin-ecommerce/client/react'
-import { ShoppingCart } from 'lucide-react'
+import { ShoppingBag } from '@phosphor-icons/react/dist/ssr'
 import Image from 'next/image'
 import Link from 'next/link'
 import { usePathname } from 'next/navigation'
@@ -53,7 +53,7 @@ export function CartModal() {
 
         {!cart || cart?.items?.length === 0 ? (
           <div className="text-center flex flex-col items-center gap-2">
-            <ShoppingCart className="h-16" />
+            <ShoppingBag className="h-16 w-16" weight="thin" />
             <p className="text-center text-2xl font-bold">Your cart is empty.</p>
           </div>
         ) : (

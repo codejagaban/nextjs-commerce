@@ -4,6 +4,7 @@ import { ThemeSelector } from '@/providers/Theme/ThemeSelector'
 import { getCachedGlobal } from '@/utilities/getGlobals'
 import Link from 'next/link'
 import React from 'react'
+import { FacebookLogo, InstagramLogo, TiktokLogo } from '@phosphor-icons/react/dist/ssr'
 
 const { COMPANY_NAME, SITE_NAME } = process.env
 
@@ -32,21 +33,13 @@ function Social() {
   return (
     <div className="mt-6 flex items-center gap-5">
       <a href="#" aria-label="Instagram" className={cls}>
-        <svg viewBox="0 0 24 24" className="h-5 w-5" fill="none" stroke="currentColor" strokeWidth="1.6">
-          <rect x="3" y="3" width="18" height="18" rx="5" />
-          <circle cx="12" cy="12" r="4" />
-          <circle cx="17.2" cy="6.8" r="1" fill="currentColor" stroke="none" />
-        </svg>
+        <InstagramLogo className="h-5 w-5" />
       </a>
       <a href="#" aria-label="Facebook" className={cls}>
-        <svg viewBox="0 0 24 24" className="h-5 w-5" fill="currentColor">
-          <path d="M14 8.5h2V6h-2c-1.7 0-3 1.3-3 3v2H9v2.5h2V21h2.5v-6.5H16l.5-2.5h-3V9c0-.3.2-.5.5-.5z" />
-        </svg>
+        <FacebookLogo className="h-5 w-5" />
       </a>
       <a href="#" aria-label="TikTok" className={cls}>
-        <svg viewBox="0 0 24 24" className="h-5 w-5" fill="currentColor">
-          <path d="M16 3c.3 2 1.6 3.4 3.5 3.6V9c-1.3 0-2.5-.4-3.5-1.1v5.8c0 3-2.2 5.3-5 5.3s-5-2.4-5-5.3 2.2-5.3 5-5.3c.3 0 .6 0 .9.1v2.6a2.6 2.6 0 0 0-.9-.2c-1.4 0-2.5 1.2-2.5 2.8s1.1 2.8 2.5 2.8 2.5-1.2 2.5-2.8V3H16z" />
-        </svg>
+        <TiktokLogo className="h-5 w-5" />
       </a>
     </div>
   )

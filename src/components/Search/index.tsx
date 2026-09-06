@@ -2,7 +2,7 @@
 
 import { cn } from '@/utilities/cn'
 import { createUrl } from '@/utilities/createUrl'
-import { SearchIcon } from 'lucide-react'
+import { MagnifyingGlass } from '@phosphor-icons/react/dist/ssr'
 import { useRouter, useSearchParams } from 'next/navigation'
 import React from 'react'
 
@@ -42,7 +42,7 @@ export const Search: React.FC<Props> = ({ className }) => {
         type="text"
       />
       <div className="absolute right-0 top-0 mr-3 flex h-full items-center">
-        <SearchIcon className="h-4" />
+        <MagnifyingGlass className="h-4 w-4" />
       </div>
     </form>
   )

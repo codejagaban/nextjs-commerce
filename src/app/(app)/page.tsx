@@ -9,6 +9,7 @@ import React from 'react'
 
 import { ProductGridItem } from '@/components/ProductGridItem'
 import { NewsletterForm } from '@/components/NewsletterForm'
+import { Drop, Leaf, ShieldCheck } from '@phosphor-icons/react/dist/ssr'
 
 export const metadata: Metadata = {
   title: 'Marisol — Clean skincare for your natural radiance',
@@ -50,26 +51,17 @@ const features = [
   {
     title: 'Pure ingredients',
     body: 'Only clean, safe and carefully selected components to protect your skin and health.',
-    icon: (
-      <path d="M12 3s5 5.6 5 9.4A5 5 0 0 1 7 12.4C7 8.6 12 3 12 3z" />
-    ),
+    Icon: Drop,
   },
   {
     title: 'Dermatologist approved',
     body: 'Every product is tested and recommended by experts for visible, lasting results.',
-    icon: (
-      <>
-        <path d="M12 3l7 3v5c0 4.4-3 7.6-7 9-4-1.4-7-4.6-7-9V6l7-3z" />
-        <path d="M9 12l2 2 4-4" fill="none" stroke="currentColor" strokeWidth="1.6" />
-      </>
-    ),
+    Icon: ShieldCheck,
   },
   {
     title: 'Sustainable beauty',
     body: 'Eco-friendly packaging and cruelty-free formulas for conscious self-care.',
-    icon: (
-      <path d="M5 19c8 1 14-4 14-13 0 0-4-1-8 1S5 12 5 19z" />
-    ),
+    Icon: Leaf,
   },
 ]
 
@@ -213,9 +205,7 @@ export default async function HomePage() {
           {features.map((f) => (
             <div key={f.title} className="flex flex-col items-center">
               <span className="flex h-14 w-14 items-center justify-center rounded-full bg-secondary text-terracotta">
-                <svg viewBox="0 0 24 24" className="h-6 w-6 fill-current">
-                  {f.icon}
-                </svg>
+                <f.Icon className="h-6 w-6" weight="light" />
               </span>
               <h3 className="mt-5 font-display text-lg text-foreground">{f.title}</h3>
               <p className="mt-2 max-w-xs text-sm leading-relaxed text-muted-foreground">{f.body}</p>
