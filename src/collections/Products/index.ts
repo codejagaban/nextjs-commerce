@@ -207,6 +207,16 @@ export const ProductsCollection: CollectionOverride = ({ defaultCollection }) =>
       hasMany: true,
       relationTo: 'categories',
     },
+    {
+      name: 'tags',
+      type: 'relationship',
+      admin: {
+        position: 'sidebar',
+        sortOptions: 'group',
+      },
+      hasMany: true,
+      relationTo: 'tags',
+    },
     slugField(),
   ],
 })
