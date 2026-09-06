@@ -19,6 +19,7 @@ import { Button } from '@/components/ui/button'
 import { deepMergeSimple } from 'payload/shared'
 import { FormError } from '@/components/forms/FormError'
 import { FormItem } from '@/components/forms/FormItem'
+import { requiredRule, postalCodeRules, phoneRules } from '@/components/forms/validation'
 
 type AddressFormValues = {
   title?: string | null
@@ -94,7 +95,7 @@ export const AddressForm: React.FC<Props> = ({
   )
 
   return (
-    <form onSubmit={handleSubmit(onSubmit)}>
+    <form noValidate onSubmit={handleSubmit(onSubmit)}>
       <div className="flex flex-col gap-4 mb-8">
         <div className="flex flex-col md:flex-row gap-4">
           <FormItem className="shrink">
@@ -126,7 +127,7 @@ export const AddressForm: React.FC<Props> = ({
             <Input
               id="firstName"
               autoComplete="given-name"
-              {...register('firstName', { required: 'First name is required.' })}
+              {...register('firstName', requiredRule('First name'))}
             />
             {errors.firstName && <FormError message={errors.firstName.message} />}
           </FormItem>
@@ -136,7 +137,7 @@ export const AddressForm: React.FC<Props> = ({
             <Input
               autoComplete="family-name"
               id="lastName"
-              {...register('lastName', { required: 'Last name is required.' })}
+              {...register('lastName', requiredRule('Last name'))}
             />
             {errors.lastName && <FormError message={errors.lastName.message} />}
           </FormItem>
@@ -144,7 +145,7 @@ export const AddressForm: React.FC<Props> = ({
 
         <FormItem>
           <Label htmlFor="phone">Phone</Label>
-          <Input type="tel" id="phone" autoComplete="mobile tel" {...register('phone')} />
+          <Input type="tel" id="phone" autoComplete="mobile tel" {...register('phone', phoneRules)} />
           {errors.phone && <FormError message={errors.phone.message} />}
         </FormItem>
 
@@ -159,7 +160,7 @@ export const AddressForm: React.FC<Props> = ({
           <Input
             id="addressLine1"
             autoComplete="address-line1"
-            {...register('addressLine1', { required: 'Address line 1 is required.' })}
+            {...register('addressLine1', requiredRule('Address line 1'))}
           />
           {errors.addressLine1 && <FormError message={errors.addressLine1.message} />}
         </FormItem>
@@ -175,7 +176,7 @@ export const AddressForm: React.FC<Props> = ({
           <Input
             id="city"
             autoComplete="address-level2"
-            {...register('city', { required: 'City is required.' })}
+            {...register('city', requiredRule('City'))}
           />
           {errors.city && <FormError message={errors.city.message} />}
         </FormItem>
@@ -190,7 +191,7 @@ export const AddressForm: React.FC<Props> = ({
           <Label htmlFor="postalCode">Zip Code*</Label>
           <Input
             id="postalCode"
-            {...register('postalCode', { required: 'Postal code is required.' })}
+            {...register('postalCode', postalCodeRules)}
           />
           {errors.postalCode && <FormError message={errors.postalCode.message} />}
         </FormItem>
@@ -205,7 +206,6 @@ export const AddressForm: React.FC<Props> = ({
             onValueChange={(value) => {
               setValue('country', value, { shouldValidate: true })
             }}
-            required
             defaultValue={initialData?.country || ''}
           >
             <SelectTrigger id="country" className="w-full">
