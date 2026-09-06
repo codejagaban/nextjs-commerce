@@ -3,7 +3,8 @@ import React, { useCallback, useMemo } from 'react'
 
 import { Category } from '@/payload-types'
 import { usePathname, useSearchParams, useRouter } from 'next/navigation'
-import clsx from 'clsx'
+import { Checkbox } from '@/components/ui/checkbox'
+import { cn } from '@/utilities/cn'
 
 type Props = {
   category: Category
@@ -16,33 +17,37 @@ export const CategoryItem: React.FC<Props> = ({ category }) => {
 
   const slug = category.slug || String(category.id)
 
-  const isActive = useMemo(() => {
-    return searchParams.get('category') === slug
-  }, [slug, searchParams])
+  const selected = useMemo(
+    () => (searchParams.get('category')?.split(',').filter(Boolean) ?? []) as string[],
+    [searchParams],
+  )
+  const isChecked = selected.includes(slug)
 
-  const setQuery = useCallback(() => {
+  const toggle = useCallback(() => {
     const params = new URLSearchParams(searchParams.toString())
+    const next = isChecked ? selected.filter((s) => s !== slug) : [...selected, slug]
 
-    if (isActive) {
-      params.delete('category')
+    if (next.length) {
+      params.set('category', next.join(','))
     } else {
-      params.set('category', slug)
+      params.delete('category')
     }
 
-    const newParams = params.toString()
-
-    router.push(newParams ? pathname + '?' + newParams : pathname)
-  }, [slug, isActive, pathname, router, searchParams])
+    const qs = params.toString()
+    router.push(qs ? `${pathname}?${qs}` : pathname, { scroll: false })
+  }, [isChecked, pathname, router, searchParams, selected, slug])
 
   return (
-    <button
-      onClick={() => setQuery()}
-      className={clsx('cursor-pointer text-sm transition-colors', {
-        'font-medium text-foreground': isActive,
-        'text-muted-foreground hover:text-foreground': !isActive,
-      })}
-    >
-      {category.title}
-    </button>
+    <label className="flex cursor-pointer items-center gap-2.5 text-sm">
+      <Checkbox checked={isChecked} onCheckedChange={toggle} aria-label={category.title} />
+      <span
+        className={cn(
+          'transition-colors',
+          isChecked ? 'font-medium text-foreground' : 'text-muted-foreground',
+        )}
+      >
+        {category.title}
+      </span>
+    </label>
   )
 }

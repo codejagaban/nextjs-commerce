@@ -19,6 +19,11 @@ export default async function ShopPage({ searchParams }: Props) {
   const { q: searchValue, sort, category } = await searchParams
   const payload = await getPayload({ config: configPromise })
 
+  // `category` may be a single slug, a comma-separated list, or repeated params.
+  const categorySlugs = (
+    Array.isArray(category) ? category : category ? category.split(',') : []
+  ).filter(Boolean)
+
   const products = await payload.find({
     collection: 'products',
     draft: false,
@@ -33,7 +38,7 @@ export default async function ShopPage({ searchParams }: Props) {
       enableVariants: true,
     },
     ...(sort ? { sort } : { sort: 'title' }),
-    ...(searchValue || category
+    ...(searchValue || categorySlugs.length
       ? {
           where: {
             and: [
@@ -60,11 +65,11 @@ export default async function ShopPage({ searchParams }: Props) {
                     },
                   ]
                 : []),
-              ...(category
+              ...(categorySlugs.length
                 ? [
                     {
                       'categories.slug': {
-                        equals: category,
+                        in: categorySlugs,
                       },
                     },
                   ]
