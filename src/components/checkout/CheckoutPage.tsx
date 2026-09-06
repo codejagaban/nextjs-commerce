@@ -131,7 +131,7 @@ export const CheckoutPage: React.FC = () => {
     <div className="grow w-full py-10">
       <h1 className="font-display text-3xl text-foreground md:text-4xl">Checkout</h1>
 
-      <div className="mt-8 grid items-start gap-10 lg:grid-cols-[1fr_360px] lg:gap-16">
+      <div className="mt-8 grid items-start gap-10 lg:grid-cols-[1fr_440px] lg:gap-14">
         <div className="flex flex-col gap-10">
           {/* Contact ------------------------------------------------------ */}
           <section>
