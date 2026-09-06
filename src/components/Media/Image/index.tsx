@@ -18,6 +18,7 @@ export const Image: React.FC<MediaProps> = (props) => {
     fill,
     height: heightFromProps,
     imgClassName,
+    loading,
     onClick,
     onLoad: onLoadFromProps,
     priority,
@@ -75,6 +76,7 @@ export const Image: React.FC<MediaProps> = (props) => {
           onLoadFromProps()
         }
       }}
+      loading={loading}
       priority={priority}
       quality={90}
       sizes={sizes}
