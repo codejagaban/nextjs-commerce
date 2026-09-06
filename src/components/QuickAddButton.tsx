@@ -4,6 +4,7 @@ import { useCart } from '@payloadcms/plugin-ecommerce/client/react'
 import Link from 'next/link'
 import React, { useState } from 'react'
 import { toast } from 'sonner'
+import { Check } from '@phosphor-icons/react/dist/ssr'
 
 type Props = {
   productId: string | number
@@ -23,6 +24,7 @@ const pill =
 export function QuickAddButton({ productId, variantId, hasVariants, slug, className }: Props) {
   const { addItem, isLoading } = useCart()
   const [busy, setBusy] = useState(false)
+  const [justAdded, setJustAdded] = useState(false)
 
   if (hasVariants) {
     return (
@@ -46,6 +48,8 @@ export function QuickAddButton({ productId, variantId, hasVariants, slug, classN
             variant: (variantId ?? undefined) as any,
           })
           toast.success('Added to cart')
+          setJustAdded(true)
+          setTimeout(() => setJustAdded(false), 1800)
         } catch {
           toast.error('Could not add to cart')
         } finally {
@@ -53,7 +57,13 @@ export function QuickAddButton({ productId, variantId, hasVariants, slug, classN
         }
       }}
     >
-      Add to cart
+      {justAdded ? (
+        <span className="inline-flex items-center gap-1">
+          <Check weight="bold" className="h-3.5 w-3.5" /> Added
+        </span>
+      ) : (
+        'Add to cart'
+      )}
     </button>
   )
 }

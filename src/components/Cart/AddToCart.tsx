@@ -6,8 +6,9 @@ import type { Product, Variant } from '@/payload-types'
 import { useCart } from '@payloadcms/plugin-ecommerce/client/react'
 import clsx from 'clsx'
 import { useSearchParams } from 'next/navigation'
-import React, { useCallback, useMemo } from 'react'
+import React, { useCallback, useMemo, useState } from 'react'
 import { toast } from 'sonner'
+import { Check } from '@phosphor-icons/react/dist/ssr'
 type Props = {
   product: Product
 }
@@ -15,6 +16,7 @@ type Props = {
 export function AddToCart({ product }: Props) {
   const { addItem, cart, isLoading } = useCart()
   const searchParams = useSearchParams()
+  const [justAdded, setJustAdded] = useState(false)
 
   const variants = product.variants?.docs || []
 
@@ -46,6 +48,8 @@ export function AddToCart({ product }: Props) {
         variant: selectedVariant?.id ?? undefined,
       }).then(() => {
         toast.success('Item added to cart.')
+        setJustAdded(true)
+        setTimeout(() => setJustAdded(false), 1800)
       })
     },
     [addItem, product, selectedVariant],
@@ -108,11 +112,17 @@ export function AddToCart({ product }: Props) {
       className={clsx(
         'h-12 w-full rounded-full text-sm font-medium sm:w-auto sm:min-w-[220px]',
       )}
-      disabled={disabled || isLoading}
+      disabled={disabled || isLoading || justAdded}
       onClick={addToCart}
       type="submit"
     >
-      {label}
+      {justAdded ? (
+        <span className="inline-flex items-center gap-1.5">
+          <Check weight="bold" className="h-4 w-4" /> Added
+        </span>
+      ) : (
+        label
+      )}
     </Button>
   )
 }
