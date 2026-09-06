@@ -37,6 +37,9 @@ export default buildConfig({
       // The `BeforeDashboard` component renders the 'welcome' block that you see after logging into your admin panel.
       // Feel free to delete this at any time. Simply remove the line below and the import `BeforeDashboard` statement on line 15.
       beforeDashboard: ['@/components/BeforeDashboard#BeforeDashboard'],
+      // Loads our admin stylesheet on every admin screen. Payload has no config
+      // key for custom CSS — it has to be imported from a rendered component.
+      providers: ['@/components/admin/AdminStyles#AdminStyles'],
     },
     user: Users.slug,
   },

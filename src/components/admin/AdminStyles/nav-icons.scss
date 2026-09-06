@@ -1,0 +1,107 @@
+/**
+ * Icons for the admin sidebar.
+ *
+ * Keyed on each link's href rather than Payload's internal class names, because
+ * those hrefs come from our own collection and global slugs — they change when we
+ * rename a collection, not when Payload ships a new version.
+ *
+ * Drawn as one family: 24px grid, 1.6 stroke, round caps and joins. Applied with
+ * mask-image so each icon takes `currentColor` and follows Payload's own light and
+ * dark themes without a second set.
+ */
+
+.nav__link {
+  display: flex;
+  align-items: center;
+  gap: 0.625rem;
+
+  &::before {
+    content: '';
+    flex: 0 0 auto;
+    width: 1.05rem;
+    height: 1.05rem;
+    background-color: currentColor;
+    opacity: 0.72;
+    -webkit-mask-repeat: no-repeat;
+    mask-repeat: no-repeat;
+    -webkit-mask-position: center;
+    mask-position: center;
+    -webkit-mask-size: contain;
+    mask-size: contain;
+  }
+
+  &:hover::before,
+  &--active::before {
+    opacity: 1;
+  }
+}
+
+@mixin icon($svg) {
+  &::before {
+    -webkit-mask-image: url("data:image/svg+xml,#{$svg}");
+    mask-image: url("data:image/svg+xml,#{$svg}");
+  }
+}
+
+$open: "%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%23000' stroke-width='1.6' stroke-linecap='round' stroke-linejoin='round'%3E";
+$close: "%3C/svg%3E";
+
+/* --- Globals ------------------------------------------------------------ */
+
+.nav__link[href$="/globals/header"] {
+  @include icon("#{$open}%3Crect x='3' y='4.5' width='18' height='15' rx='2'/%3E%3Cpath d='M3 9.5h18'/%3E#{$close}");
+}
+
+.nav__link[href$="/globals/footer"] {
+  @include icon("#{$open}%3Crect x='3' y='4.5' width='18' height='15' rx='2'/%3E%3Cpath d='M3 14.5h18'/%3E#{$close}");
+}
+
+/* --- People ------------------------------------------------------------- */
+
+.nav__link[href$="/collections/users"] {
+  @include icon("#{$open}%3Ccircle cx='12' cy='8' r='3.5'/%3E%3Cpath d='M4.5 20c0-3.4 3.4-5.5 7.5-5.5s7.5 2.1 7.5 5.5'/%3E#{$close}");
+}
+
+/* --- Content ------------------------------------------------------------ */
+
+.nav__link[href$="/collections/pages"] {
+  @include icon("#{$open}%3Cpath d='M14 3.5H7.5a2 2 0 0 0-2 2v13a2 2 0 0 0 2 2h9a2 2 0 0 0 2-2V8z'/%3E%3Cpath d='M14 3.5V8h4.5'/%3E%3Cpath d='M9 13h6M9 16.5h4'/%3E#{$close}");
+}
+
+.nav__link[href$="/collections/categories"] {
+  @include icon("#{$open}%3Cpath d='M3.5 7a2 2 0 0 1 2-2h3.2l2 2.2h7.8a2 2 0 0 1 2 2v8.8a2 2 0 0 1-2 2h-13a2 2 0 0 1-2-2z'/%3E#{$close}");
+}
+
+.nav__link[href$="/collections/tags"] {
+  @include icon("#{$open}%3Cpath d='M3.5 11.4V5.2a1.7 1.7 0 0 1 1.7-1.7h6.2l9 9-7.9 7.9z'/%3E%3Ccircle cx='7.9' cy='7.9' r='1.2'/%3E#{$close}");
+}
+
+.nav__link[href$="/collections/media"] {
+  @include icon("#{$open}%3Crect x='3.5' y='5' width='17' height='14' rx='2'/%3E%3Cpath d='M3.5 16l4.5-4.4 3.6 3.5 3-2.9 5.9 5.8'/%3E%3Ccircle cx='9' cy='9.6' r='1.3'/%3E#{$close}");
+}
+
+.nav__link[href$="/collections/forms"] {
+  @include icon("#{$open}%3Cpath d='M9 4.5H7.5a2 2 0 0 0-2 2v12a2 2 0 0 0 2 2h9a2 2 0 0 0 2-2v-12a2 2 0 0 0-2-2H15'/%3E%3Crect x='9' y='3' width='6' height='3.2' rx='1'/%3E%3Cpath d='M9 12h6M9 15.6h3.5'/%3E#{$close}");
+}
+
+.nav__link[href$="/collections/form-submissions"] {
+  @include icon("#{$open}%3Cpath d='M3.5 13.5h4.6l1.2 2.6h5.4l1.2-2.6h4.6'/%3E%3Cpath d='M6 5h12l2.5 8.5v5a2 2 0 0 1-2 2H5.5a2 2 0 0 1-2-2v-5z'/%3E#{$close}");
+}
+
+/* --- Ecommerce ---------------------------------------------------------- */
+
+.nav__link[href$="/collections/products"] {
+  @include icon("#{$open}%3Cpath d='M12 3.2l8.4 4.4-8.4 4.5-8.4-4.5z'/%3E%3Cpath d='M3.6 7.6v8.5l8.4 4.6 8.4-4.6V7.6'/%3E%3Cpath d='M12 12.1v8.6'/%3E#{$close}");
+}
+
+.nav__link[href$="/collections/carts"] {
+  @include icon("#{$open}%3Cpath d='M2.8 4h2.4l2.5 10.4h9.3l2.2-7.6H6.2'/%3E%3Ccircle cx='9.2' cy='19' r='1.4'/%3E%3Ccircle cx='16.6' cy='19' r='1.4'/%3E#{$close}");
+}
+
+.nav__link[href$="/collections/orders"] {
+  @include icon("#{$open}%3Cpath d='M6 3.2h12v17.6l-3-1.9-3 1.9-3-1.9-3 1.9z'/%3E%3Cpath d='M9 8.4h6M9 12.4h6'/%3E#{$close}");
+}
+
+.nav__link[href$="/collections/transactions"] {
+  @include icon("#{$open}%3Crect x='3' y='5.6' width='18' height='12.8' rx='2'/%3E%3Cpath d='M3 10h18'/%3E%3Cpath d='M6.6 14.6h3.2'/%3E#{$close}");
+}
