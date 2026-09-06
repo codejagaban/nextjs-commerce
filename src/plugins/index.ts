@@ -88,6 +88,38 @@ export const plugins: Plugin[] = [
     customers: {
       slug: 'users',
     },
+    transactions: {
+      /**
+       * The Stripe adapter builds each transaction item by spreading the cart
+       * item, which carries the cart row's own `id` along with it. Payload then
+       * writes `transactions_items` rows using those ids, so the second attempt
+       * to pay for the same cart collides with the first and fails with
+       * "Value must be unique: id" — permanently breaking retry on that cart.
+       *
+       * Drop the inherited id so Payload mints a fresh one per row.
+       */
+      transactionsCollectionOverride: ({ defaultCollection }) => ({
+        ...defaultCollection,
+        hooks: {
+          ...defaultCollection.hooks,
+          beforeValidate: [
+            ...(defaultCollection.hooks?.beforeValidate ?? []),
+            ({ data }) => {
+              if (data && Array.isArray(data.items)) {
+                data.items = data.items.map((item: Record<string, unknown>) => {
+                  if (item && typeof item === 'object' && 'id' in item) {
+                    const { id: _inheritedCartRowID, ...rest } = item
+                    return rest
+                  }
+                  return item
+                })
+              }
+              return data
+            },
+          ],
+        },
+      }),
+    },
     orders: {
       ordersCollectionOverride: ({ defaultCollection }) => ({
         ...defaultCollection,
