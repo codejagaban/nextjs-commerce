@@ -3,7 +3,7 @@
 import { CartItem } from '@/components/Cart'
 import { useCart } from '@payloadcms/plugin-ecommerce/client/react'
 import clsx from 'clsx'
-import { MinusIcon, PlusIcon } from 'lucide-react'
+import { Minus, Plus } from '@phosphor-icons/react/dist/ssr'
 import React, { useMemo } from 'react'
 
 export function EditItemQuantityButton({ type, item }: { item: CartItem; type: 'minus' | 'plus' }) {
@@ -59,9 +59,9 @@ export function EditItemQuantityButton({ type, item }: { item: CartItem; type: '
         type="button"
       >
         {type === 'plus' ? (
-          <PlusIcon className="h-4 w-4 dark:text-neutral-500 hover:text-blue-300" />
+          <Plus className="h-4 w-4 dark:text-neutral-500 hover:text-blue-300" />
         ) : (
-          <MinusIcon className="h-4 w-4 dark:text-neutral-500 hover:text-blue-300" />
+          <Minus className="h-4 w-4 dark:text-neutral-500 hover:text-blue-300" />
         )}
       </button>
     </form>

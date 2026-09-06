@@ -10,7 +10,7 @@ import { draftMode } from 'next/headers'
 import Link from 'next/link'
 import { notFound } from 'next/navigation'
 import React, { Suspense } from 'react'
-import { ChevronLeftIcon } from 'lucide-react'
+import { CaretLeft } from '@phosphor-icons/react/dist/ssr'
 import { Metadata } from 'next'
 
 type Args = {
@@ -121,7 +121,7 @@ export default async function ProductPage({ params }: Args) {
           href="/shop"
           className="mb-8 inline-flex items-center gap-1 text-sm text-muted-foreground transition-colors hover:text-foreground"
         >
-          <ChevronLeftIcon className="h-4 w-4" />
+          <CaretLeft className="h-4 w-4" />
           All products
         </Link>
         <div className="grid gap-10 lg:grid-cols-2 lg:gap-16">
