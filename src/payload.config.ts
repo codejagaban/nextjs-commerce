@@ -34,9 +34,10 @@ export default buildConfig({
       // The `BeforeLogin` component renders a message that you see while logging into your admin panel.
       // Feel free to delete this at any time. Simply remove the line below and the import `BeforeLogin` statement on line 15.
       beforeLogin: ['@/components/BeforeLogin#BeforeLogin'],
-      // The `BeforeDashboard` component renders the 'welcome' block that you see after logging into your admin panel.
-      // Feel free to delete this at any time. Simply remove the line below and the import `BeforeDashboard` statement on line 15.
-      beforeDashboard: ['@/components/BeforeDashboard#BeforeDashboard'],
+      // Store overview above the collection index. Replaces the starter's setup
+      // checklist, which also carried a one-click reseed of the whole database.
+      // Seeding is still available from the CLI with `pnpm seed`.
+      beforeDashboard: ['@/components/admin/Dashboard#Dashboard'],
       // Loads our admin stylesheet on every admin screen. Payload has no config
       // key for custom CSS — it has to be imported from a rendered component.
       providers: ['@/components/admin/AdminStyles#AdminStyles'],
