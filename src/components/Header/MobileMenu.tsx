@@ -53,7 +53,7 @@ export function MobileMenu({ menu }: Props) {
 
       <SheetContent side="left" className="px-4">
         <SheetHeader className="px-0 pt-4 pb-0">
-          <SheetTitle>My Store</SheetTitle>
+          <SheetTitle className="font-display text-2xl tracking-[0.06em]">Marisol</SheetTitle>
 
           <SheetDescription />
         </SheetHeader>

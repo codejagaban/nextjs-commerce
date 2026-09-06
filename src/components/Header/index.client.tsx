@@ -10,7 +10,8 @@ import type { Header } from 'src/payload-types'
 
 import { usePathname } from 'next/navigation'
 import { cn } from '@/utilities/cn'
-import { MagnifyingGlass } from '@phosphor-icons/react/dist/ssr'
+import { MagnifyingGlass, User } from '@phosphor-icons/react/dist/ssr'
+import { useAuth } from '@/providers/Auth'
 
 type Props = {
   header: Header
@@ -20,6 +21,7 @@ export function HeaderClient({ header }: Props) {
   const menu = header.navItems || []
   const pathname = usePathname()
   const isHome = pathname === '/'
+  const { user } = useAuth()
 
   const [scrolled, setScrolled] = useState(false)
   useEffect(() => {
@@ -89,7 +91,7 @@ export function HeaderClient({ header }: Props) {
             Marisol
           </Link>
 
-          {/* right: search + cart */}
+          {/* right: search + account + cart */}
           <div className="flex items-center justify-end gap-4">
             <Link
               href="/shop"
@@ -97,6 +99,13 @@ export function HeaderClient({ header }: Props) {
               className="transition-opacity hover:opacity-70"
             >
               <MagnifyingGlass className="h-5 w-5" weight="light" />
+            </Link>
+            <Link
+              href={user ? '/account' : '/login'}
+              aria-label={user ? 'Your account' : 'Log in or sign up'}
+              className="transition-opacity hover:opacity-70"
+            >
+              <User className="h-5 w-5" weight="light" />
             </Link>
             <Suspense fallback={<OpenCartButton />}>
               <Cart />
