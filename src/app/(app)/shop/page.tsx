@@ -16,13 +16,14 @@ type Props = {
 }
 
 export default async function ShopPage({ searchParams }: Props) {
-  const { q: searchValue, sort, category } = await searchParams
+  const { q: searchValue, sort, category, tag } = await searchParams
   const payload = await getPayload({ config: configPromise })
 
-  // `category` may be a single slug, a comma-separated list, or repeated params.
-  const categorySlugs = (
-    Array.isArray(category) ? category : category ? category.split(',') : []
-  ).filter(Boolean)
+  // `category` / `tag` may be a single slug, a comma-separated list, or repeated params.
+  const toSlugs = (v: string | string[] | undefined) =>
+    (Array.isArray(v) ? v : v ? v.split(',') : []).filter(Boolean)
+  const categorySlugs = toSlugs(category)
+  const tagSlugs = toSlugs(tag)
 
   const products = await payload.find({
     collection: 'products',
@@ -38,7 +39,7 @@ export default async function ShopPage({ searchParams }: Props) {
       enableVariants: true,
     },
     ...(sort ? { sort } : { sort: 'title' }),
-    ...(searchValue || categorySlugs.length
+    ...(searchValue || categorySlugs.length || tagSlugs.length
       ? {
           where: {
             and: [
@@ -70,6 +71,15 @@ export default async function ShopPage({ searchParams }: Props) {
                     {
                       'categories.slug': {
                         in: categorySlugs,
+                      },
+                    },
+                  ]
+                : []),
+              ...(tagSlugs.length
+                ? [
+                    {
+                      'tags.slug': {
+                        in: tagSlugs,
                       },
                     },
                   ]
