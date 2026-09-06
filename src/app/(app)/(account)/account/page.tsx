@@ -48,28 +48,23 @@ export default async function AccountPage() {
 
   return (
     <>
-      <div className="border p-8 rounded-lg bg-primary-foreground">
-        <h1 className="text-3xl font-medium mb-8">Account settings</h1>
+      <div className="rounded-2xl border border-border bg-card p-6 sm:p-8">
+        <h1 className="mb-6 font-display text-2xl text-foreground">Account settings</h1>
         <AccountForm />
       </div>
 
-      <div className=" border p-8 rounded-lg bg-primary-foreground">
-        <h2 className="text-3xl font-medium mb-8">Recent Orders</h2>
-
-        <div className="prose dark:prose-invert mb-8">
-          <p>
-            These are the most recent orders you have placed. Each order is associated with an
-            payment. As you place more orders, they will appear in your orders list.
-          </p>
-        </div>
+      <div className=" rounded-2xl border border-border bg-card p-6 sm:p-8">
+        <h2 className="mb-6 font-display text-2xl text-foreground">Recent orders</h2>
 
         {(!orders || !Array.isArray(orders) || orders?.length === 0) && (
-          <p className="mb-8">You have no orders.</p>
+          <p className="mb-8 text-sm text-muted-foreground">
+            You haven&rsquo;t placed any orders yet. When you do, they&rsquo;ll show up here.
+          </p>
         )}
 
         {orders && orders.length > 0 && (
-          <ul className="flex flex-col gap-6 mb-8">
-            {orders?.map((order, index) => (
+          <ul className="mb-8 flex flex-col gap-6">
+            {orders?.map((order) => (
               <li key={order.id}>
                 <OrderItem order={order} />
               </li>
@@ -77,7 +72,7 @@ export default async function AccountPage() {
           </ul>
         )}
 
-        <Button asChild variant="default">
+        <Button asChild variant="default" className="h-11 rounded-full px-6">
           <Link href="/orders">View all orders</Link>
         </Button>
       </div>
