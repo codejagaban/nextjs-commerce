@@ -15,7 +15,7 @@ export function DeleteItemButton({ item }: { item: CartItem }) {
       <button
         aria-label="Remove cart item"
         className={clsx(
-          'ease hover:cursor-pointer flex h-[17px] w-[17px] items-center justify-center rounded-full bg-neutral-500 transition-all duration-200',
+          'ease flex h-[18px] w-[18px] cursor-pointer items-center justify-center rounded-full bg-foreground/75 transition-all duration-200 hover:bg-foreground',
           {
             'cursor-not-allowed px-0': !itemId || isLoading,
           },
@@ -27,7 +27,7 @@ export function DeleteItemButton({ item }: { item: CartItem }) {
         }}
         type="button"
       >
-        <X className="hover:text-accent-3 mx-px h-4 w-4 text-white dark:text-black" />
+        <X className="mx-px h-3 w-3 text-background" weight="bold" />
       </button>
     </form>
   )

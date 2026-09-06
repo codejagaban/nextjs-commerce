@@ -19,7 +19,6 @@ import React, { useEffect, useMemo, useState } from 'react'
 import { DeleteItemButton } from './DeleteItemButton'
 import { EditItemQuantityButton } from './EditItemQuantityButton'
 import { OpenCartButton } from './OpenCart'
-import { Button } from '@/components/ui/button'
 import { Product } from '@/payload-types'
 
 export function CartModal() {
@@ -46,15 +45,17 @@ export function CartModal() {
 
       <SheetContent className="flex w-full flex-col sm:max-w-lg md:max-w-xl">
         <SheetHeader>
-          <SheetTitle>My Cart</SheetTitle>
+          <SheetTitle className="font-display text-2xl text-foreground">Your cart</SheetTitle>
 
-          <SheetDescription>Manage your cart here, add items to view the total.</SheetDescription>
+          <SheetDescription className="text-muted-foreground">
+            Add items to see your total and check out.
+          </SheetDescription>
         </SheetHeader>
 
         {!cart || cart?.items?.length === 0 ? (
-          <div className="text-center flex flex-col items-center gap-2">
-            <ShoppingCart className="h-16 w-16" weight="thin" />
-            <p className="text-center text-2xl font-bold">Your cart is empty.</p>
+          <div className="flex flex-1 flex-col items-center justify-center gap-4 text-center text-muted-foreground">
+            <ShoppingCart className="h-14 w-14" weight="thin" />
+            <p className="font-display text-xl text-foreground">Your cart is empty.</p>
           </div>
         ) : (
           <div className="grow flex px-4">
@@ -115,7 +116,7 @@ export function CartModal() {
                           className="z-30 flex flex-row space-x-4"
                           href={`/products/${(item.product as Product)?.slug}`}
                         >
-                          <div className="relative h-16 w-16 cursor-pointer overflow-hidden rounded-md border border-neutral-300 bg-neutral-300 dark:border-neutral-700 dark:bg-neutral-900 dark:hover:bg-neutral-800">
+                          <div className="relative h-16 w-16 cursor-pointer overflow-hidden rounded-lg border border-border bg-secondary">
                             {image?.url && (
                               <Image
                                 alt={image?.alt || product?.title || ''}
@@ -130,7 +131,7 @@ export function CartModal() {
                           <div className="flex flex-1 flex-col text-base">
                             <span className="leading-tight">{product?.title}</span>
                             {isVariant && variant ? (
-                              <p className="text-sm text-neutral-500 dark:text-neutral-400 capitalize">
+                              <p className="text-sm capitalize text-muted-foreground">
                                 {variant.options
                                   ?.map((option: any) => {
                                     if (typeof option === 'object') return option.label
@@ -162,23 +163,27 @@ export function CartModal() {
                 })}
               </ul>
 
-              <div className="px-4">
-                <div className="py-4 text-sm text-neutral-500 dark:text-neutral-400">
+              <div className="border-t border-border px-4 pt-5">
+                <div className="pb-4 text-sm text-muted-foreground">
                   {typeof cart?.subtotal === 'number' && (
-                    <div className="mb-3 flex items-center justify-between border-b border-neutral-200 pb-1 pt-1 dark:border-neutral-700">
-                      <p>Total</p>
+                    <div className="mb-4 flex items-center justify-between">
+                      <p>Subtotal</p>
                       <Price
                         amount={cart?.subtotal}
-                        className="text-right text-base text-black dark:text-white"
+                        className="text-right text-lg text-foreground tabular-nums"
                       />
                     </div>
                   )}
 
-                  <Button asChild>
-                    <Link className="w-full" href="/checkout">
-                      Proceed to Checkout
-                    </Link>
-                  </Button>
+                  <Link
+                    href="/checkout"
+                    className="flex h-12 w-full items-center justify-center rounded-full bg-primary text-sm font-medium text-primary-foreground transition-colors hover:bg-primary/85"
+                  >
+                    Proceed to checkout
+                  </Link>
+                  <p className="mt-3 text-center text-xs text-muted-foreground">
+                    Shipping &amp; taxes calculated at checkout
+                  </p>
                 </div>
               </div>
             </div>
