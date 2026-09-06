@@ -113,53 +113,55 @@ export default async function Order({ params, searchParams }: PageProps) {
   }
 
   return (
-    <div className="">
-      <div className="flex gap-8 justify-between items-center mb-6">
+    <div className="w-full">
+      <div className="mb-6 flex items-center justify-between gap-8">
         {user ? (
-          <div className="flex gap-4">
-            <Button asChild variant="ghost">
-              <Link href="/orders">
-                <CaretLeft />
-                All orders
-              </Link>
-            </Button>
-          </div>
+          <Button asChild variant="ghost" className="-ml-3 rounded-full">
+            <Link href="/orders">
+              <CaretLeft />
+              All orders
+            </Link>
+          </Button>
         ) : (
-          <div></div>
+          <div />
         )}
 
-        <h1 className="text-sm uppercase font-mono px-2 bg-primary/10 rounded tracking-[0.07em]">
-          <span className="">{`Order #${order.id}`}</span>
-        </h1>
+        <p className="text-sm text-muted-foreground tabular-nums">Order #{order.id}</p>
       </div>
 
-      <div className="bg-card border rounded-lg px-6 py-4 flex flex-col gap-12">
-        <div className="flex flex-col gap-6 lg:flex-row lg:justify-between">
-          <div className="">
-            <p className="font-mono uppercase text-primary/50 mb-1 text-sm">Order Date</p>
-            <p className="text-lg">
+      <div className="flex flex-col gap-10 rounded-2xl border border-border bg-card p-6 sm:p-8">
+        <div className="flex flex-col gap-8 sm:flex-row sm:justify-between">
+          <div>
+            <p className="mb-1 text-xs uppercase tracking-[0.12em] text-muted-foreground">
+              Order date
+            </p>
+            <p className="font-display text-lg text-foreground">
               <time dateTime={order.createdAt}>
                 {formatDateTime({ date: order.createdAt, format: 'MMMM dd, yyyy' })}
               </time>
             </p>
           </div>
 
-          <div className="">
-            <p className="font-mono uppercase text-primary/50 mb-1 text-sm">Total</p>
-            {order.amount && <Price className="text-lg" amount={order.amount} />}
+          <div>
+            <p className="mb-1 text-xs uppercase tracking-[0.12em] text-muted-foreground">Total</p>
+            {order.amount && (
+              <Price className="font-display text-lg text-foreground" amount={order.amount} />
+            )}
           </div>
 
           {order.status && (
-            <div className="grow max-w-1/3">
-              <p className="font-mono uppercase text-primary/50 mb-1 text-sm">Status</p>
-              <OrderStatus className="text-sm" status={order.status} />
+            <div>
+              <p className="mb-1 text-xs uppercase tracking-[0.12em] text-muted-foreground">
+                Status
+              </p>
+              <OrderStatus status={order.status} />
             </div>
           )}
         </div>
 
         {order.items && (
-          <div>
-            <h2 className="font-mono text-primary/50 mb-4 uppercase text-sm">Items</h2>
+          <div className="border-t border-border pt-8">
+            <h2 className="mb-5 font-display text-lg text-foreground">Items</h2>
             <ul className="flex flex-col gap-6">
               {order.items?.map((item, index) => {
                 if (typeof item.product === 'string') {
@@ -188,8 +190,8 @@ export default async function Order({ params, searchParams }: PageProps) {
         )}
 
         {order.shippingAddress && (
-          <div>
-            <h2 className="font-mono text-primary/50 mb-4 uppercase text-sm">Shipping Address</h2>
+          <div className="border-t border-border pt-8">
+            <h2 className="mb-5 font-display text-lg text-foreground">Shipping address</h2>
 
             {/* @ts-expect-error - some kind of type hell */}
             <AddressItem address={order.shippingAddress} hideActions />
