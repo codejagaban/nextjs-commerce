@@ -6,6 +6,9 @@ import { getCachedGlobal } from '@/utilities/getGlobals'
 import Link from 'next/link'
 import React from 'react'
 import { SunMark } from '@/components/Logo/MarisolMark'
+import { getPayload } from 'payload'
+import { headers as getHeaders } from 'next/headers.js'
+import configPromise from '@payload-config'
 
 const { COMPANY_NAME, SITE_NAME } = process.env
 
@@ -95,12 +98,33 @@ export async function Footer() {
   const currentYear = new Date().getFullYear()
   const name = COMPANY_NAME || SITE_NAME || 'Marisol'
 
+  let user = null
+  try {
+    const payload = await getPayload({ config: configPromise })
+    const authResult = await payload.auth({ headers: await getHeaders() })
+    user = authResult.user
+  } catch {
+    // auth may be unavailable during build — fall back to logged-out links
+  }
+
+  const accountLinks = user
+    ? [
+        { label: 'Your account', url: '/account' },
+        { label: 'Orders', url: '/orders' },
+        { label: 'Addresses', url: '/account/addresses' },
+        { label: 'Log out', url: '/logout' },
+      ]
+    : [
+        { label: 'Log in', url: '/login' },
+        { label: 'Create account', url: '/create-account' },
+      ]
+
   return (
     <footer className="grain relative mt-28 overflow-hidden border-t border-border bg-secondary/50">
       <div className="container relative z-10">
         <div className="grid grid-cols-2 gap-10 py-16 md:grid-cols-12 md:gap-8">
           {/* brand */}
-          <div className="col-span-2 md:col-span-5">
+          <div className="col-span-2 md:col-span-4">
             <Link href="/" aria-label="Marisol — home" className="inline-flex items-center gap-2.5">
               <SunMark className="h-7 w-7" />
               <span className="font-display text-2xl leading-none tracking-[0.02em] text-foreground">
@@ -114,7 +138,7 @@ export async function Footer() {
           </div>
 
           {/* shop */}
-          <div className="md:col-span-3">
+          <div className="md:col-span-2">
             <h2 className="text-xs uppercase tracking-[0.14em] text-muted-foreground">Shop</h2>
             <ul className="mt-4 space-y-3">
               {shopLinks.map((l) => (
@@ -141,6 +165,23 @@ export async function Footer() {
                     appearance="inline"
                     className="text-sm text-foreground/80 transition-colors hover:text-foreground"
                   />
+                </li>
+              ))}
+            </ul>
+          </div>
+
+          {/* account */}
+          <div className="md:col-span-2">
+            <h2 className="text-xs uppercase tracking-[0.14em] text-muted-foreground">Account</h2>
+            <ul className="mt-4 space-y-3">
+              {accountLinks.map((l) => (
+                <li key={l.url}>
+                  <Link
+                    href={l.url}
+                    className="text-sm text-foreground/80 transition-colors hover:text-foreground"
+                  >
+                    {l.label}
+                  </Link>
                 </li>
               ))}
             </ul>
