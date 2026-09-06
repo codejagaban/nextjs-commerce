@@ -54,6 +54,9 @@ export const Gallery: React.FC<Props> = ({ gallery }) => {
           resource={gallery[current].image}
           className="w-full"
           imgClassName="w-full rounded-lg"
+          // Above the fold on every product page — this is the LCP element.
+          loading="eager"
+          priority
         />
       </div>
 

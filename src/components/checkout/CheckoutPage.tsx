@@ -434,7 +434,15 @@ export const CheckoutPage: React.FC = () => {
                   <li className="flex items-start gap-3" key={index}>
                     <div className="relative h-16 w-16 shrink-0 overflow-hidden rounded-lg border border-border bg-secondary">
                       {image && typeof image !== 'string' && (
-                        <Media fill imgClassName="object-cover" resource={image} />
+                        <Media
+                          fill
+                          imgClassName="object-cover"
+                          // Nothing larger sits above the fold here, so the first
+                          // thumbnail is the LCP element.
+                          loading={index === 0 ? 'eager' : undefined}
+                          priority={index === 0}
+                          resource={image}
+                        />
                       )}
                     </div>
                     <div className="min-w-0 flex-1">

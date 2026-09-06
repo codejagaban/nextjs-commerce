@@ -109,8 +109,9 @@ export default async function ShopPage({ searchParams }: Props) {
 
       {products?.docs.length > 0 ? (
         <Grid className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
-          {products.docs.map((product) => {
-            return <ProductGridItem key={product.id} product={product} />
+          {products.docs.map((product, i) => {
+            // The first row is above the fold, so it carries the LCP image.
+            return <ProductGridItem key={product.id} product={product} priority={i < 3} />
           })}
         </Grid>
       ) : null}
