@@ -18,7 +18,7 @@ const shopLinks = [
 
 /** Card-brand marks shown in a small "we accept" strip. Real, recognisable marks. */
 function PaymentMethods() {
-  const tile = 'h-6 w-auto rounded-[3px]'
+  const tile = 'h-8 w-auto rounded-[4px]'
   return (
     <div className="flex items-center gap-1.5" aria-label="Accepted payment methods">
       {/* Visa */}
