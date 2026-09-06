@@ -1,5 +1,5 @@
-import { Categories } from '@/components/layout/search/Categories'
-import { FilterList } from '@/components/layout/search/filter'
+import { FilterSidebar } from '@/components/shop/FilterSidebar'
+import { FilterItemDropdown } from '@/components/layout/search/filter/FilterItemDropdown'
 import { sorting } from '@/lib/constants'
 import { Search } from '@/components/Search'
 import React, { Suspense } from 'react'
@@ -7,15 +7,24 @@ import React, { Suspense } from 'react'
 export default function ShopLayout({ children }: { children: React.ReactNode }) {
   return (
     <Suspense fallback={null}>
-      <div className="container flex flex-col gap-8 my-16 pb-4 ">
-        <Search className="mb-8" />
-
-        <div className="flex flex-col md:flex-row items-start justify-between gap-16 md:gap-4">
-          <div className="w-full flex-none flex flex-col gap-4 md:gap-8 basis-1/5">
-            <Categories />
-            <FilterList list={sorting} title="Sort by" />
+      <div className="container my-16 pb-4">
+        <div className="flex flex-col gap-10 md:flex-row md:items-start md:gap-10">
+          <aside className="w-full flex-none md:basis-1/4 lg:basis-1/5">
+            <Suspense fallback={null}>
+              <FilterSidebar />
+            </Suspense>
+          </aside>
+          <div className="min-h-screen w-full">
+            <div className="mb-8 flex flex-col gap-3 sm:flex-row sm:items-center">
+              <Search className="flex-1" />
+              <div className="sm:flex-none">
+                <Suspense fallback={null}>
+                  <FilterItemDropdown list={sorting} />
+                </Suspense>
+              </div>
+            </div>
+            {children}
           </div>
-          <div className="min-h-screen w-full">{children}</div>
         </div>
       </div>
     </Suspense>

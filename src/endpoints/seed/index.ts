@@ -64,6 +64,7 @@ const usd = (dollars: number) => Math.round(dollars * 100)
 
 const collections: CollectionSlug[] = [
   'categories',
+  'tags',
   'media',
   'pages',
   'products',
@@ -105,9 +106,27 @@ const mediaDefs: MediaDef[] = [
 
 const categoryDefs = [
   { title: 'Skin Care', slug: 'skin-care' },
+  { title: 'Serums', slug: 'serums' },
+  { title: 'Moisturisers', slug: 'moisturisers' },
+  { title: 'Cleansers', slug: 'cleansers' },
+  { title: 'Oils', slug: 'oils' },
   { title: 'Body Products', slug: 'body' },
   { title: 'Anti-aging Care', slug: 'anti-aging' },
   { title: 'Organic Products', slug: 'organic' },
+]
+
+// Attribute tags, grouped into filter facets on the shop page.
+const tagDefs = [
+  { title: 'Dry', slug: 'dry', group: 'Skin Type' },
+  { title: 'Oily', slug: 'oily', group: 'Skin Type' },
+  { title: 'Combination', slug: 'combination', group: 'Skin Type' },
+  { title: 'Sensitive', slug: 'sensitive', group: 'Skin Type' },
+  { title: 'Normal', slug: 'normal', group: 'Skin Type' },
+  { title: 'Hydration', slug: 'hydration', group: 'Concern' },
+  { title: 'Brightening', slug: 'brightening', group: 'Concern' },
+  { title: 'Firming', slug: 'firming', group: 'Concern' },
+  { title: 'Blemish control', slug: 'blemish-control', group: 'Concern' },
+  { title: 'Calming', slug: 'calming', group: 'Concern' },
 ]
 
 const sizeOptions = [
@@ -120,7 +139,8 @@ const oilDefs = [
   {
     title: 'Vitamin C Brightening Serum',
     slug: 'vitamin-c-brightening-serum',
-    category: 'skin-care',
+    categories: ['skin-care', 'serums'],
+    tags: ['normal', 'combination', 'brightening'],
     gallery: ['serum-03.jpg', 'lifestyle-01.jpg'],
     description:
       'A stable 15% vitamin C that evens tone and lends skin a lit-from-within glow. Light, fast-absorbing, non-greasy.',
@@ -129,7 +149,8 @@ const oilDefs = [
   {
     title: 'Hyaluronic Hydra Serum',
     slug: 'hyaluronic-hydra-serum',
-    category: 'skin-care',
+    categories: ['skin-care', 'serums'],
+    tags: ['dry', 'sensitive', 'hydration'],
     gallery: ['serum-04.jpg', 'still-life-01.jpg'],
     description:
       'Multi-weight hyaluronic acid draws moisture deep into the skin for a plump, dewy finish that lasts all day.',
@@ -142,7 +163,8 @@ const pantryDefs = [
   {
     title: 'Niacinamide Oil Booster',
     slug: 'niacinamide-oil-booster',
-    category: 'skin-care',
+    categories: ['skin-care', 'serums', 'oils'],
+    tags: ['oily', 'combination', 'blemish-control', 'calming'],
     gallery: ['serum-02.jpg', 'lifestyle-02.jpg'],
     description: 'A 5% niacinamide booster that refines pores and calms redness, worn alone or mixed into your cream.',
     price: 32,
@@ -151,7 +173,8 @@ const pantryDefs = [
   {
     title: 'Rosehip Facial Oil',
     slug: 'rosehip-facial-oil',
-    category: 'organic',
+    categories: ['organic', 'oils'],
+    tags: ['dry', 'normal', 'firming', 'hydration'],
     gallery: ['serum-01.jpg', 'lifestyle-02.jpg'],
     description: 'Cold-pressed organic rosehip, rich in omegas, to nourish and soften while you sleep. One dropper is plenty.',
     price: 28,
@@ -160,7 +183,8 @@ const pantryDefs = [
   {
     title: 'Retinol Renewal Night Cream',
     slug: 'retinol-renewal-night-cream',
-    category: 'anti-aging',
+    categories: ['anti-aging', 'moisturisers'],
+    tags: ['normal', 'combination', 'firming'],
     gallery: ['cream-jar-02.jpg'],
     description: 'Encapsulated retinol smooths fine lines overnight, buffered with ceramides so skin wakes calm, not tight.',
     price: 46,
@@ -169,7 +193,8 @@ const pantryDefs = [
   {
     title: 'Hydrating Day Moisturiser',
     slug: 'hydrating-day-moisturiser',
-    category: 'skin-care',
+    categories: ['skin-care', 'moisturisers'],
+    tags: ['dry', 'sensitive', 'normal', 'hydration'],
     gallery: ['cream-jar-01.jpg'],
     description: 'A weightless daily moisturiser with squalane and glycerin that sits beautifully under sunscreen and makeup.',
     price: 30,
@@ -178,7 +203,8 @@ const pantryDefs = [
   {
     title: 'Gentle Foaming Cleanser',
     slug: 'gentle-foaming-cleanser',
-    category: 'skin-care',
+    categories: ['skin-care', 'cleansers'],
+    tags: ['sensitive', 'calming'],
     gallery: ['pump-03.jpg'],
     description: 'A soft, sulphate-free foam that lifts away the day without stripping. Leaves skin clean, never squeaky.',
     price: 22,
@@ -187,7 +213,8 @@ const pantryDefs = [
   {
     title: 'Marine Mineral Body Lotion',
     slug: 'marine-mineral-body-lotion',
-    category: 'body',
+    categories: ['body'],
+    tags: ['dry', 'hydration'],
     gallery: ['pump-02.jpg'],
     description: 'A fast-sinking body lotion with sea minerals and shea, for skin that feels smooth from shoulders to toes.',
     price: 24,
@@ -196,7 +223,8 @@ const pantryDefs = [
   {
     title: 'Nourishing Body Wash',
     slug: 'nourishing-body-wash',
-    category: 'body',
+    categories: ['body'],
+    tags: ['sensitive', 'hydration'],
     gallery: ['pump-01.jpg'],
     description: 'A creamy, low-foam wash that cleanses and conditions in one step, leaving a soft botanical scent.',
     price: 18,
@@ -290,6 +318,15 @@ export const seed = async ({
     })
   }
 
+  payload.logger.info('— Seeding tags…')
+  const tagDocs: Record<string, any> = {}
+  for (const def of tagDefs) {
+    tagDocs[def.slug] = await payload.create({
+      collection: 'tags',
+      data: { title: def.title, slug: def.slug, group: def.group } as any,
+    })
+  }
+
   payload.logger.info('— Seeding variant types and options…')
   const sizeType = await payload.create({
     collection: 'variantTypes',
@@ -319,7 +356,8 @@ export const seed = async ({
         inventory: 0,
         priceInUSDEnabled: true,
         priceInUSD: usd(def.prices['30ml']),
-        categories: [categories[def.category].id],
+        categories: def.categories.map((c) => categories[c].id),
+        tags: def.tags.map((t) => tagDocs[t].id),
         description: root([para(def.description)]),
         gallery: def.gallery.map((f) => ({ image: media[f].id })),
         meta: {
@@ -359,7 +397,8 @@ export const seed = async ({
         inventory: def.inventory,
         priceInUSDEnabled: true,
         priceInUSD: usd(def.price),
-        categories: [categories[def.category].id],
+        categories: def.categories.map((c) => categories[c].id),
+        tags: def.tags.map((t) => tagDocs[t].id),
         description: root([para(def.description)]),
         gallery: def.gallery.map((f) => ({ image: media[f].id })),
         meta: {

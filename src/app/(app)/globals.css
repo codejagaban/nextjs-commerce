@@ -89,6 +89,26 @@
   .text-balance {
     text-wrap: balance;
   }
+
+  /* Cart icon reaction when an item is added. */
+  @keyframes cart-bump {
+    0%,
+    100% {
+      transform: scale(1);
+    }
+    30% {
+      transform: scale(1.28);
+    }
+    55% {
+      transform: scale(0.92);
+    }
+    80% {
+      transform: scale(1.06);
+    }
+  }
+  .animate-cart-bump {
+    animation: cart-bump 0.5s ease-in-out;
+  }
   .text-pretty {
     text-wrap: pretty;
   }
