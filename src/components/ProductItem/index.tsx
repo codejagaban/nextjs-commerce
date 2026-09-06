@@ -63,7 +63,7 @@ export const ProductItem: React.FC<Props> = ({
       <div className="flex items-stretch justify-stretch h-20 w-20 p-2 rounded-lg border">
         <div className="relative w-full h-full">
           {image && typeof image !== 'string' && (
-            <Media className="" fill imgClassName="rounded-lg object-cover" resource={image} />
+            <Media fill imgClassName="rounded-lg object-cover" resource={image} />
           )}
         </div>
       </div>
