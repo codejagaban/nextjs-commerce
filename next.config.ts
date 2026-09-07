@@ -9,6 +9,14 @@ import { redirects } from './redirects'
 
 const NEXT_PUBLIC_SERVER_URL = process.env.NEXT_PUBLIC_SERVER_URL || 'http://localhost:3000'
 
+/**
+ * Media may be served from a bucket rather than this origin. next/image refuses
+ * any host it has not been told about, so the public bucket URL is added here —
+ * derived from the same variable the storage adapter uses, so the two can never
+ * drift apart.
+ */
+const mediaOrigins = [process.env.R2_PUBLIC_URL].filter((v): v is string => Boolean(v))
+
 const nextConfig: NextConfig = {
   // Temporarily required on Windows until Next.js fixes Turbopack Sass resolution.
   // See: https://github.com/vercel/next.js/issues/86431
@@ -26,7 +34,7 @@ const nextConfig: NextConfig = {
     ],
     qualities: [75, 90, 100],
     remotePatterns: [
-      ...[NEXT_PUBLIC_SERVER_URL /* 'https://example.com' */].map((item) => {
+      ...[NEXT_PUBLIC_SERVER_URL /* 'https://example.com' */, ...mediaOrigins].map((item) => {
         const url = new URL(item)
 
         return {

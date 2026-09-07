@@ -16,6 +16,7 @@ import { customerOnlyFieldAccess } from '@/access/customerOnlyFieldAccess'
 import { isAdmin } from '@/access/isAdmin'
 import { isDocumentOwner } from '@/access/isDocumentOwner'
 import { DEFAULT_CURRENCY_CODE, SUPPORTED_CURRENCIES } from '@/currencies'
+import { mediaStorage } from '@/storage'
 
 const generateTitle: GenerateTitle<Product | Page> = ({ doc }) => {
   const siteName = process.env.SITE_NAME || 'Marisol'
@@ -29,6 +30,7 @@ const generateURL: GenerateURL<Product | Page> = ({ doc }) => {
 }
 
 export const plugins: Plugin[] = [
+  mediaStorage,
   seoPlugin({
     generateTitle,
     generateURL,
