@@ -42,8 +42,10 @@ export function HeaderClient({ header }: Props) {
   return (
     <>
       <header
+        // Sits below the admin bar when one is on screen, flush to the top when not.
+        style={{ top: 'var(--admin-bar-h, 0px)' }}
         className={cn(
-          'fixed inset-x-0 top-0 z-40 transition-colors duration-300',
+          'fixed inset-x-0 z-40 transition-colors duration-300',
           overlay
             ? 'border-b border-transparent bg-transparent text-bone [&_a]:text-bone [&_button]:text-bone'
             : 'border-b border-border/70 bg-background/90 text-foreground backdrop-blur-md',
