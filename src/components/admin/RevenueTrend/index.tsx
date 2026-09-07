@@ -154,7 +154,11 @@ export const RevenueTrend: React.FC<Props> = ({
         <div className="revenue-trend__controls">
           <ul className="revenue-trend__legend">
             <li><span className="revenue-trend__key revenue-trend__key--current" />{current.label}</li>
-            <li><span className="revenue-trend__key revenue-trend__key--previous" />{previous.label}</li>
+            {/* Only listed when it is on the chart — a key for an absent series
+                is worse than no key at all. */}
+            {mode === 'line' && (
+              <li><span className="revenue-trend__key revenue-trend__key--previous" />{previous.label}</li>
+            )}
           </ul>
 
           <div aria-label="Chart type" className="revenue-trend__switch" role="group">
@@ -181,7 +185,11 @@ export const RevenueTrend: React.FC<Props> = ({
       </figcaption>
 
       <svg className="revenue-trend__svg" preserveAspectRatio="xMidYMid meet" role="img" viewBox={`0 0 ${W} ${H}`}>
-        <title>{`Revenue for the last 30 days compared with the 30 days before`}</title>
+        <title>
+          {mode === 'line'
+            ? 'Revenue for the last 30 days compared with the 30 days before'
+            : 'Revenue for each of the last 30 days'}
+        </title>
 
         {ticks.map((t) => (
           <g key={t}>
@@ -192,10 +200,9 @@ export const RevenueTrend: React.FC<Props> = ({
           </g>
         ))}
 
-        <path className="revenue-trend__line revenue-trend__line--previous" d={path(previous.points)} />
-
         {mode === 'line' ? (
           <>
+            <path className="revenue-trend__line revenue-trend__line--previous" d={path(previous.points)} />
             <path className="revenue-trend__line revenue-trend__line--current" d={path(current.points)} />
             {lastIdx >= 0 && (
               <circle className="revenue-trend__endpoint" cx={x(lastIdx)} cy={y(current.points[lastIdx])} r={4.5} />
