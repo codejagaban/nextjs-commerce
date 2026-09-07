@@ -26,7 +26,16 @@
 
   &__headline { display: flex; flex-direction: column; gap: 0.5rem; }
 
-  &__title { margin: 0; font-size: 0.95rem; font-weight: 600; }
+  &__title {
+    margin: 0;
+    font-size: 0.95rem;
+    font-weight: 600;
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+  }
+
+  &__icon { color: var(--theme-elevation-500); flex: 0 0 auto; }
 
   &__figure { display: flex; align-items: baseline; flex-wrap: wrap; gap: 0.5rem; }
 

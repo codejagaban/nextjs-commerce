@@ -1,5 +1,7 @@
 import React from 'react'
 
+import { IconTrend } from '../icons'
+
 import './index.scss'
 
 export type Series = { label: string; points: number[] }
@@ -17,6 +19,48 @@ type Props = {
 const W = 780
 const H = 240
 const PAD = { top: 16, right: 12, bottom: 28, left: 54 }
+
+/**
+ * Monotone cubic interpolation (Fritsch–Carlson).
+ *
+ * A plain spline through spiky daily figures overshoots — the curve dips below
+ * zero between a busy day and a quiet one, drawing revenue that never happened.
+ * Monotone tangents are clamped so the curve never leaves the range of the points
+ * it joins: smooth edges, honest values.
+ */
+function smoothPath(pts: Array<{ x: number; y: number }>): string {
+  if (pts.length < 2) return pts.length ? `M${pts[0].x} ${pts[0].y}` : ''
+  const n = pts.length
+  const dx: number[] = []
+  const dy: number[] = []
+  const slope: number[] = []
+  for (let i = 0; i < n - 1; i++) {
+    dx[i] = pts[i + 1].x - pts[i].x
+    dy[i] = pts[i + 1].y - pts[i].y
+    slope[i] = dx[i] === 0 ? 0 : dy[i] / dx[i]
+  }
+
+  const m: number[] = [slope[0]]
+  for (let i = 1; i < n - 1; i++) {
+    if (slope[i - 1] * slope[i] <= 0) {
+      m[i] = 0 // a turning point stays flat, so the curve cannot overshoot it
+    } else {
+      const w1 = 2 * dx[i] + dx[i - 1]
+      const w2 = dx[i] + 2 * dx[i - 1]
+      m[i] = (w1 + w2) / (w1 / slope[i - 1] + w2 / slope[i])
+    }
+  }
+  m[n - 1] = slope[n - 2]
+
+  let d = `M${pts[0].x.toFixed(2)} ${pts[0].y.toFixed(2)}`
+  for (let i = 0; i < n - 1; i++) {
+    const h = dx[i] / 3
+    d += ` C${(pts[i].x + h).toFixed(2)} ${(pts[i].y + m[i] * h).toFixed(2)}`
+    d += ` ${(pts[i + 1].x - h).toFixed(2)} ${(pts[i + 1].y - m[i + 1] * h).toFixed(2)}`
+    d += ` ${pts[i + 1].x.toFixed(2)} ${pts[i + 1].y.toFixed(2)}`
+  }
+  return d
+}
 
 const money = (minor: number, currency: string) =>
   new Intl.NumberFormat('en-US', {
@@ -53,8 +97,7 @@ export const RevenueTrend: React.FC<Props> = ({
 
   const x = (i: number) => PAD.left + (i / (n - 1)) * plotW
   const y = (v: number) => PAD.top + plotH - (v / top) * plotH
-  const path = (pts: number[]) =>
-    pts.map((v, i) => `${i === 0 ? 'M' : 'L'}${x(i).toFixed(1)} ${y(v).toFixed(1)}`).join(' ')
+  const path = (pts: number[]) => smoothPath(pts.map((v, i) => ({ x: x(i), y: y(v) })))
 
   const lastIdx = current.points.length - 1
   const dir = delta === undefined ? null : delta > 0 ? 'up' : delta < 0 ? 'down' : 'flat'
@@ -63,7 +106,10 @@ export const RevenueTrend: React.FC<Props> = ({
     <figure className="revenue-trend">
       <figcaption className="revenue-trend__head">
         <div className="revenue-trend__headline">
-          <h3 className="revenue-trend__title">Total revenue</h3>
+          <h3 className="revenue-trend__title">
+            <IconTrend className="revenue-trend__icon" />
+            Total revenue
+          </h3>
           <div className="revenue-trend__figure">
             <span className="revenue-trend__total">{total}</span>
             {dir && (
