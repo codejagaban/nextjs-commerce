@@ -2,6 +2,8 @@ import config from '@payload-config'
 import { getPayload } from 'payload'
 import React from 'react'
 
+import { ActivityChart, type DayPoint } from '../ActivityChart'
+
 import './index.scss'
 
 const baseClass = 'store-overview'
@@ -58,7 +60,25 @@ async function getOverview() {
     })),
   ].sort((a, b) => a.qty - b.qty)
 
+  const DAYS = 14
+  const dayKey = (d: Date) => d.toISOString().slice(0, 10)
+  const buckets = new Map<string, DayPoint>()
+  for (let i = DAYS - 1; i >= 0; i--) {
+    const d = new Date()
+    d.setUTCHours(0, 0, 0, 0)
+    d.setUTCDate(d.getUTCDate() - i)
+    buckets.set(dayKey(d), { date: dayKey(d), started: 0, completed: 0 })
+  }
+  const bump = (createdAt: unknown, field: 'started' | 'completed') => {
+    if (typeof createdAt !== 'string') return
+    const b = buckets.get(createdAt.slice(0, 10))
+    if (b) b[field] += 1
+  }
+  transactions.docs.forEach((t) => bump(t.createdAt, 'started'))
+  orders.docs.forEach((o) => bump(o.createdAt, 'completed'))
+
   return {
+    activity: Array.from(buckets.values()),
     orderCount: orders.totalDocs,
     revenue,
     customers: users.totalDocs,
@@ -93,6 +113,8 @@ export const Dashboard: React.FC = async () => {
           </div>
         ))}
       </div>
+
+      <ActivityChart data={s.activity} />
 
       {s.orderCount === 0 && (
         <div className={`${baseClass}__notice`}>
