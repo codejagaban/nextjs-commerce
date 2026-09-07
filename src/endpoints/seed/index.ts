@@ -505,6 +505,24 @@ export const seed = async ({
         ],
       } as any,
     }),
+    // Fictional, like the rest of the demo brand — a clone replaces these first.
+    payload.updateGlobal({
+      slug: 'settings',
+      data: {
+        storeName: 'Marisol',
+        tagline:
+          "Clean, effective skincare made with naturally-derived ingredients, for skin's own natural radiance.",
+        supportEmail: 'hello@marisol.store',
+        social: [
+          { platform: 'instagram', url: 'https://instagram.com/marisolskin' },
+          { platform: 'tiktok', url: 'https://tiktok.com/@marisolskin' },
+        ],
+        metaTitle: 'Marisol — Clean skincare for your natural radiance',
+        metaDescription:
+          'Clean, effective skincare made with naturally-derived ingredients \u2014 cleansers, serums and moisturisers for skin\u2019s own natural radiance.',
+      } as any,
+      context: { disableRevalidate: true },
+    }),
   ])
 
   payload.logger.info('Seeded Marisol demo data successfully.')
