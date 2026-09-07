@@ -127,9 +127,11 @@
     font-size: 0.95rem;
     font-weight: 600;
     display: flex;
-    align-items: baseline;
+    align-items: center;
     gap: 0.5rem;
   }
+
+  &__panel-icon { color: var(--theme-elevation-500); flex: 0 0 auto; }
 
   &__panel-note {
     font-size: 0.78rem;

@@ -20,7 +20,12 @@
   &__label {
     font-size: 0.85rem;
     color: var(--theme-elevation-500);
+    display: flex;
+    align-items: center;
+    gap: 0.45rem;
   }
+
+  &__icon { flex: 0 0 auto; }
 
   /* Value and delta share a baseline; the comparison always sits on its own line
      so a long figure in one column cannot push the row out of step with the rest. */
