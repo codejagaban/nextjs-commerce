@@ -9,7 +9,9 @@ import {
   SheetTitle,
   SheetTrigger,
 } from '@/components/ui/sheet'
-import { useCart } from '@payloadcms/plugin-ecommerce/client/react'
+import { useCart, useCurrency } from '@payloadcms/plugin-ecommerce/client/react'
+
+import { priceFor } from '@/currencies'
 import { ShoppingCart } from '@phosphor-icons/react/dist/ssr'
 import Image from 'next/image'
 import Link from 'next/link'
@@ -23,6 +25,7 @@ import { Product } from '@/payload-types'
 
 export function CartModal() {
   const { cart } = useCart()
+  const { currency } = useCurrency()
   const [isOpen, setIsOpen] = useState(false)
 
   const pathname = usePathname()
@@ -107,12 +110,12 @@ export function CartModal() {
                       : undefined
 
                   let image = firstGalleryImage || metaImage
-                  let price = product.priceInUSD
+                  let price = priceFor(product, currency.code)
 
                   const isVariant = Boolean(variant) && typeof variant === 'object'
 
                   if (isVariant) {
-                    price = variant?.priceInUSD
+                    price = priceFor(variant, currency.code)
 
                     const imageVariant = product.gallery?.find((item: any) => {
                       if (!item.variantOption) return false

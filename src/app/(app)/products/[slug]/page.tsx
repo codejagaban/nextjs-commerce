@@ -13,6 +13,9 @@ import React, { Suspense } from 'react'
 import { CaretLeft } from '@phosphor-icons/react/dist/ssr'
 import { Metadata } from 'next'
 
+import { priceFor, priceSelect } from '@/currencies'
+import { getStoreCurrency } from '@/utilities/getStoreCurrency'
+
 type Args = {
   params: Promise<{
     slug: string
@@ -80,13 +83,14 @@ export default async function ProductPage({ params }: Args) {
       })
     : product.inventory! > 0
 
-  let price = product.priceInUSD
+  const currency = await getStoreCurrency()
+  let price = priceFor(product, currency)
 
   if (product.enableVariants && product?.variants?.docs?.length) {
     price = product?.variants?.docs?.reduce((acc, variant) => {
-      if (typeof variant === 'object' && variant?.priceInUSD && acc && variant?.priceInUSD > acc) {
-        return variant.priceInUSD
-      }
+      if (typeof variant !== 'object' || !variant) return acc
+      const variantPrice = priceFor(variant, currency)
+      if (variantPrice !== undefined && acc !== undefined && variantPrice > acc) return variantPrice
       return acc
     }, price)
   }
@@ -154,8 +158,10 @@ export default async function ProductPage({ params }: Args) {
   )
 }
 
-function RelatedProducts({ products }: { products: Product[] }) {
+async function RelatedProducts({ products }: { products: Product[] }) {
   if (!products.length) return null
+
+  const currency = await getStoreCurrency()
 
   return (
     <div className="py-8">
@@ -169,7 +175,7 @@ function RelatedProducts({ products }: { products: Product[] }) {
             <Link className="relative h-full w-full" href={`/products/${product.slug}`}>
               <GridTileImage
                 label={{
-                  amount: product.priceInUSD!,
+                  amount: priceFor(product, currency)!,
                   title: product.title,
                 }}
                 media={product.meta?.image as Media}
@@ -207,7 +213,7 @@ const queryProductBySlug = async ({ slug }: { slug: string }) => {
     populate: {
       variants: {
         title: true,
-        priceInUSD: true,
+        ...priceSelect,
         inventory: true,
         options: true,
       },

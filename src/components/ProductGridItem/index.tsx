@@ -5,22 +5,25 @@ import React from 'react'
 import { Media } from '@/components/Media'
 import { Price } from '@/components/Price'
 import { QuickAddButton } from '@/components/QuickAddButton'
+import { priceFor } from '@/currencies'
 
 type Props = {
+  /** The store's active currency, so the tile reads the matching price field. */
+  currency: string
   product: Partial<Product>
   priority?: boolean
   /** soft pastel tile background, cycled by the grid for variety */
   tile?: string
 }
 
-export const ProductGridItem: React.FC<Props> = ({ product, priority, tile }) => {
-  const { gallery, priceInUSD, title, enableVariants } = product
+export const ProductGridItem: React.FC<Props> = ({ currency, product, priority, tile }) => {
+  const { gallery, title, enableVariants } = product
 
-  let price = priceInUSD
+  let price = priceFor(product, currency)
   const variants = product.variants?.docs as Variant[] | undefined
   if (variants && variants.length > 0) {
     const prices = variants
-      .map((v) => (typeof v === 'object' ? v?.priceInUSD : undefined))
+      .map((v) => (typeof v === 'object' ? priceFor(v, currency) : undefined))
       .filter((n): n is number => typeof n === 'number')
     if (prices.length) price = Math.min(...prices)
   }

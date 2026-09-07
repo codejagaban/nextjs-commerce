@@ -13,6 +13,9 @@ import { MarkDroplet, MarkLeaf, MarkTested } from '@/components/Marks'
 import { Horizon } from '@/components/Horizon'
 import { SunMark } from '@/components/Logo/MarisolMark'
 
+import { priceSelect } from '@/currencies'
+import { getStoreCurrency } from '@/utilities/getStoreCurrency'
+
 export const metadata: Metadata = {
   title: 'Marisol — Clean skincare for your natural radiance',
   description:
@@ -33,7 +36,7 @@ async function getProducts(): Promise<Product[]> {
       slug: true,
       gallery: true,
       categories: true,
-      priceInUSD: true,
+      ...priceSelect,
       enableVariants: true,
     },
   })
@@ -92,7 +95,7 @@ const hasCategory = (p: Product, slug: string) =>
   Array.isArray(p.categories) && p.categories.some((c) => typeof c === 'object' && c?.slug === slug)
 
 export default async function HomePage() {
-  const products = await getProducts()
+  const [products, currency] = await Promise.all([getProducts(), getStoreCurrency()])
   const newArrivals = products.slice(0, 4)
   const bestsellers = products.slice(4, 8).length >= 4 ? products.slice(4, 8) : products.slice(0, 4)
 
@@ -188,7 +191,13 @@ export default async function HomePage() {
         </div>
         <div className="grid grid-cols-2 gap-x-6 gap-y-10 lg:grid-cols-4">
           {newArrivals.map((p, i) => (
-            <ProductGridItem key={p.id} product={p} priority={i < 2} tile={TILES[i % TILES.length]} />
+            <ProductGridItem
+              currency={currency}
+              key={p.id}
+              priority={i < 2}
+              product={p}
+              tile={TILES[i % TILES.length]}
+            />
           ))}
         </div>
       </section>
@@ -303,7 +312,12 @@ export default async function HomePage() {
         </div>
         <div className="grid grid-cols-2 gap-x-6 gap-y-10 lg:grid-cols-4">
           {bestsellers.map((p, i) => (
-            <ProductGridItem key={p.id} product={p} tile={TILES[(i + 2) % TILES.length]} />
+            <ProductGridItem
+              currency={currency}
+              key={p.id}
+              product={p}
+              tile={TILES[(i + 2) % TILES.length]}
+            />
           ))}
         </div>
       </section>

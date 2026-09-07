@@ -4,6 +4,7 @@ import { Price } from '@/components/Price'
 import { Button } from '@/components/ui/button'
 import { Media as MediaType, Order, Product, Variant } from '@/payload-types'
 import { formatDateTime } from '@/utilities/formatDateTime'
+import { DEFAULT_CURRENCY_CODE, priceFor } from '@/currencies'
 import Link from 'next/link'
 
 type Props = {
@@ -55,7 +56,9 @@ export const ProductItem: React.FC<Props> = ({
     }
   }
 
-  const itemPrice = variant?.priceInUSD || product.priceInUSD
+  // An order is read in the currency it was paid in, not today's store currency.
+  const code = currencyCode || DEFAULT_CURRENCY_CODE
+  const itemPrice = priceFor(variant, code) ?? priceFor(product, code)
   const itemURL = `/products/${product.slug}${variant ? `?variant=${variant.id}` : ''}`
 
   return (
