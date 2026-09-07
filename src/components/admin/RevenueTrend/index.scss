@@ -60,6 +60,55 @@
 
   &__compare { font-size: 0.8rem; color: var(--theme-elevation-450); }
 
+  &__controls {
+    display: flex;
+    flex-direction: column;
+    align-items: flex-end;
+    gap: 0.6rem;
+  }
+
+  /* A real control, so it looks pressable and shows which mode is on. */
+  &__switch {
+    display: inline-flex;
+    padding: 2px;
+    gap: 2px;
+    border: 1px solid var(--theme-elevation-150);
+    border-radius: 7px;
+    background: var(--theme-elevation-50);
+  }
+
+  &__switch-btn {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.35rem;
+    padding: 0.3rem 0.6rem;
+    border: 0;
+    border-radius: 5px;
+    background: transparent;
+    color: var(--theme-elevation-600);
+    font: inherit;
+    font-size: 0.8rem;
+    cursor: pointer;
+    transition: background-color 0.15s ease, color 0.15s ease;
+
+    &:hover { color: var(--theme-elevation-800); }
+
+    &:focus-visible {
+      outline: 2px solid var(--current);
+      outline-offset: 1px;
+    }
+
+    &[aria-pressed='true'] {
+      background: var(--theme-elevation-0);
+      color: var(--theme-elevation-900);
+      box-shadow: 0 1px 2px rgb(0 0 0 / 0.06);
+    }
+  }
+
+  &__switch-icon { width: 14px; height: 14px; flex: 0 0 auto; }
+
+  &__bar { fill: var(--current); }
+
   &__legend {
     display: flex;
     flex-wrap: wrap;
