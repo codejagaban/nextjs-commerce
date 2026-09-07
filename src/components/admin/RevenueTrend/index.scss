@@ -1,13 +1,12 @@
 /**
- * Revenue, this period against the last.
+ * Revenue over the last 30 days.
  *
- * The current series carries the brand's warm accent; the comparison sits in a
- * neutral so it reads as background context rather than a competing measure.
+ * One series, so one hue: the violet is the same step Popular products uses, and
+ * it holds its lightness on both surfaces, so no dark-mode swap is needed.
  */
 
 .revenue-trend {
-  --current: #f97316;
-  --previous: var(--theme-elevation-200);
+  --current: #7c3aed;
 
   margin: 0;
   border: 1px solid var(--theme-elevation-100);
@@ -132,14 +131,12 @@
 
 @media (prefers-color-scheme: dark) {
   :root:where(:not([data-theme='light'])) .revenue-trend {
-    --current: #ea580c;
     &__delta--up { color: #4ade80; }
     &__delta--down { color: #f87171; }
   }
 }
 
 :root[data-theme='dark'] .revenue-trend {
-  --current: #ea580c;
   &__delta--up { color: #4ade80; }
   &__delta--down { color: #f87171; }
 }
