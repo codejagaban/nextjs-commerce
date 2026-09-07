@@ -72,14 +72,16 @@ const money = (minor: number, currency: string) =>
   }).format(minor / 100)
 
 /**
- * Revenue for this period against the one before it.
+ * Revenue for the current period.
  *
- * Two series, so a legend is always present. The comparison line is deliberately
- * recessive — it is context for the current line, not an equal partner — and the
- * current line ends on a marked point, since "where are we now" is the question.
+ * One series, so no legend — the title names it. Bars are the default: daily
+ * revenue is a set of discrete magnitudes, and a bar per day reads them off the
+ * baseline without implying a continuous value between one day and the next. The
+ * line view stays available for anyone reading the shape rather than the days,
+ * and the choice is remembered.
  */
 type Mode = 'line' | 'bars'
-const STORAGE_KEY = 'marisol-admin:revenue-chart-mode'
+const STORAGE_KEY = 'marisol-admin:revenue-chart-mode:v2'
 
 export const RevenueTrend: React.FC<Props> = ({
   current,
@@ -89,7 +91,7 @@ export const RevenueTrend: React.FC<Props> = ({
   endLabel,
   currency = 'USD',
 }) => {
-  const [mode, setMode] = React.useState<Mode>('line')
+  const [mode, setMode] = React.useState<Mode>('bars')
 
   /**
    * Read the saved preference after mount rather than during render — reading it
