@@ -1,0 +1,105 @@
+/**
+ * Order pipeline health.
+ *
+ * These are status colours, not chart series — they are reserved for state and
+ * never reused for "the next series". Every segment ships with a written label and
+ * a count, so the bar is never the only thing carrying meaning.
+ */
+
+.order-health {
+  --ok: #2d6a4f;
+  --busy: #b7791f;
+  --refunded: #6b7280;
+  --bad: #a3231e;
+
+  border: 1px solid var(--theme-elevation-100);
+  border-radius: var(--style-radius-s, 3px);
+  padding: 1.15rem 1.25rem;
+  background: var(--theme-elevation-0);
+
+  &__title {
+    margin: 0 0 0.85rem;
+    font-size: 0.95rem;
+    font-weight: 600;
+    display: flex;
+    align-items: baseline;
+    gap: 0.5rem;
+  }
+
+  &__note {
+    font-size: 0.78rem;
+    font-weight: 400;
+    color: var(--theme-elevation-450);
+  }
+
+  &__bar {
+    display: flex;
+    gap: 2px;
+    height: 24px;
+    border-radius: 2px;
+    overflow: hidden;
+  }
+
+  &__seg {
+    display: block;
+    height: 100%;
+
+    &--completed { background: var(--ok); }
+    &--processing { background: var(--busy); }
+    &--refunded { background: var(--refunded); }
+    &--cancelled { background: var(--bad); }
+  }
+
+  &__key {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.35rem 1.25rem;
+    margin: 0.8rem 0 0;
+    padding: 0;
+    list-style: none;
+    font-size: 0.85rem;
+    color: var(--theme-elevation-650);
+
+    li { display: flex; align-items: center; gap: 0.45rem; }
+    b { color: var(--theme-elevation-800); font-variant-numeric: tabular-nums; }
+  }
+
+  &__swatch {
+    width: 0.6rem;
+    height: 0.6rem;
+    border-radius: 2px;
+    flex: 0 0 auto;
+
+    &--completed { background: var(--ok); }
+    &--processing { background: var(--busy); }
+    &--refunded { background: var(--refunded); }
+    &--cancelled { background: var(--bad); }
+  }
+
+  &__aside {
+    margin: 0.9rem 0 0;
+    padding-top: 0.8rem;
+    border-top: 1px solid var(--theme-elevation-100);
+    font-size: 0.85rem;
+    color: var(--theme-elevation-500);
+  }
+
+  &__empty { margin: 0; color: var(--theme-elevation-450); }
+}
+
+/* Status steps lifted for the dark surface rather than reused from light. */
+@media (prefers-color-scheme: dark) {
+  :root:where(:not([data-theme='light'])) .order-health {
+    --ok: #6fbb92;
+    --busy: #d9a75a;
+    --refunded: #9aa1ab;
+    --bad: #e08078;
+  }
+}
+
+:root[data-theme='dark'] .order-health {
+  --ok: #6fbb92;
+  --busy: #d9a75a;
+  --refunded: #9aa1ab;
+  --bad: #e08078;
+}
