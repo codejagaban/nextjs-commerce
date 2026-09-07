@@ -25,6 +25,7 @@ import { HorizontalRuleFeatureClient as HorizontalRuleFeatureClient_e70f5e05f09f
 import { BeforeLogin as BeforeLogin_8a7ab0eb7ab5c511aba12e68480bfe5e } from '@/components/BeforeLogin'
 import { DashboardNavLink as DashboardNavLink_3987d42d9edba53cc710fb1f6cc541b5 } from '@/components/admin/DashboardNavLink'
 import { AdminStyles as AdminStyles_340cf3538fa47d0416e0abd461790ca4 } from '@/components/admin/AdminStyles'
+import { S3ClientUploadHandler as S3ClientUploadHandler_f97aa6c64367fa259c5bc0567239ef24 } from '@payloadcms/storage-s3/client'
 import { DashboardView as DashboardView_8d5ccf53266e3797f61e9453e2f2d431 } from '@/components/admin/DashboardView'
 import { CollectionCards as CollectionCards_f9c02e79a4aed9a3924487c0cd4cafb1 } from '@payloadcms/next/rsc'
 
@@ -57,6 +58,7 @@ export const importMap = {
   "@/components/BeforeLogin#BeforeLogin": BeforeLogin_8a7ab0eb7ab5c511aba12e68480bfe5e,
   "@/components/admin/DashboardNavLink#DashboardNavLink": DashboardNavLink_3987d42d9edba53cc710fb1f6cc541b5,
   "@/components/admin/AdminStyles#AdminStyles": AdminStyles_340cf3538fa47d0416e0abd461790ca4,
+  "@payloadcms/storage-s3/client#S3ClientUploadHandler": S3ClientUploadHandler_f97aa6c64367fa259c5bc0567239ef24,
   "@/components/admin/DashboardView#DashboardView": DashboardView_8d5ccf53266e3797f61e9453e2f2d431,
   "@payloadcms/next/rsc#CollectionCards": CollectionCards_f9c02e79a4aed9a3924487c0cd4cafb1
 }
