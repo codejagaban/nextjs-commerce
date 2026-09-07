@@ -41,12 +41,41 @@ export const AdminBar: React.FC<{
     setShow(Boolean(canSeeAdmin))
   }, [])
 
+  /**
+   * The site header is `fixed` at the top of the viewport, so a bar in normal
+   * flow ends up underneath it. Publishing the bar's height as a custom property
+   * lets the header sit below the bar instead of on top of it, and removes the
+   * offset the moment the bar is hidden.
+   */
+  const barRef = React.useRef<HTMLDivElement | null>(null)
+  React.useEffect(() => {
+    const root = document.documentElement
+    if (!show) {
+      root.style.removeProperty('--admin-bar-h')
+      return
+    }
+
+    const publish = () => {
+      const height = barRef.current?.offsetHeight ?? 0
+      root.style.setProperty('--admin-bar-h', `${height}px`)
+    }
+    publish()
+
+    const observer = new ResizeObserver(publish)
+    if (barRef.current) observer.observe(barRef.current)
+    return () => {
+      observer.disconnect()
+      root.style.removeProperty('--admin-bar-h')
+    }
+  }, [show])
+
   return (
     <div
-      className={cn('py-2 bg-black text-white', {
+      className={cn('fixed inset-x-0 top-0 z-50 bg-black py-2 text-white', {
         block: show,
         hidden: !show,
       })}
+      ref={barRef}
     >
       <div className="container">
         <PayloadAdminBar
