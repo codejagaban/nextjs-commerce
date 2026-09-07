@@ -1,8 +1,9 @@
-import type { Footer, Setting } from '@/payload-types'
+import type { Footer } from '@/payload-types'
 
 import { CMSLink } from '@/components/Link'
 import { ThemeSelector } from '@/providers/Theme/ThemeSelector'
 import { getCachedGlobal } from '@/utilities/getGlobals'
+import { getSettings } from '@/utilities/getSettings'
 import Link from 'next/link'
 import React from 'react'
 import { SunMark } from '@/components/Logo/MarisolMark'
@@ -80,7 +81,7 @@ function PaymentMethods() {
 export async function Footer() {
   const [footer, settings] = await Promise.all([
     getCachedGlobal('footer', 1)() as Promise<Footer>,
-    getCachedGlobal('settings', 1)() as Promise<Setting>,
+    getSettings(),
   ])
   const menu = footer.navItems || []
   const currentYear = new Date().getFullYear()

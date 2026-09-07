@@ -1,14 +1,12 @@
 import type { Metadata } from 'next'
 import type { ReactNode } from 'react'
 
-import type { Setting } from '@/payload-types'
-
 import { AdminBar } from '@/components/AdminBar'
 import { Footer } from '@/components/Footer'
 import { Header } from '@/components/Header'
 import { LivePreviewListener } from '@/components/LivePreviewListener'
 import { ensureStartsWith } from '@/utilities/ensureStartsWith'
-import { getCachedGlobal } from '@/utilities/getGlobals'
+import { getSettings } from '@/utilities/getSettings'
 import { Providers } from '@/providers'
 import { InitTheme } from '@/providers/Theme/InitTheme'
 import { GeistSans } from 'geist/font/sans'
@@ -40,7 +38,7 @@ const twitterSite = TWITTER_SITE ? ensureStartsWith(TWITTER_SITE, 'https://') : 
  * database that has not been seeded yet.
  */
 export async function generateMetadata(): Promise<Metadata> {
-  const settings = (await getCachedGlobal('settings', 1)()) as Setting | null
+  const settings = await getSettings()
   const name = settings?.storeName || SITE_NAME
   const title = settings?.metaTitle || name
   const description = settings?.metaDescription || undefined
