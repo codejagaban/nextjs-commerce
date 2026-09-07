@@ -1,0 +1,96 @@
+/**
+ * Best sellers.
+ *
+ * Hues are the validated bright set — orange, violet, green, sky, pink — which
+ * clears colour-blind separation in both themes. Only the orange changes between
+ * light and dark; the rest hold their step.
+ *
+ * The hatched strip under each bar is the full scale the bar is measured against,
+ * so a short bar still reads as a share of the same whole.
+ */
+
+.popular {
+  --c1: #f97316;
+  --c2: #7c3aed;
+  --c3: #16a34a;
+  --c4: #0284c7;
+  --c5: #db2777;
+
+  border: 1px solid var(--theme-elevation-100);
+  border-radius: 10px;
+  padding: 1.4rem 1.5rem 1.25rem;
+  background: var(--theme-elevation-0);
+
+  &__title { margin: 0 0 1.15rem; font-size: 0.95rem; font-weight: 600; }
+
+  &__list {
+    margin: 0;
+    padding: 0;
+    list-style: none;
+    display: flex;
+    flex-direction: column;
+    gap: 1.05rem;
+  }
+
+  &__label {
+    display: flex;
+    align-items: baseline;
+    justify-content: space-between;
+    gap: 1rem;
+    margin-bottom: 0.4rem;
+  }
+
+  &__name { font-size: 0.875rem; min-width: 0; overflow-wrap: anywhere; }
+
+  &__units {
+    font-size: 0.8rem;
+    color: var(--theme-elevation-500);
+    font-variant-numeric: tabular-nums;
+    white-space: nowrap;
+  }
+
+  /* Hatched remainder: the rest of the scale, shown rather than implied. */
+  &__track {
+    position: relative;
+    height: 9px;
+    border-radius: 5px;
+    background-image: repeating-linear-gradient(
+      -45deg,
+      var(--theme-elevation-100) 0 3px,
+      transparent 3px 6px
+    );
+    background-color: var(--theme-elevation-50);
+    overflow: hidden;
+  }
+
+  &__bar {
+    height: 100%;
+    border-radius: 5px;
+    background: var(--theme-elevation-400);
+  }
+
+  &__row--1 .popular__bar { background: var(--c1); }
+  &__row--2 .popular__bar { background: var(--c2); }
+  &__row--3 .popular__bar { background: var(--c3); }
+  &__row--4 .popular__bar { background: var(--c4); }
+  &__row--5 .popular__bar { background: var(--c5); }
+
+  &__axis {
+    display: flex;
+    justify-content: space-between;
+    margin-top: 0.9rem;
+    padding-top: 0.6rem;
+    border-top: 1px solid var(--theme-elevation-100);
+    font-size: 0.72rem;
+    color: var(--theme-elevation-450);
+    font-variant-numeric: tabular-nums;
+  }
+
+  &__empty { margin: 0; color: var(--theme-elevation-450); }
+}
+
+@media (prefers-color-scheme: dark) {
+  :root:where(:not([data-theme='light'])) .popular { --c1: #ea580c; }
+}
+
+:root[data-theme='dark'] .popular { --c1: #ea580c; }

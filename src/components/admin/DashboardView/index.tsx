@@ -15,12 +15,16 @@ import { Dashboard } from '../Dashboard'
  * header are untouched.
  */
 export async function DashboardView({ initPageResult }: AdminViewServerProps) {
+  const user = initPageResult.req.user
+  const fullName = typeof user?.name === 'string' ? user.name : undefined
+  const firstName = fullName ? fullName.split(' ')[0] : undefined
+
   return (
     <Fragment>
       <HydrateAuthProvider permissions={initPageResult.permissions} />
       <SetStepNav nav={[{ label: 'Dashboard' }]} />
       <Gutter>
-        <Dashboard />
+        <Dashboard name={firstName} />
       </Gutter>
     </Fragment>
   )
