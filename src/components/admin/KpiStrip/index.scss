@@ -1,0 +1,73 @@
+/** Headline figures. One bordered row, hairline dividers between metrics. */
+.kpi-strip {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(13rem, 1fr));
+  border: 1px solid var(--theme-elevation-100);
+  border-radius: 10px;
+  background: var(--theme-elevation-0);
+  overflow: hidden;
+
+  &__item {
+    display: flex;
+    flex-direction: column;
+    gap: 0.55rem;
+    padding: 1.3rem 1.5rem;
+    border-left: 1px solid var(--theme-elevation-100);
+
+    &:first-child { border-left: 0; }
+  }
+
+  &__label {
+    font-size: 0.85rem;
+    color: var(--theme-elevation-500);
+  }
+
+  /* Value and delta share a baseline; the comparison always sits on its own line
+     so a long figure in one column cannot push the row out of step with the rest. */
+  &__figure {
+    display: flex;
+    align-items: baseline;
+    flex-wrap: wrap;
+    gap: 0.45rem;
+    min-height: 1.9rem;
+  }
+
+  &__value {
+    font-size: 1.7rem;
+    font-weight: 600;
+    line-height: 1.05;
+    font-variant-numeric: tabular-nums;
+    letter-spacing: -0.01em;
+  }
+
+  &__delta {
+    font-size: 0.85rem;
+    font-weight: 600;
+    font-variant-numeric: tabular-nums;
+    display: inline-flex;
+    align-items: center;
+    gap: 0.12rem;
+
+    &--up { color: #16a34a; }
+    &--down { color: #dc2626; }
+    &--flat { color: var(--theme-elevation-500); }
+  }
+
+  &__compare {
+    font-size: 0.8rem;
+    color: var(--theme-elevation-450);
+    margin-top: -0.15rem;
+  }
+}
+
+@media (prefers-color-scheme: dark) {
+  :root:where(:not([data-theme='light'])) .kpi-strip {
+    &__delta--up { color: #4ade80; }
+    &__delta--down { color: #f87171; }
+  }
+}
+
+:root[data-theme='dark'] .kpi-strip {
+  &__delta--up { color: #4ade80; }
+  &__delta--down { color: #f87171; }
+}

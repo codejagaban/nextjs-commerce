@@ -1,0 +1,116 @@
+/**
+ * Revenue, this period against the last.
+ *
+ * The current series carries the brand's warm accent; the comparison sits in a
+ * neutral so it reads as background context rather than a competing measure.
+ */
+
+.revenue-trend {
+  --current: #f97316;
+  --previous: var(--theme-elevation-200);
+
+  margin: 0;
+  border: 1px solid var(--theme-elevation-100);
+  border-radius: 10px;
+  padding: 1.4rem 1.5rem 1rem;
+  background: var(--theme-elevation-0);
+
+  &__head {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: flex-start;
+    justify-content: space-between;
+    gap: 0.75rem 1.5rem;
+    margin-bottom: 0.5rem;
+  }
+
+  &__headline { display: flex; flex-direction: column; gap: 0.5rem; }
+
+  &__title { margin: 0; font-size: 0.95rem; font-weight: 600; }
+
+  &__figure { display: flex; align-items: baseline; flex-wrap: wrap; gap: 0.5rem; }
+
+  &__total {
+    font-size: 1.85rem;
+    font-weight: 600;
+    line-height: 1;
+    font-variant-numeric: tabular-nums;
+    letter-spacing: -0.01em;
+  }
+
+  &__delta {
+    font-size: 0.875rem;
+    font-weight: 600;
+    display: inline-flex;
+    gap: 0.12rem;
+
+    &--up { color: #16a34a; }
+    &--down { color: #dc2626; }
+    &--flat { color: var(--theme-elevation-500); }
+  }
+
+  &__compare { font-size: 0.8rem; color: var(--theme-elevation-450); }
+
+  &__legend {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.3rem 1.1rem;
+    margin: 0.2rem 0 0;
+    padding: 0;
+    list-style: none;
+    font-size: 0.8rem;
+    color: var(--theme-elevation-500);
+
+    li { display: flex; align-items: center; gap: 0.4rem; }
+  }
+
+  &__key {
+    width: 0.55rem;
+    height: 0.55rem;
+    border-radius: 50%;
+    flex: 0 0 auto;
+
+    &--current { background: var(--current); }
+    &--previous { background: var(--theme-elevation-300); }
+  }
+
+  &__svg { display: block; width: 100%; height: auto; overflow: visible; }
+
+  &__grid { stroke: var(--theme-elevation-100); stroke-width: 1; stroke-dasharray: 3 4; }
+
+  &__tick {
+    fill: var(--theme-elevation-450);
+    font-size: 10.5px;
+    font-variant-numeric: tabular-nums;
+  }
+
+  &__line {
+    fill: none;
+    stroke-width: 2.25;
+    stroke-linecap: round;
+    stroke-linejoin: round;
+
+    &--current { stroke: var(--current); }
+    &--previous { stroke: var(--theme-elevation-250); stroke-width: 2; }
+  }
+
+  &__endpoint {
+    fill: var(--current);
+    stroke: var(--theme-elevation-0);
+    stroke-width: 2.5;
+  }
+}
+
+@media (prefers-color-scheme: dark) {
+  :root:where(:not([data-theme='light'])) .revenue-trend {
+    --current: #ea580c;
+    &__delta--up { color: #4ade80; }
+    &__delta--down { color: #f87171; }
+  }
+}
+
+:root[data-theme='dark'] .revenue-trend {
+  --current: #ea580c;
+  &__delta--up { color: #4ade80; }
+  &__delta--down { color: #f87171; }
+}
