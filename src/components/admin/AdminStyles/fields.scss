@@ -1,0 +1,16 @@
+/**
+ * Field fixes for the admin panel.
+ *
+ * Payload's select menu drops straight onto the field below it with no edge and
+ * no gap: `.rs__menu` is square-cornered and shares its background with the
+ * inputs it covers, so on the dark theme the seam disappears entirely and the
+ * next field's content reads as one more option in the list. Lifting the menu
+ * off the control and giving it its own border makes it read as a sheet floating
+ * over the form, which is what it is.
+ */
+.rs__menu {
+  margin-top: 4px;
+  border: 1px solid var(--theme-elevation-200);
+  border-radius: var(--style-radius-s, 3px);
+  overflow: hidden;
+}
