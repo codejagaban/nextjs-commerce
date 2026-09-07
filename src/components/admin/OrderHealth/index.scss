@@ -1,16 +1,17 @@
 /**
  * Order pipeline health.
  *
- * These are status colours, not chart series — they are reserved for state and
- * never reused for "the next series". Every segment ships with a written label and
- * a count, so the bar is never the only thing carrying meaning.
+ * The same validated hues Popular products uses, assigned one per state and never
+ * re-ordered, so a state keeps its colour as counts change. Every segment ships
+ * with a written label and a count, so the bar is never the only thing carrying
+ * meaning. The set clears CVD separation on both surfaces unchanged.
  */
 
 .order-health {
-  --ok: #2d6a4f;
-  --busy: #b7791f;
-  --refunded: #6b7280;
-  --bad: #a3231e;
+  --ok: #16a34a;
+  --busy: #0284c7;
+  --refunded: #7c3aed;
+  --bad: #db2777;
 
   border: 1px solid var(--theme-elevation-100);
   border-radius: var(--style-radius-s, 3px);
@@ -87,21 +88,4 @@
   }
 
   &__empty { margin: 0; color: var(--theme-elevation-450); }
-}
-
-/* Status steps lifted for the dark surface rather than reused from light. */
-@media (prefers-color-scheme: dark) {
-  :root:where(:not([data-theme='light'])) .order-health {
-    --ok: #6fbb92;
-    --busy: #d9a75a;
-    --refunded: #9aa1ab;
-    --bad: #e08078;
-  }
-}
-
-:root[data-theme='dark'] .order-health {
-  --ok: #6fbb92;
-  --busy: #d9a75a;
-  --refunded: #9aa1ab;
-  --bad: #e08078;
 }
