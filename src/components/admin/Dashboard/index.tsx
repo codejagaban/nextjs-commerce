@@ -2,7 +2,8 @@ import config from '@payload-config'
 import { getPayload } from 'payload'
 import React from 'react'
 
-import { TopProducts, type ProductRevenue } from '../TopProducts'
+import { OrderHealth, type StatusCount } from '../OrderHealth'
+import { RevenueByWeek, type WeekPoint } from '../RevenueByWeek'
 
 import './index.scss'
 
@@ -32,7 +33,6 @@ async function getOverview() {
   const revenue = earning.reduce((sum, o) => sum + (typeof o.amount === 'number' ? o.amount : 0), 0)
 
   const paymentsPending = transactions.docs.filter((t) => t.status === 'pending').length
-  const paymentsSucceeded = transactions.docs.filter((t) => t.status === 'succeeded').length
 
   /**
    * Stock lives on the variant when a product has them — the parent row is left
@@ -62,57 +62,48 @@ async function getOverview() {
     })),
   ].sort((a, b) => a.qty - b.qty)
 
-  const DAYS = 30
-  const since = new Date()
-  since.setUTCHours(0, 0, 0, 0)
-  since.setUTCDate(since.getUTCDate() - (DAYS - 1))
-
-  /**
-   * Revenue per product over the window. Line value comes from the variant's own
-   * price when the item has one, since a 50ml sells for more than a 30ml.
-   */
-  const catalogue = await payload.find({ collection: 'products', depth: 0, limit: 200 })
-  const allVariants = await payload.find({ collection: 'variants', depth: 0, limit: 200 })
-  const idOf = (rel: unknown) =>
-    typeof rel === 'object' && rel !== null ? (rel as { id?: unknown }).id : rel
-  const titleFor = new Map(catalogue.docs.map((p) => [p.id, String(p.title ?? 'Untitled')]))
-  const productPrice = new Map(catalogue.docs.map((p) => [p.id, Number(p.priceInUSD ?? 0)]))
-  const variantPrice = new Map(allVariants.docs.map((v) => [v.id, Number(v.priceInUSD ?? 0)]))
-
-  const perProduct = new Map<string, ProductRevenue>()
+  /** Monday-anchored weeks, oldest first, covering the last 13 complete weeks. */
+  const WEEKS = 13
+  const startOfWeek = (d: Date) => {
+    const x = new Date(d)
+    x.setUTCHours(0, 0, 0, 0)
+    // getUTCDay: 0 = Sunday, so shift back to the preceding Monday.
+    x.setUTCDate(x.getUTCDate() - ((x.getUTCDay() + 6) % 7))
+    return x
+  }
+  const thisWeek = startOfWeek(new Date())
+  const weeks = new Map<string, WeekPoint>()
+  for (let i = WEEKS; i >= 1; i--) {
+    const w = new Date(thisWeek)
+    w.setUTCDate(w.getUTCDate() - i * 7)
+    const key = w.toISOString().slice(0, 10)
+    weeks.set(key, { weekStart: key, revenue: 0, orders: 0 })
+  }
   earning.forEach((o) => {
-    if (typeof o.createdAt !== 'string' || new Date(o.createdAt) < since) return
-    const items = Array.isArray(o.items) ? o.items : []
-    items.forEach((item) => {
-      const productID = idOf((item as { product?: unknown }).product)
-      const variantID = idOf((item as { variant?: unknown }).variant)
-      const title = titleFor.get(productID as never)
-      if (!title) return
-      const qty = Number((item as { quantity?: unknown }).quantity ?? 1)
-      const unit = variantID
-        ? (variantPrice.get(variantID as never) ?? productPrice.get(productID as never) ?? 0)
-        : (productPrice.get(productID as never) ?? 0)
-      const row = perProduct.get(title) ?? { title, revenue: 0, units: 0 }
-      row.revenue += unit * qty
-      row.units += qty
-      perProduct.set(title, row)
-    })
+    if (typeof o.createdAt !== 'string') return
+    const key = startOfWeek(new Date(o.createdAt)).toISOString().slice(0, 10)
+    const bucket = weeks.get(key)
+    if (!bucket) return
+    bucket.revenue += typeof o.amount === 'number' ? o.amount : 0
+    bucket.orders += 1
+  })
+  const weekly = Array.from(weeks.values())
+
+  const statusCounts: StatusCount = { completed: 0, processing: 0, cancelled: 0, refunded: 0 }
+  orders.docs.forEach((o) => {
+    const key = String(o.status) as keyof StatusCount
+    if (key in statusCounts) statusCounts[key] += 1
   })
 
-  const topProducts = Array.from(perProduct.values())
-    .sort((a, b) => b.revenue - a.revenue)
-    .slice(0, 6)
-
   return {
-    topProducts,
-    windowDays: DAYS,
+    weekly,
+    statusCounts,
     orderCount: orders.totalDocs,
     revenue,
     customers: users.totalDocs,
     products: products.totalDocs,
     carts: carts.totalDocs,
     paymentsPending,
-    paymentsSucceeded,
     lowStock,
   }
 }
@@ -141,7 +132,7 @@ export const Dashboard: React.FC = async () => {
         ))}
       </div>
 
-      <TopProducts data={s.topProducts} days={s.windowDays} />
+      <RevenueByWeek data={s.weekly} />
 
       {s.orderCount === 0 && (
         <div className={`${baseClass}__notice`}>
@@ -161,25 +152,7 @@ export const Dashboard: React.FC = async () => {
       )}
 
       <div className={`${baseClass}__columns`}>
-        <div className={`${baseClass}__panel`}>
-          <h3 className={`${baseClass}__panel-heading`}>
-            Checkout attempts <span className={`${baseClass}__panel-note`}>via Stripe</span>
-          </h3>
-          <dl className={`${baseClass}__rows`}>
-            <div className={`${baseClass}__row`}>
-              <dt>Completed</dt>
-              <dd>{s.paymentsSucceeded}</dd>
-            </div>
-            <div className={`${baseClass}__row`}>
-              <dt>Started, not finished</dt>
-              <dd>{s.paymentsPending}</dd>
-            </div>
-            <div className={`${baseClass}__row`}>
-              <dt>Open carts</dt>
-              <dd>{s.carts}</dd>
-            </div>
-          </dl>
-        </div>
+        <OrderHealth counts={s.statusCounts} unfinishedPayments={s.paymentsPending} />
 
         <div className={`${baseClass}__panel`}>
           <h3 className={`${baseClass}__panel-heading`}>
