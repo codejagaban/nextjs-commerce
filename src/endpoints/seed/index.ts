@@ -62,6 +62,28 @@ const credit = (name: string): any =>
 
 const usd = (dollars: number) => Math.round(dollars * 100)
 
+/**
+ * Demo prices in the other supported currencies.
+ *
+ * Nothing is converted at runtime — each currency holds its own amount — so the
+ * demo needs a real figure per currency. These are the kind of round retail
+ * prices a shop actually sets, derived from the dollar price and rounded to a
+ * tidy ending rather than a spot exchange rate.
+ */
+const retail = (dollars: number, factor: number) => {
+  const raw = dollars * factor
+  return Math.round(raw) * 100 - 5 // e.g. 26.7 -> 26.95
+}
+
+const prices = (dollars: number) => ({
+  priceInUSDEnabled: true,
+  priceInUSD: usd(dollars),
+  priceInEUREnabled: true,
+  priceInEUR: retail(dollars, 0.94),
+  priceInGBPEnabled: true,
+  priceInGBP: retail(dollars, 0.81),
+})
+
 const collections: CollectionSlug[] = [
   'categories',
   'tags',
@@ -354,8 +376,7 @@ export const seed = async ({
         enableVariants: true,
         variantTypes: [sizeType.id],
         inventory: 0,
-        priceInUSDEnabled: true,
-        priceInUSD: usd(def.prices['30ml']),
+        ...prices(def.prices['30ml']),
         categories: def.categories.map((c) => categories[c].id),
         tags: def.tags.map((t) => tagDocs[t].id),
         description: root([para(def.description)]),
@@ -376,8 +397,7 @@ export const seed = async ({
           product: product.id,
           options: [sizeOptionDocs[opt.value].id],
           inventory: 80,
-          priceInUSDEnabled: true,
-          priceInUSD: usd((def.prices as any)[opt.value]),
+          ...prices((def.prices as any)[opt.value]),
           _status: 'published',
         } as any,
       })
@@ -395,8 +415,7 @@ export const seed = async ({
         _status: 'published',
         enableVariants: false,
         inventory: def.inventory,
-        priceInUSDEnabled: true,
-        priceInUSD: usd(def.price),
+        ...prices(def.price),
         categories: def.categories.map((c) => categories[c].id),
         tags: def.tags.map((t) => tagDocs[t].id),
         description: root([para(def.description)]),
@@ -510,6 +529,7 @@ export const seed = async ({
       slug: 'settings',
       data: {
         storeName: 'Marisol',
+        currency: 'USD',
         tagline:
           "Clean, effective skincare made with naturally-derived ingredients, for skin's own natural radiance.",
         supportEmail: 'hello@marisol.store',
