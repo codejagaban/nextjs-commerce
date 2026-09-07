@@ -2,7 +2,7 @@ import config from '@payload-config'
 import { getPayload } from 'payload'
 import React from 'react'
 
-import { ActivityChart, type DayPoint } from '../ActivityChart'
+import { SalesChart, type DayPoint } from '../SalesChart'
 
 import './index.scss'
 
@@ -27,7 +27,9 @@ async function getOverview() {
     payload.find({ collection: 'transactions', limit: 0, pagination: false, depth: 0 }),
   ])
 
-  const revenue = orders.docs.reduce((sum, o) => sum + (typeof o.amount === 'number' ? o.amount : 0), 0)
+  // Cancelled orders were never money in the till, so they stay out of revenue.
+  const earning = orders.docs.filter((o) => o.status !== 'cancelled')
+  const revenue = earning.reduce((sum, o) => sum + (typeof o.amount === 'number' ? o.amount : 0), 0)
 
   const paymentsPending = transactions.docs.filter((t) => t.status === 'pending').length
   const paymentsSucceeded = transactions.docs.filter((t) => t.status === 'succeeded').length
@@ -60,22 +62,22 @@ async function getOverview() {
     })),
   ].sort((a, b) => a.qty - b.qty)
 
-  const DAYS = 14
+  const DAYS = 30
   const dayKey = (d: Date) => d.toISOString().slice(0, 10)
   const buckets = new Map<string, DayPoint>()
   for (let i = DAYS - 1; i >= 0; i--) {
     const d = new Date()
     d.setUTCHours(0, 0, 0, 0)
     d.setUTCDate(d.getUTCDate() - i)
-    buckets.set(dayKey(d), { date: dayKey(d), started: 0, completed: 0 })
+    buckets.set(dayKey(d), { date: dayKey(d), revenue: 0, orders: 0 })
   }
-  const bump = (createdAt: unknown, field: 'started' | 'completed') => {
-    if (typeof createdAt !== 'string') return
-    const b = buckets.get(createdAt.slice(0, 10))
-    if (b) b[field] += 1
-  }
-  transactions.docs.forEach((t) => bump(t.createdAt, 'started'))
-  orders.docs.forEach((o) => bump(o.createdAt, 'completed'))
+  earning.forEach((o) => {
+    if (typeof o.createdAt !== 'string') return
+    const b = buckets.get(o.createdAt.slice(0, 10))
+    if (!b) return
+    b.revenue += typeof o.amount === 'number' ? o.amount : 0
+    b.orders += 1
+  })
 
   return {
     activity: Array.from(buckets.values()),
@@ -114,7 +116,7 @@ export const Dashboard: React.FC = async () => {
         ))}
       </div>
 
-      <ActivityChart data={s.activity} />
+      <SalesChart data={s.activity} />
 
       {s.orderCount === 0 && (
         <div className={`${baseClass}__notice`}>
@@ -135,7 +137,9 @@ export const Dashboard: React.FC = async () => {
 
       <div className={`${baseClass}__columns`}>
         <div className={`${baseClass}__panel`}>
-          <h3 className={`${baseClass}__panel-heading`}>Payments</h3>
+          <h3 className={`${baseClass}__panel-heading`}>
+            Checkout attempts <span className={`${baseClass}__panel-note`}>via Stripe</span>
+          </h3>
           <dl className={`${baseClass}__rows`}>
             <div className={`${baseClass}__row`}>
               <dt>Completed</dt>
