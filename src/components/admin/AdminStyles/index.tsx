@@ -1,6 +1,7 @@
 import React from 'react'
 
 import './nav-icons.scss'
+import './fields.scss'
 
 /**
  * Carries our admin stylesheet into the panel.
