@@ -92,3 +92,11 @@ export const IconStock: React.FC<Props> = (p) => (
     <path d="M12 11.4v3.2M12 17.4v.1" stroke="currentColor" />
   </Icon>
 )
+
+/** Bar chart. */
+export const IconBars: React.FC<Props> = (p) => (
+  <Icon {...p}>
+    <path d="M3.6 20.4h16.8" stroke="currentColor" />
+    <path d="M7 20.4v-6.2M12 20.4V7.6M17 20.4v-9.4" stroke="currentColor" />
+  </Icon>
+)

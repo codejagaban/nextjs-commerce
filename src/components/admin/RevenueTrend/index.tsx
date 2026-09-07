@@ -1,6 +1,8 @@
+'use client'
+
 import React from 'react'
 
-import { IconTrend } from '../icons'
+import { IconBars, IconTrend } from '../icons'
 
 import './index.scss'
 
@@ -77,6 +79,9 @@ const money = (minor: number, currency: string) =>
  * recessive — it is context for the current line, not an equal partner — and the
  * current line ends on a marked point, since "where are we now" is the question.
  */
+type Mode = 'line' | 'bars'
+const STORAGE_KEY = 'marisol-admin:revenue-chart-mode'
+
 export const RevenueTrend: React.FC<Props> = ({
   current,
   previous,
@@ -86,6 +91,31 @@ export const RevenueTrend: React.FC<Props> = ({
   endLabel,
   currency = 'USD',
 }) => {
+  const [mode, setMode] = React.useState<Mode>('line')
+
+  /**
+   * Read the saved preference after mount rather than during render — reading it
+   * while rendering would make the server and client disagree on the first frame.
+   * Storage can throw outright in a private window, so it stays wrapped.
+   */
+  React.useEffect(() => {
+    try {
+      const saved = window.localStorage.getItem(STORAGE_KEY)
+      if (saved === 'line' || saved === 'bars') setMode(saved)
+    } catch {
+      // No stored preference available; the default stands.
+    }
+  }, [])
+
+  const choose = (next: Mode) => {
+    setMode(next)
+    try {
+      window.localStorage.setItem(STORAGE_KEY, next)
+    } catch {
+      // Preference just will not persist; the chart still switches.
+    }
+  }
+
   const plotW = W - PAD.left - PAD.right
   const plotH = H - PAD.top - PAD.bottom
   const n = Math.max(current.points.length, previous.points.length, 2)
@@ -121,10 +151,33 @@ export const RevenueTrend: React.FC<Props> = ({
             <span className="revenue-trend__compare">vs previous 30 days</span>
           </div>
         </div>
-        <ul className="revenue-trend__legend">
-          <li><span className="revenue-trend__key revenue-trend__key--current" />{current.label}</li>
-          <li><span className="revenue-trend__key revenue-trend__key--previous" />{previous.label}</li>
-        </ul>
+        <div className="revenue-trend__controls">
+          <ul className="revenue-trend__legend">
+            <li><span className="revenue-trend__key revenue-trend__key--current" />{current.label}</li>
+            <li><span className="revenue-trend__key revenue-trend__key--previous" />{previous.label}</li>
+          </ul>
+
+          <div aria-label="Chart type" className="revenue-trend__switch" role="group">
+            <button
+              aria-pressed={mode === 'line'}
+              className="revenue-trend__switch-btn"
+              onClick={() => choose('line')}
+              type="button"
+            >
+              <IconTrend className="revenue-trend__switch-icon" />
+              Line
+            </button>
+            <button
+              aria-pressed={mode === 'bars'}
+              className="revenue-trend__switch-btn"
+              onClick={() => choose('bars')}
+              type="button"
+            >
+              <IconBars className="revenue-trend__switch-icon" />
+              Bars
+            </button>
+          </div>
+        </div>
       </figcaption>
 
       <svg className="revenue-trend__svg" preserveAspectRatio="xMidYMid meet" role="img" viewBox={`0 0 ${W} ${H}`}>
@@ -140,10 +193,30 @@ export const RevenueTrend: React.FC<Props> = ({
         ))}
 
         <path className="revenue-trend__line revenue-trend__line--previous" d={path(previous.points)} />
-        <path className="revenue-trend__line revenue-trend__line--current" d={path(current.points)} />
 
-        {lastIdx >= 0 && (
-          <circle className="revenue-trend__endpoint" cx={x(lastIdx)} cy={y(current.points[lastIdx])} r={4.5} />
+        {mode === 'line' ? (
+          <>
+            <path className="revenue-trend__line revenue-trend__line--current" d={path(current.points)} />
+            {lastIdx >= 0 && (
+              <circle className="revenue-trend__endpoint" cx={x(lastIdx)} cy={y(current.points[lastIdx])} r={4.5} />
+            )}
+          </>
+        ) : (
+          current.points.map((v, i) => {
+            // Leave a couple of pixels of surface between bars so they never touch.
+            const w = Math.max(2, plotW / n - 3)
+            return (
+              <rect
+                className="revenue-trend__bar"
+                height={Math.max(v > 0 ? 1.5 : 0, PAD.top + plotH - y(v))}
+                key={i}
+                rx={2}
+                width={w}
+                x={x(i) - w / 2}
+                y={y(v)}
+              />
+            )
+          })
         )}
 
         <text className="revenue-trend__tick" x={PAD.left} y={H - 9}>{startLabel}</text>
