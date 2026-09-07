@@ -15,6 +15,7 @@ import { adminOnlyFieldAccess } from '@/access/adminOnlyFieldAccess'
 import { customerOnlyFieldAccess } from '@/access/customerOnlyFieldAccess'
 import { isAdmin } from '@/access/isAdmin'
 import { isDocumentOwner } from '@/access/isDocumentOwner'
+import { DEFAULT_CURRENCY_CODE, SUPPORTED_CURRENCIES } from '@/currencies'
 
 const generateTitle: GenerateTitle<Product | Page> = ({ doc }) => {
   const siteName = process.env.SITE_NAME || 'Marisol'
@@ -78,6 +79,15 @@ export const plugins: Plugin[] = [
     },
   }),
   ecommercePlugin({
+    /**
+     * Each supported currency gets its own `priceIn<CODE>` field on products and
+     * variants, so an amount is entered per currency and never converted. Which
+     * of these the storefront sells in is chosen in Store settings.
+     */
+    currencies: {
+      defaultCurrency: DEFAULT_CURRENCY_CODE,
+      supportedCurrencies: SUPPORTED_CURRENCIES,
+    },
     access: {
       adminOnlyFieldAccess,
       adminOrPublishedStatus,
