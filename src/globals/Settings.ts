@@ -1,17 +1,13 @@
 import type { GlobalConfig } from 'payload'
 
-import { revalidateTag } from 'next/cache'
-
 import { adminOnly } from '@/access/adminOnly'
+import { DEFAULT_CURRENCY_CODE, SUPPORTED_CURRENCIES } from '@/currencies'
 
 /**
  * The one place a clone of this template gets its identity.
  *
- * Everything here is text the storefront reads at request time, so a new store is
- * branded from the admin rather than from a code edit. Currency is deliberately
- * absent: the ecommerce plugin resolves it when the Payload config is built, long
- * before the database is readable, so a picker here would be a control that does
- * nothing.
+ * Everything here is read by the storefront at request time, so a new store is
+ * branded and priced from the admin rather than from a code edit.
  */
 export const Settings: GlobalConfig = {
   slug: 'settings',
@@ -22,24 +18,6 @@ export const Settings: GlobalConfig = {
   },
   admin: {
     group: 'Settings',
-  },
-  hooks: {
-    /**
-     * Without this the storefront keeps serving the cached copy until a redeploy.
-     * Seeding and any other CLI write runs outside a request, where there is no
-     * cache store to revalidate — hence the guard and the escape hatch the seed
-     * script already uses for the other globals.
-     */
-    afterChange: [
-      ({ context }) => {
-        if (context?.disableRevalidate) return
-        try {
-          revalidateTag('global_settings', 'max')
-        } catch {
-          // No static generation store — nothing is cached to bust.
-        }
-      },
-    ],
   },
   fields: [
     {
@@ -55,6 +33,20 @@ export const Settings: GlobalConfig = {
               defaultValue: 'Marisol',
               admin: {
                 description: 'Shown in the footer, the copyright line and the browser tab.',
+              },
+            },
+            {
+              name: 'currency',
+              type: 'select',
+              required: true,
+              defaultValue: DEFAULT_CURRENCY_CODE,
+              options: SUPPORTED_CURRENCIES.map((c) => ({
+                label: `${c.label} (${c.symbol})`,
+                value: c.code,
+              })),
+              admin: {
+                description:
+                  'The currency the storefront sells in. Each product holds a separate price per currency — nothing is converted — so fill in the matching price field on your products. Adding a currency to this list is a code change, since it adds a price field.',
               },
             },
             {
