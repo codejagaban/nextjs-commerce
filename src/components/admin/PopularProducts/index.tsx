@@ -1,5 +1,7 @@
 import React from 'react'
 
+import { IconPopular } from '../icons'
+
 import './index.scss'
 
 export type PopularProduct = { title: string; units: number }
@@ -20,7 +22,10 @@ export const PopularProducts: React.FC<{ data: PopularProduct[] }> = ({ data }) 
 
   return (
     <section className="popular">
-      <h3 className="popular__title">Popular products</h3>
+      <h3 className="popular__title">
+        <IconPopular className="popular__icon" />
+        Popular products
+      </h3>
 
       {data.length === 0 ? (
         <p className="popular__empty">Best sellers appear here once orders start coming in.</p>

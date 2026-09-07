@@ -2,6 +2,7 @@ import config from '@payload-config'
 import { getPayload } from 'payload'
 import React from 'react'
 
+import { IconAverage, IconOrders, IconProducts, IconRevenue, IconStock } from '../icons'
 import { KpiStrip, type Kpi } from '../KpiStrip'
 import { OrderHealth, type StatusCount } from '../OrderHealth'
 import { PopularProducts, type PopularProduct } from '../PopularProducts'
@@ -157,10 +158,10 @@ export const Dashboard: React.FC<{ name?: string }> = async ({ name }) => {
   const s = await getOverview()
 
   const kpis: Kpi[] = [
-    { label: 'Revenue', value: money(s.currentRevenue), delta: s.revenueChange, compare: 'vs previous 30 days' },
-    { label: 'Orders', value: s.currentOrders.toLocaleString('en-US'), delta: s.ordersChange, compare: 'vs previous 30 days' },
-    { label: 'Average order', value: money(s.currentAov), delta: s.aovChange, compare: 'vs previous 30 days' },
-    { label: 'Products live', value: String(s.products), compare: `${s.customers} customers` },
+    { Icon: IconRevenue, label: 'Revenue', value: money(s.currentRevenue), delta: s.revenueChange, compare: 'vs previous 30 days' },
+    { Icon: IconOrders, label: 'Orders', value: s.currentOrders.toLocaleString('en-US'), delta: s.ordersChange, compare: 'vs previous 30 days' },
+    { Icon: IconAverage, label: 'Average order', value: money(s.currentAov), delta: s.aovChange, compare: 'vs previous 30 days' },
+    { Icon: IconProducts, label: 'Products live', value: String(s.products), compare: `${s.customers} customers` },
   ]
 
   return (
@@ -196,6 +197,7 @@ export const Dashboard: React.FC<{ name?: string }> = async ({ name }) => {
 
         <div className={`${baseClass}__panel`}>
           <h3 className={`${baseClass}__panel-heading`}>
+            <IconStock className={`${baseClass}__panel-icon`} />
             Low stock <span className={`${baseClass}__panel-note`}>under {LOW_STOCK_AT}</span>
           </h3>
           {s.lowStock.length === 0 ? (

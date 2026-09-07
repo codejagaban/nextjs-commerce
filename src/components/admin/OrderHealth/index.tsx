@@ -1,5 +1,7 @@
 import React from 'react'
 
+import { IconHealth } from '../icons'
+
 import './index.scss'
 
 export type StatusCount = { completed: number; processing: number; cancelled: number; refunded: number }
@@ -26,6 +28,7 @@ export const OrderHealth: React.FC<Props> = ({ counts, unfinishedPayments }) => 
   return (
     <section className="order-health">
       <h3 className="order-health__title">
+        <IconHealth className="order-health__icon" />
         Order health <span className="order-health__note">{total} order{total === 1 ? '' : 's'}</span>
       </h3>
 
