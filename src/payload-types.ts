@@ -133,10 +133,12 @@ export interface Config {
   globals: {
     header: Header;
     footer: Footer;
+    settings: Setting;
   };
   globalsSelect: {
     header: HeaderSelect<false> | HeaderSelect<true>;
     footer: FooterSelect<false> | FooterSelect<true>;
+    settings: SettingsSelect<false> | SettingsSelect<true>;
   };
   locale: null;
   widgets: {
@@ -1866,6 +1868,49 @@ export interface Footer {
 }
 /**
  * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "settings".
+ */
+export interface Setting {
+  id: number;
+  /**
+   * Shown in the footer, the copyright line and the browser tab.
+   */
+  storeName: string;
+  /**
+   * One or two sentences under the footer wordmark.
+   */
+  tagline?: string | null;
+  /**
+   * Published in the footer so customers can reach a person.
+   */
+  supportEmail?: string | null;
+  /**
+   * Optional. Left blank, no phone is shown.
+   */
+  supportPhone?: string | null;
+  /**
+   * Only the platforms you actually use — an empty list shows no social row at all.
+   */
+  social?:
+    | {
+        platform: 'instagram' | 'tiktok' | 'youtube' | 'facebook' | 'x' | 'pinterest';
+        url: string;
+        id?: string | null;
+      }[]
+    | null;
+  /**
+   * The home page title, and the fallback for any page without its own. Blank falls back to the store name.
+   */
+  metaTitle?: string | null;
+  /**
+   * The search-result snippet for pages without their own description.
+   */
+  metaDescription?: string | null;
+  updatedAt?: string | null;
+  createdAt?: string | null;
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
  * via the `definition` "header_select".
  */
 export interface HeaderSelect<T extends boolean = true> {
@@ -1906,6 +1951,28 @@ export interface FooterSelect<T extends boolean = true> {
             };
         id?: T;
       };
+  updatedAt?: T;
+  createdAt?: T;
+  globalType?: T;
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "settings_select".
+ */
+export interface SettingsSelect<T extends boolean = true> {
+  storeName?: T;
+  tagline?: T;
+  supportEmail?: T;
+  supportPhone?: T;
+  social?:
+    | T
+    | {
+        platform?: T;
+        url?: T;
+        id?: T;
+      };
+  metaTitle?: T;
+  metaDescription?: T;
   updatedAt?: T;
   createdAt?: T;
   globalType?: T;
