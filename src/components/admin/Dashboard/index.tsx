@@ -2,7 +2,7 @@ import config from '@payload-config'
 import { getPayload } from 'payload'
 import React from 'react'
 
-import { SalesChart, type DayPoint } from '../SalesChart'
+import { TopProducts, type ProductRevenue } from '../TopProducts'
 
 import './index.scss'
 
@@ -63,24 +63,49 @@ async function getOverview() {
   ].sort((a, b) => a.qty - b.qty)
 
   const DAYS = 30
-  const dayKey = (d: Date) => d.toISOString().slice(0, 10)
-  const buckets = new Map<string, DayPoint>()
-  for (let i = DAYS - 1; i >= 0; i--) {
-    const d = new Date()
-    d.setUTCHours(0, 0, 0, 0)
-    d.setUTCDate(d.getUTCDate() - i)
-    buckets.set(dayKey(d), { date: dayKey(d), revenue: 0, orders: 0 })
-  }
+  const since = new Date()
+  since.setUTCHours(0, 0, 0, 0)
+  since.setUTCDate(since.getUTCDate() - (DAYS - 1))
+
+  /**
+   * Revenue per product over the window. Line value comes from the variant's own
+   * price when the item has one, since a 50ml sells for more than a 30ml.
+   */
+  const catalogue = await payload.find({ collection: 'products', depth: 0, limit: 200 })
+  const allVariants = await payload.find({ collection: 'variants', depth: 0, limit: 200 })
+  const idOf = (rel: unknown) =>
+    typeof rel === 'object' && rel !== null ? (rel as { id?: unknown }).id : rel
+  const titleFor = new Map(catalogue.docs.map((p) => [p.id, String(p.title ?? 'Untitled')]))
+  const productPrice = new Map(catalogue.docs.map((p) => [p.id, Number(p.priceInUSD ?? 0)]))
+  const variantPrice = new Map(allVariants.docs.map((v) => [v.id, Number(v.priceInUSD ?? 0)]))
+
+  const perProduct = new Map<string, ProductRevenue>()
   earning.forEach((o) => {
-    if (typeof o.createdAt !== 'string') return
-    const b = buckets.get(o.createdAt.slice(0, 10))
-    if (!b) return
-    b.revenue += typeof o.amount === 'number' ? o.amount : 0
-    b.orders += 1
+    if (typeof o.createdAt !== 'string' || new Date(o.createdAt) < since) return
+    const items = Array.isArray(o.items) ? o.items : []
+    items.forEach((item) => {
+      const productID = idOf((item as { product?: unknown }).product)
+      const variantID = idOf((item as { variant?: unknown }).variant)
+      const title = titleFor.get(productID as never)
+      if (!title) return
+      const qty = Number((item as { quantity?: unknown }).quantity ?? 1)
+      const unit = variantID
+        ? (variantPrice.get(variantID as never) ?? productPrice.get(productID as never) ?? 0)
+        : (productPrice.get(productID as never) ?? 0)
+      const row = perProduct.get(title) ?? { title, revenue: 0, units: 0 }
+      row.revenue += unit * qty
+      row.units += qty
+      perProduct.set(title, row)
+    })
   })
 
+  const topProducts = Array.from(perProduct.values())
+    .sort((a, b) => b.revenue - a.revenue)
+    .slice(0, 6)
+
   return {
-    activity: Array.from(buckets.values()),
+    topProducts,
+    windowDays: DAYS,
     orderCount: orders.totalDocs,
     revenue,
     customers: users.totalDocs,
@@ -116,7 +141,7 @@ export const Dashboard: React.FC = async () => {
         ))}
       </div>
 
-      <SalesChart data={s.activity} />
+      <TopProducts data={s.topProducts} days={s.windowDays} />
 
       {s.orderCount === 0 && (
         <div className={`${baseClass}__notice`}>
