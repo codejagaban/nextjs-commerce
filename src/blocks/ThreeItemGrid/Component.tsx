@@ -5,16 +5,20 @@ import Link from 'next/link'
 import React from 'react'
 import type { DefaultDocumentIDType } from 'payload'
 
-type Props = { item: Product; priority?: boolean; size: 'full' | 'half' }
+import { priceFor } from '@/currencies'
+import { getStoreCurrency } from '@/utilities/getStoreCurrency'
 
-export const ThreeItemGridItem: React.FC<Props> = ({ item, size }) => {
-  let price = item.priceInUSD
+type Props = { currency: string; item: Product; priority?: boolean; size: 'full' | 'half' }
+
+export const ThreeItemGridItem: React.FC<Props> = ({ currency, item, size }) => {
+  let price = priceFor(item, currency)
 
   if (item.enableVariants && item.variants?.docs?.length) {
     const variant = item.variants.docs[0]
 
-    if (variant && typeof variant === 'object' && variant.priceInUSD) {
-      price = variant.priceInUSD
+    if (variant && typeof variant === 'object') {
+      const variantPrice = priceFor(variant, currency)
+      if (variantPrice !== undefined) price = variantPrice
     }
   }
 
@@ -44,13 +48,14 @@ export const ThreeItemGridBlock: React.FC<
 > = async ({ products }) => {
   if (!products || !products[0] || !products[1] || !products[2]) return null
 
+  const currency = await getStoreCurrency()
   const [firstProduct, secondProduct, thirdProduct] = products
 
   return (
     <section className="container grid gap-4 pb-4 md:grid-cols-6 md:grid-rows-2">
-      <ThreeItemGridItem item={firstProduct as Product} priority size="full" />
-      <ThreeItemGridItem item={secondProduct as Product} priority size="half" />
-      <ThreeItemGridItem item={thirdProduct as Product} size="half" />
+      <ThreeItemGridItem currency={currency} item={firstProduct as Product} priority size="full" />
+      <ThreeItemGridItem currency={currency} item={secondProduct as Product} priority size="half" />
+      <ThreeItemGridItem currency={currency} item={thirdProduct as Product} size="half" />
     </section>
   )
 }

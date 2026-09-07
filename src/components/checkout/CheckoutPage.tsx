@@ -16,7 +16,14 @@ import React, { Suspense, useCallback, useEffect, useState } from 'react'
 
 import { cssVariables } from '@/cssVariables'
 import { CheckoutForm } from '@/components/forms/CheckoutForm'
-import { useAddresses, useCart, usePayments } from '@payloadcms/plugin-ecommerce/client/react'
+import {
+  useAddresses,
+  useCart,
+  useCurrency,
+  usePayments,
+} from '@payloadcms/plugin-ecommerce/client/react'
+
+import { priceFor } from '@/currencies'
 import { CheckoutAddresses } from '@/components/checkout/CheckoutAddresses'
 import { CreateAddressModal } from '@/components/addresses/CreateAddressModal'
 import { Address } from '@/payload-types'
@@ -33,6 +40,7 @@ export const CheckoutPage: React.FC = () => {
   const { user } = useAuth()
   const router = useRouter()
   const { cart } = useCart()
+  const { currency } = useCurrency()
   const [error, setError] = useState<null | string>(null)
   const { theme } = useTheme()
   /**
@@ -403,12 +411,12 @@ export const CheckoutPage: React.FC = () => {
                 if (!quantity) return null
 
                 let image = gallery?.[0]?.image || meta?.image
-                let price = product?.priceInUSD
+                let price = priceFor(product, currency.code)
 
                 const isVariant = Boolean(variant) && typeof variant === 'object'
 
                 if (isVariant) {
-                  price = variant?.priceInUSD
+                  price = priceFor(variant, currency.code)
 
                   const imageVariant = product.gallery?.find((item: any) => {
                     if (!item.variantOption) return false

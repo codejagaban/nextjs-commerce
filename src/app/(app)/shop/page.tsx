@@ -5,6 +5,9 @@ import configPromise from '@payload-config'
 import { getPayload } from 'payload'
 import React from 'react'
 
+import { DEFAULT_CURRENCY_CODE, priceSelect } from '@/currencies'
+import { getStoreCurrency } from '@/utilities/getStoreCurrency'
+
 export const metadata = {
   description: 'Search for products in the store.',
   title: 'Shop',
@@ -17,6 +20,7 @@ type Props = {
 }
 
 export default async function ShopPage({ searchParams }: Props) {
+  const currency = await getStoreCurrency()
   const { q: searchValue, sort, category, tag } = await searchParams
   const payload = await getPayload({ config: configPromise })
 
@@ -25,6 +29,14 @@ export default async function ShopPage({ searchParams }: Props) {
     (Array.isArray(v) ? v : v ? v.split(',') : []).filter(Boolean)
   const categorySlugs = toSlugs(category)
   const tagSlugs = toSlugs(tag)
+
+  /**
+   * The sort links name the base currency's price column. Sorting by price has to
+   * follow the currency on display, or "low to high" orders by a figure nobody
+   * can see.
+   */
+  const sortBy =
+    typeof sort === 'string' ? sort.replace(DEFAULT_CURRENCY_CODE, currency) : undefined
 
   const products = await payload.find({
     collection: 'products',
@@ -36,10 +48,10 @@ export default async function ShopPage({ searchParams }: Props) {
       slug: true,
       gallery: true,
       categories: true,
-      priceInUSD: true,
+      ...priceSelect,
       enableVariants: true,
     },
-    ...(sort ? { sort } : { sort: 'title' }),
+    ...(sortBy ? { sort: sortBy } : { sort: 'title' }),
     ...(searchValue || categorySlugs.length || tagSlugs.length
       ? {
           where: {
@@ -153,7 +165,14 @@ export default async function ShopPage({ searchParams }: Props) {
         <Grid className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
           {products.docs.map((product, i) => {
             // The first row is above the fold, so it carries the LCP image.
-            return <ProductGridItem key={product.id} product={product} priority={i < 3} />
+            return (
+              <ProductGridItem
+                currency={currency}
+                key={product.id}
+                priority={i < 3}
+                product={product}
+              />
+            )
           })}
         </Grid>
       )}
