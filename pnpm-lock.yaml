@@ -17,6 +17,9 @@ importers:
       '@payloadcms/email-nodemailer':
         specifier: 3.88.0
         version: 3.88.0(payload@3.88.0(graphql@16.14.2)(supports-color@7.2.0)(typescript@5.7.2))
+      '@payloadcms/email-resend':
+        specifier: 3.88.0
+        version: 3.88.0(payload@3.88.0(graphql@16.14.2)(supports-color@7.2.0)(typescript@5.7.2))
       '@payloadcms/live-preview-react':
         specifier: 3.88.0
         version: 3.88.0(react-dom@19.2.6(react@19.2.6))(react@19.2.6)
@@ -1528,6 +1531,12 @@ packages:
 
   '@payloadcms/email-nodemailer@3.88.0':
     resolution: {integrity: sha512-cW8SUYpdVXdZBpa539smI5P2lYdTB3944rfAipv/TVG9VND0u/DDwtRuqBqGf/0eh5OajqWC0X9igMXU67dhbg==}
+    engines: {node: ^18.20.2 || >=20.9.0}
+    peerDependencies:
+      payload: 3.88.0
+
+  '@payloadcms/email-resend@3.88.0':
+    resolution: {integrity: sha512-0iuTVkzCY6vpHSHHlDegrAeHQLj7MrvfONGgwyXSy92vwTeQ57aWq2iR2xyHeenLGI3To4DJpKzU1ydVBPJK4Q==}
     engines: {node: ^18.20.2 || >=20.9.0}
     peerDependencies:
       payload: 3.88.0
@@ -6694,6 +6703,10 @@ snapshots:
   '@payloadcms/email-nodemailer@3.88.0(payload@3.88.0(graphql@16.14.2)(supports-color@7.2.0)(typescript@5.7.2))':
     dependencies:
       nodemailer: 9.1.1
+      payload: 3.88.0(graphql@16.14.2)(supports-color@7.2.0)(typescript@5.7.2)
+
+  '@payloadcms/email-resend@3.88.0(payload@3.88.0(graphql@16.14.2)(supports-color@7.2.0)(typescript@5.7.2))':
+    dependencies:
       payload: 3.88.0(graphql@16.14.2)(supports-color@7.2.0)(typescript@5.7.2)
 
   '@payloadcms/graphql@3.88.0(graphql@16.14.2)(payload@3.88.0(graphql@16.14.2)(supports-color@7.2.0)(typescript@5.7.2))(typescript@5.7.2)':
