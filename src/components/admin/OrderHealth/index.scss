@@ -1,17 +1,19 @@
 /**
  * Order pipeline health.
  *
- * The same validated hues Popular products uses, assigned one per state and never
- * re-ordered, so a state keeps its colour as counts change. Every segment ships
- * with a written label and a count, so the bar is never the only thing carrying
- * meaning. The set clears CVD separation on both surfaces unchanged.
+ * Status keeps its conventional green / amber / red reading, stepped to the same
+ * brightness as the Popular products hues so the two panels sit together. Refunded
+ * stays neutral — it is neither good nor bad. Every segment ships with a written
+ * label and a count, and 2px of surface separates them, so the bar never carries
+ * meaning by colour alone; that secondary encoding is what licenses the amber and
+ * green sitting adjacent at a protan ΔE in the floor band.
  */
 
 .order-health {
   --ok: #16a34a;
-  --busy: #0284c7;
-  --refunded: #7c3aed;
-  --bad: #db2777;
+  --busy: #f59e0b;
+  --refunded: #6b7280;
+  --bad: #dc2626;
 
   border: 1px solid var(--theme-elevation-100);
   border-radius: var(--style-radius-s, 3px);
@@ -88,4 +90,19 @@
   }
 
   &__empty { margin: 0; color: var(--theme-elevation-450); }
+}
+
+/* Amber and red are stepped down for the dark surface; the greens hold. */
+@media (prefers-color-scheme: dark) {
+  :root:where(:not([data-theme='light'])) .order-health {
+    --busy: #d97706;
+    --refunded: #9aa1ab;
+    --bad: #b91c1c;
+  }
+}
+
+:root[data-theme='dark'] .order-health {
+  --busy: #d97706;
+  --refunded: #9aa1ab;
+  --bad: #b91c1c;
 }
