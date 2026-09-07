@@ -101,9 +101,78 @@
 
   &__switch-icon { width: 14px; height: 14px; flex: 0 0 auto; }
 
-  &__bar { fill: var(--current); }
+  &__bar {
+    fill: var(--current);
+    transition: opacity 0.12s ease;
+  }
 
-  &__svg { display: block; width: 100%; height: auto; overflow: visible; }
+  /* Reading a day dims the rest of the month so the read-out bar is unmistakable. */
+  &__plot--reading &__bar { opacity: 0.4; }
+  &__plot--reading &__bar--active { opacity: 1; }
+
+  &__plot { position: relative; }
+
+  &__svg {
+    display: block;
+    width: 100%;
+    height: auto;
+    overflow: visible;
+    touch-action: pan-y;
+
+    &:focus-visible {
+      outline: 2px solid var(--current);
+      outline-offset: 4px;
+      border-radius: 4px;
+    }
+  }
+
+  /* The crosshair: it locates the reading, so it stays quieter than the data. */
+  &__cursor {
+    pointer-events: none;
+
+    line {
+      stroke: var(--theme-elevation-300);
+      stroke-width: 1;
+    }
+
+    circle {
+      fill: var(--current);
+      stroke: var(--theme-elevation-0);
+      stroke-width: 2.5;
+    }
+  }
+
+  &__tip {
+    position: absolute;
+    z-index: 2;
+    transform: translate(-50%, calc(-100% - 12px));
+    display: flex;
+    flex-direction: column;
+    gap: 0.1rem;
+    padding: 0.4rem 0.6rem;
+    border: 1px solid var(--theme-elevation-150);
+    border-radius: 6px;
+    background: var(--theme-elevation-0);
+    box-shadow: 0 2px 6px rgb(0 0 0 / 0.08);
+    pointer-events: none;
+    white-space: nowrap;
+
+    /* At the ends the box shifts inward instead of hanging off the panel. */
+    &--start { transform: translate(-0.6rem, calc(-100% - 12px)); }
+    &--end { transform: translate(calc(-100% + 0.6rem), calc(-100% - 12px)); }
+  }
+
+  &__tip-day {
+    font-size: 0.72rem;
+    color: var(--theme-elevation-500);
+  }
+
+  &__tip-value {
+    font-size: 0.9rem;
+    font-weight: 600;
+    font-variant-numeric: tabular-nums;
+    color: var(--theme-elevation-900);
+  }
 
   &__grid { stroke: var(--theme-elevation-100); stroke-width: 1; stroke-dasharray: 3 4; }
 
