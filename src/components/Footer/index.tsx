@@ -1,4 +1,4 @@
-import type { Footer } from '@/payload-types'
+import type { Footer, Setting } from '@/payload-types'
 
 import { CMSLink } from '@/components/Link'
 import { ThemeSelector } from '@/providers/Theme/ThemeSelector'
@@ -6,6 +6,7 @@ import { getCachedGlobal } from '@/utilities/getGlobals'
 import Link from 'next/link'
 import React from 'react'
 import { SunMark } from '@/components/Logo/MarisolMark'
+import { Social } from './Social'
 import { getPayload } from 'payload'
 import { headers as getHeaders } from 'next/headers.js'
 import configPromise from '@payload-config'
@@ -77,10 +78,14 @@ function PaymentMethods() {
 }
 
 export async function Footer() {
-  const footer: Footer = await getCachedGlobal('footer', 1)()
+  const [footer, settings] = await Promise.all([
+    getCachedGlobal('footer', 1)() as Promise<Footer>,
+    getCachedGlobal('settings', 1)() as Promise<Setting>,
+  ])
   const menu = footer.navItems || []
   const currentYear = new Date().getFullYear()
-  const name = COMPANY_NAME || SITE_NAME || 'Marisol'
+  // Store settings win; the env vars stay as the fallback for a fresh database.
+  const name = settings?.storeName || COMPANY_NAME || SITE_NAME || 'Marisol'
 
   let user = null
   try {
@@ -109,16 +114,22 @@ export async function Footer() {
         <div className="grid grid-cols-2 gap-10 py-16 md:grid-cols-12 md:gap-8">
           {/* brand */}
           <div className="col-span-2 md:col-span-4">
-            <Link href="/" aria-label="Marisol — home" className="inline-flex items-center gap-2.5">
+            <Link
+              aria-label={`${name} — home`}
+              className="inline-flex items-center gap-2.5"
+              href="/"
+            >
               <SunMark className="h-7 w-7" />
               <span className="font-display text-2xl leading-none tracking-[0.02em] text-foreground">
-                Marisol
+                {name}
               </span>
             </Link>
-            <p className="mt-5 max-w-xs text-sm leading-relaxed text-muted-foreground">
-              Clean, effective skincare made with naturally-derived ingredients, for skin&rsquo;s own
-              natural radiance.
-            </p>
+            {settings?.tagline && (
+              <p className="mt-5 max-w-xs text-sm leading-relaxed text-muted-foreground">
+                {settings.tagline}
+              </p>
+            )}
+            <Social profiles={settings?.social ?? []} storeName={name} />
           </div>
 
           {/* shop */}
@@ -182,6 +193,17 @@ export async function Footer() {
           <p>
             &copy; {currentYear} {name}. All rights reserved.
           </p>
+          {settings?.supportEmail && (
+            <p>
+              <a
+                className="transition-colors hover:text-foreground"
+                href={`mailto:${settings.supportEmail}`}
+              >
+                {settings.supportEmail}
+              </a>
+              {settings.supportPhone ? <span className="ml-3">{settings.supportPhone}</span> : null}
+            </p>
+          )}
           <div className="flex items-center gap-2 md:ml-auto">
             <span className="mr-1 text-xs uppercase tracking-[0.12em]">We accept</span>
             <PaymentMethods />
@@ -196,7 +218,7 @@ export async function Footer() {
         className="pointer-events-none relative z-10 flex justify-center px-4 pt-4"
       >
         <span className="block translate-y-[0.14em] select-none font-display text-[22vw] leading-[0.8] tracking-[0.01em] text-foreground/[0.06] md:text-[20vw]">
-          Marisol
+          {name}
         </span>
       </div>
     </footer>

@@ -1,11 +1,14 @@
 import type { Metadata } from 'next'
 import type { ReactNode } from 'react'
 
+import type { Setting } from '@/payload-types'
+
 import { AdminBar } from '@/components/AdminBar'
 import { Footer } from '@/components/Footer'
 import { Header } from '@/components/Header'
 import { LivePreviewListener } from '@/components/LivePreviewListener'
 import { ensureStartsWith } from '@/utilities/ensureStartsWith'
+import { getCachedGlobal } from '@/utilities/getGlobals'
 import { Providers } from '@/providers'
 import { InitTheme } from '@/providers/Theme/InitTheme'
 import { GeistSans } from 'geist/font/sans'
@@ -31,30 +34,42 @@ const baseUrl = process.env.NEXT_PUBLIC_SERVER_URL || 'http://localhost:3000'
 const twitterCreator = TWITTER_CREATOR ? ensureStartsWith(TWITTER_CREATOR, '@') : undefined
 const twitterSite = TWITTER_SITE ? ensureStartsWith(TWITTER_SITE, 'https://') : undefined
 
-export const metadata: Metadata = {
-  metadataBase: new URL(baseUrl),
-  title: {
-    default: `${SITE_NAME} — Single-estate olive oil & Mediterranean pantry`,
-    template: `%s | ${SITE_NAME}`,
-  },
-  description:
-    'Cold-pressed single-estate olive oil, hand-harvested and bottled by the season, with a small Mediterranean pantry of salt, honey and vinegar.',
-  openGraph: {
-    type: 'website',
-    siteName: SITE_NAME,
-    title: SITE_NAME,
-    url: baseUrl,
-  },
-  robots: { follow: true, index: true },
-  ...(twitterCreator && twitterSite
-    ? {
-        twitter: {
-          card: 'summary_large_image',
-          creator: twitterCreator,
-          site: twitterSite,
-        },
-      }
-    : {}),
+/**
+ * Read from Store settings rather than declared as a constant, so a clone of this
+ * template renames itself from the admin. The env vars remain the fallback for a
+ * database that has not been seeded yet.
+ */
+export async function generateMetadata(): Promise<Metadata> {
+  const settings = (await getCachedGlobal('settings', 1)()) as Setting | null
+  const name = settings?.storeName || SITE_NAME
+  const title = settings?.metaTitle || name
+  const description = settings?.metaDescription || undefined
+
+  return {
+    metadataBase: new URL(baseUrl),
+    title: {
+      default: title,
+      template: `%s | ${name}`,
+    },
+    ...(description ? { description } : {}),
+    openGraph: {
+      type: 'website',
+      siteName: name,
+      title,
+      url: baseUrl,
+      ...(description ? { description } : {}),
+    },
+    robots: { follow: true, index: true },
+    ...(twitterCreator && twitterSite
+      ? {
+          twitter: {
+            card: 'summary_large_image',
+            creator: twitterCreator,
+            site: twitterSite,
+          },
+        }
+      : {}),
+  }
 }
 
 export default async function RootLayout({ children }: { children: ReactNode }) {
