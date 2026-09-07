@@ -37,22 +37,65 @@
     color: var(--theme-elevation-450);
   }
 
+  /**
+   * No overflow clip here — the hover reading rises above the bar, and a clip
+   * would shave it off. Each segment carries its own radius instead.
+   */
   &__bar {
     display: flex;
     gap: 2px;
     height: 24px;
-    border-radius: 2px;
-    overflow: hidden;
   }
 
   &__seg {
+    position: relative;
     display: block;
     height: 100%;
+    border-radius: 2px;
+    cursor: default;
 
     &--completed { background: var(--ok); }
     &--processing { background: var(--busy); }
     &--refunded { background: var(--refunded); }
     &--cancelled { background: var(--bad); }
+  }
+
+  /**
+   * The reading drops below the segment rather than above it: the bar sits close
+   * to the panel's top edge, and rising would push the box outside the card.
+   */
+  &__tip {
+    position: absolute;
+    top: calc(100% + 8px);
+    left: 50%;
+    z-index: 2;
+    transform: translateX(-50%);
+    display: flex;
+    flex-direction: column;
+    gap: 0.1rem;
+    padding: 0.35rem 0.55rem;
+    border: 1px solid var(--theme-elevation-150);
+    border-radius: 6px;
+    background: var(--theme-elevation-0);
+    box-shadow: 0 2px 6px rgb(0 0 0 / 0.08);
+    pointer-events: none;
+    white-space: nowrap;
+
+    /* A thin segment at either end would push the box past the card. */
+    &--start { left: 0; transform: none; }
+    &--end { left: auto; right: 0; transform: none; }
+  }
+
+  &__tip-label {
+    font-size: 0.72rem;
+    color: var(--theme-elevation-500);
+  }
+
+  &__tip-value {
+    font-size: 0.85rem;
+    font-weight: 600;
+    font-variant-numeric: tabular-nums;
+    color: var(--theme-elevation-900);
   }
 
   &__key {
