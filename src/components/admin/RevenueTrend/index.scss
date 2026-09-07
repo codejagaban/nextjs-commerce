@@ -60,12 +60,7 @@
 
   &__compare { font-size: 0.8rem; color: var(--theme-elevation-450); }
 
-  &__controls {
-    display: flex;
-    flex-direction: column;
-    align-items: flex-end;
-    gap: 0.6rem;
-  }
+  &__controls { display: flex; align-items: center; }
 
   /* A real control, so it looks pressable and shows which mode is on. */
   &__switch {
@@ -109,29 +104,6 @@
 
   &__bar { fill: var(--current); }
 
-  &__legend {
-    display: flex;
-    flex-wrap: wrap;
-    gap: 0.3rem 1.1rem;
-    margin: 0.2rem 0 0;
-    padding: 0;
-    list-style: none;
-    font-size: 0.8rem;
-    color: var(--theme-elevation-500);
-
-    li { display: flex; align-items: center; gap: 0.4rem; }
-  }
-
-  &__key {
-    width: 0.55rem;
-    height: 0.55rem;
-    border-radius: 50%;
-    flex: 0 0 auto;
-
-    &--current { background: var(--current); }
-    &--previous { background: var(--theme-elevation-300); }
-  }
-
   &__svg { display: block; width: 100%; height: auto; overflow: visible; }
 
   &__grid { stroke: var(--theme-elevation-100); stroke-width: 1; stroke-dasharray: 3 4; }
@@ -149,7 +121,6 @@
     stroke-linejoin: round;
 
     &--current { stroke: var(--current); }
-    &--previous { stroke: var(--theme-elevation-250); stroke-width: 2; }
   }
 
   &__endpoint {

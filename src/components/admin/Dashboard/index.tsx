@@ -48,7 +48,6 @@ async function getOverview() {
   const priorStart = new Date(windowStart.getTime() - WINDOW * dayMs)
 
   const currentDaily = new Array(WINDOW).fill(0)
-  const priorDaily = new Array(WINDOW).fill(0)
   let currentRevenue = 0
   let priorRevenue = 0
   let currentOrders = 0
@@ -64,8 +63,6 @@ async function getOverview() {
       currentRevenue += amount
       currentOrders += 1
     } else if (placed >= priorStart) {
-      const i = Math.floor((placed.getTime() - priorStart.getTime()) / dayMs)
-      if (i >= 0 && i < WINDOW) priorDaily[i] += amount
       priorRevenue += amount
       priorOrders += 1
     }
@@ -133,7 +130,6 @@ async function getOverview() {
 
   return {
     currentDaily,
-    priorDaily,
     currentRevenue,
     currentOrders,
     currentAov,
@@ -185,7 +181,6 @@ export const Dashboard: React.FC<{ name?: string }> = async ({ name }) => {
           current={{ label: 'Last 30 days', points: s.currentDaily }}
           delta={s.revenueChange}
           endLabel={dayLabel(s.endLabel)}
-          previous={{ label: 'Previous 30 days', points: s.priorDaily }}
           startLabel={dayLabel(s.windowStart)}
           total={money(s.currentRevenue)}
         />
