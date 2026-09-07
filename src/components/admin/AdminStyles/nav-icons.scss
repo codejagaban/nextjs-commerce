@@ -130,3 +130,14 @@ $close: "%3C/svg%3E";
 #nav-transactions {
   @include icon("#{$open}%3Crect x='3' y='5.6' width='18' height='12.8' rx='2'/%3E%3Cpath d='M3 10h18'/%3E%3Cpath d='M6.6 14.6h3.2'/%3E#{$close}");
 }
+
+/* --- Settings ----------------------------------------------------------- */
+
+/**
+ * Sliders rather than a cog: the rest of this set is built from straight rails
+ * and simple geometry, and a toothed wheel would be the one glyph drawn in a
+ * different language.
+ */
+#nav-global-settings {
+  @include icon("#{$open}%3Cpath d='M4 7h5M13 7h7M4 12h11M19 12h1M4 17h3M11 17h9'/%3E%3Ccircle cx='11' cy='7' r='2'/%3E%3Ccircle cx='17' cy='12' r='2'/%3E%3Ccircle cx='9' cy='17' r='2'/%3E#{$close}");
+}
