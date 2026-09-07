@@ -258,7 +258,7 @@ export interface Order {
   transactions?: (number | Transaction)[] | null;
   status?: OrderStatus;
   amount?: number | null;
-  currency?: 'USD' | null;
+  currency?: ('USD' | 'EUR' | 'GBP') | null;
   accessToken?: string | null;
   updatedAt: string;
   createdAt: string;
@@ -303,6 +303,10 @@ export interface Product {
   };
   priceInUSDEnabled?: boolean | null;
   priceInUSD?: number | null;
+  priceInEUREnabled?: boolean | null;
+  priceInEUR?: number | null;
+  priceInGBPEnabled?: boolean | null;
+  priceInGBP?: number | null;
   relatedProducts?: (number | Product)[] | null;
   meta?: {
     title?: string | null;
@@ -885,6 +889,10 @@ export interface Variant {
   inventory?: number | null;
   priceInUSDEnabled?: boolean | null;
   priceInUSD?: number | null;
+  priceInEUREnabled?: boolean | null;
+  priceInEUR?: number | null;
+  priceInGBPEnabled?: boolean | null;
+  priceInGBP?: number | null;
   updatedAt: string;
   createdAt: string;
   deletedAt?: string | null;
@@ -947,7 +955,7 @@ export interface Transaction {
   order?: (number | null) | Order;
   cart?: (number | null) | Cart;
   amount?: number | null;
-  currency?: 'USD' | null;
+  currency?: ('USD' | 'EUR' | 'GBP') | null;
   updatedAt: string;
   createdAt: string;
 }
@@ -970,7 +978,7 @@ export interface Cart {
   purchasedAt?: string | null;
   status?: ('active' | 'purchased' | 'abandoned') | null;
   subtotal?: number | null;
-  currency?: 'USD' | null;
+  currency?: ('USD' | 'EUR' | 'GBP') | null;
   updatedAt: string;
   createdAt: string;
 }
@@ -1599,6 +1607,10 @@ export interface VariantsSelect<T extends boolean = true> {
   inventory?: T;
   priceInUSDEnabled?: T;
   priceInUSD?: T;
+  priceInEUREnabled?: T;
+  priceInEUR?: T;
+  priceInGBPEnabled?: T;
+  priceInGBP?: T;
   updatedAt?: T;
   createdAt?: T;
   deletedAt?: T;
@@ -1656,6 +1668,10 @@ export interface ProductsSelect<T extends boolean = true> {
   variants?: T;
   priceInUSDEnabled?: T;
   priceInUSD?: T;
+  priceInEUREnabled?: T;
+  priceInEUR?: T;
+  priceInGBPEnabled?: T;
+  priceInGBP?: T;
   relatedProducts?: T;
   meta?:
     | T
@@ -1877,6 +1893,10 @@ export interface Setting {
    */
   storeName: string;
   /**
+   * The currency the storefront sells in. Each product holds a separate price per currency — nothing is converted — so fill in the matching price field on your products. Adding a currency to this list is a code change, since it adds a price field.
+   */
+  currency: 'USD' | 'EUR' | 'GBP';
+  /**
    * One or two sentences under the footer wordmark.
    */
   tagline?: string | null;
@@ -1961,6 +1981,7 @@ export interface FooterSelect<T extends boolean = true> {
  */
 export interface SettingsSelect<T extends boolean = true> {
   storeName?: T;
+  currency?: T;
   tagline?: T;
   supportEmail?: T;
   supportPhone?: T;
