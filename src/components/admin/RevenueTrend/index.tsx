@@ -10,7 +10,6 @@ export type Series = { label: string; points: number[] }
 
 type Props = {
   current: Series
-  previous: Series
   total: string
   delta?: number
   startLabel: string
@@ -84,7 +83,6 @@ const STORAGE_KEY = 'marisol-admin:revenue-chart-mode'
 
 export const RevenueTrend: React.FC<Props> = ({
   current,
-  previous,
   total,
   delta,
   startLabel,
@@ -118,9 +116,9 @@ export const RevenueTrend: React.FC<Props> = ({
 
   const plotW = W - PAD.left - PAD.right
   const plotH = H - PAD.top - PAD.bottom
-  const n = Math.max(current.points.length, previous.points.length, 2)
+  const n = Math.max(current.points.length, 2)
 
-  const peak = Math.max(1, ...current.points, ...previous.points)
+  const peak = Math.max(1, ...current.points)
   const magnitude = Math.pow(10, Math.floor(Math.log10(peak)))
   const top = Math.ceil(peak / (magnitude / 2)) * (magnitude / 2)
   const ticks = [top, top / 2, 0]
@@ -152,15 +150,6 @@ export const RevenueTrend: React.FC<Props> = ({
           </div>
         </div>
         <div className="revenue-trend__controls">
-          <ul className="revenue-trend__legend">
-            <li><span className="revenue-trend__key revenue-trend__key--current" />{current.label}</li>
-            {/* Only listed when it is on the chart — a key for an absent series
-                is worse than no key at all. */}
-            {mode === 'line' && (
-              <li><span className="revenue-trend__key revenue-trend__key--previous" />{previous.label}</li>
-            )}
-          </ul>
-
           <div aria-label="Chart type" className="revenue-trend__switch" role="group">
             <button
               aria-pressed={mode === 'line'}
@@ -185,11 +174,7 @@ export const RevenueTrend: React.FC<Props> = ({
       </figcaption>
 
       <svg className="revenue-trend__svg" preserveAspectRatio="xMidYMid meet" role="img" viewBox={`0 0 ${W} ${H}`}>
-        <title>
-          {mode === 'line'
-            ? 'Revenue for the last 30 days compared with the 30 days before'
-            : 'Revenue for each of the last 30 days'}
-        </title>
+        <title>{`Revenue for each of the last ${n} days`}</title>
 
         {ticks.map((t) => (
           <g key={t}>
@@ -202,7 +187,6 @@ export const RevenueTrend: React.FC<Props> = ({
 
         {mode === 'line' ? (
           <>
-            <path className="revenue-trend__line revenue-trend__line--previous" d={path(previous.points)} />
             <path className="revenue-trend__line revenue-trend__line--current" d={path(current.points)} />
             {lastIdx >= 0 && (
               <circle className="revenue-trend__endpoint" cx={x(lastIdx)} cy={y(current.points[lastIdx])} r={4.5} />
