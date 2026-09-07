@@ -24,7 +24,7 @@
     gap: 1px;
     background: var(--theme-elevation-100);
     border: 1px solid var(--theme-elevation-100);
-    border-radius: 4px;
+    border-radius: var(--style-radius-s, 3px);
     overflow: hidden;
   }
 
@@ -55,14 +55,19 @@
     color: var(--theme-elevation-450);
   }
 
+  /**
+   * No accent rail. A coloured bar down one edge is decoration standing in for
+   * hierarchy, and a radius curving a 3px bar reads as broken. This is the same
+   * panel as everything else, set apart by its surface and the weight of the
+   * opening line.
+   */
   &__notice {
     display: flex;
     flex-direction: column;
     gap: 0.5rem;
     padding: 1rem 1.15rem;
     border: 1px solid var(--theme-elevation-150);
-    border-left: 3px solid var(--theme-elevation-400);
-    border-radius: 4px;
+    border-radius: var(--style-radius-s, 3px);
     background: var(--theme-elevation-50);
 
     p {
@@ -80,7 +85,7 @@
 
   &__panel {
     border: 1px solid var(--theme-elevation-100);
-    border-radius: 4px;
+    border-radius: var(--style-radius-s, 3px);
     padding: 1.15rem 1.25rem;
     background: var(--theme-elevation-0);
   }
