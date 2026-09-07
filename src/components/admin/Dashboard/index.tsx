@@ -150,6 +150,17 @@ async function getOverview() {
 const dayLabel = (d: Date) =>
   d.toLocaleDateString('en-US', { day: 'numeric', month: 'short', timeZone: 'UTC' })
 
+/** One label per bucket, matching how the daily totals were bucketed. */
+const dayLabelsFrom = (start: Date, count: number) =>
+  Array.from({ length: count }, (_, i) =>
+    new Date(start.getTime() + i * 86400000).toLocaleDateString('en-US', {
+      weekday: 'short',
+      day: 'numeric',
+      month: 'short',
+      timeZone: 'UTC',
+    }),
+  )
+
 export const Dashboard: React.FC<{ name?: string }> = async ({ name }) => {
   const s = await getOverview()
 
@@ -179,6 +190,7 @@ export const Dashboard: React.FC<{ name?: string }> = async ({ name }) => {
       <div className={`${baseClass}__split`}>
         <RevenueTrend
           current={{ label: 'Last 30 days', points: s.currentDaily }}
+          dayLabels={dayLabelsFrom(s.windowStart, s.currentDaily.length)}
           delta={s.revenueChange}
           endLabel={dayLabel(s.endLabel)}
           startLabel={dayLabel(s.windowStart)}

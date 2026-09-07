@@ -14,6 +14,8 @@ type Props = {
   delta?: number
   startLabel: string
   endLabel: string
+  /** One label per point, so a hovered day can name itself. */
+  dayLabels?: string[]
   currency?: string
 }
 
@@ -71,6 +73,10 @@ const money = (minor: number, currency: string) =>
     notation: minor >= 100000 ? 'compact' : 'standard',
   }).format(minor / 100)
 
+/** The exact figure, for the tooltip — a compacted "$1.2K" is not an answer. */
+const exactMoney = (minor: number, currency: string) =>
+  new Intl.NumberFormat('en-US', { style: 'currency', currency }).format(minor / 100)
+
 /**
  * Revenue for the current period.
  *
@@ -89,9 +95,12 @@ export const RevenueTrend: React.FC<Props> = ({
   delta,
   startLabel,
   endLabel,
+  dayLabels,
   currency = 'USD',
 }) => {
   const [mode, setMode] = React.useState<Mode>('bars')
+  const [hover, setHover] = React.useState<number | null>(null)
+  const svgRef = React.useRef<SVGSVGElement | null>(null)
 
   /**
    * Read the saved preference after mount rather than during render — reading it
@@ -131,6 +140,43 @@ export const RevenueTrend: React.FC<Props> = ({
 
   const lastIdx = current.points.length - 1
   const dir = delta === undefined ? null : delta > 0 ? 'up' : delta < 0 ? 'down' : 'flat'
+
+  /**
+   * Which day is under the pointer.
+   *
+   * The svg scales with the panel but keeps its aspect ratio, so a client x maps
+   * back to a viewBox x by one ratio — no per-mark hit rectangles needed, and the
+   * whole plot answers the pointer rather than only the 20px a bar happens to fill.
+   */
+  const indexAt = (clientX: number): number | null => {
+    const el = svgRef.current
+    if (!el || lastIdx < 0) return null
+    const box = el.getBoundingClientRect()
+    if (!box.width) return null
+    const vx = ((clientX - box.left) / box.width) * W
+    const i = Math.round(((vx - PAD.left) / plotW) * (n - 1))
+    return Math.min(lastIdx, Math.max(0, i))
+  }
+
+  const onMove = (e: React.PointerEvent<SVGSVGElement>) => setHover(indexAt(e.clientX))
+
+  /** Arrow keys walk the same readout, so the values are not pointer-only. */
+  const onKey = (e: React.KeyboardEvent<SVGSVGElement>) => {
+    if (lastIdx < 0) return
+    const step = e.key === 'ArrowRight' ? 1 : e.key === 'ArrowLeft' ? -1 : 0
+    if (step === 0) {
+      if (e.key === 'Escape') setHover(null)
+      return
+    }
+    e.preventDefault()
+    setHover((h) => Math.min(lastIdx, Math.max(0, (h === null ? (step > 0 ? -1 : lastIdx + 1) : h) + step)))
+  }
+
+  const active = hover !== null && hover >= 0 && hover <= lastIdx ? hover : null
+  const activeValue = active === null ? 0 : current.points[active]
+  // Nudge the tooltip inward at the ends so it never hangs off the panel.
+  const anchor = active === null ? 0 : (x(active) / W) * 100
+  const align = anchor < 18 ? 'start' : anchor > 82 ? 'end' : 'center'
 
   return (
     <figure className="revenue-trend">
@@ -175,7 +221,19 @@ export const RevenueTrend: React.FC<Props> = ({
         </div>
       </figcaption>
 
-      <svg className="revenue-trend__svg" preserveAspectRatio="xMidYMid meet" role="img" viewBox={`0 0 ${W} ${H}`}>
+      <div className={`revenue-trend__plot${active !== null ? ' revenue-trend__plot--reading' : ''}`}>
+      <svg
+        className="revenue-trend__svg"
+        onBlur={() => setHover(null)}
+        onKeyDown={onKey}
+        onPointerLeave={() => setHover(null)}
+        onPointerMove={onMove}
+        preserveAspectRatio="xMidYMid meet"
+        ref={svgRef}
+        role="img"
+        tabIndex={0}
+        viewBox={`0 0 ${W} ${H}`}
+      >
         <title>{`Revenue for each of the last ${n} days`}</title>
 
         {ticks.map((t) => (
@@ -200,7 +258,7 @@ export const RevenueTrend: React.FC<Props> = ({
             const w = Math.max(2, plotW / n - 3)
             return (
               <rect
-                className="revenue-trend__bar"
+                className={`revenue-trend__bar${i === active ? ' revenue-trend__bar--active' : ''}`}
                 height={Math.max(v > 0 ? 1.5 : 0, PAD.top + plotH - y(v))}
                 key={i}
                 rx={2}
@@ -212,9 +270,29 @@ export const RevenueTrend: React.FC<Props> = ({
           })
         )}
 
+        {/* Bars need no crosshair — the lit bar already locates the reading. */}
+        {active !== null && mode === 'line' && (
+          <g className="revenue-trend__cursor">
+            <line x1={x(active)} x2={x(active)} y1={PAD.top} y2={PAD.top + plotH} />
+            <circle cx={x(active)} cy={y(activeValue)} r={4.5} />
+          </g>
+        )}
+
         <text className="revenue-trend__tick" x={PAD.left} y={H - 9}>{startLabel}</text>
         <text className="revenue-trend__tick" x={W - PAD.right} y={H - 9} textAnchor="end">{endLabel}</text>
       </svg>
+
+      {active !== null && (
+        <div
+          aria-live="polite"
+          className={`revenue-trend__tip revenue-trend__tip--${align}`}
+          style={{ left: `${anchor}%`, top: `${(y(activeValue) / H) * 100}%` }}
+        >
+          <span className="revenue-trend__tip-day">{dayLabels?.[active] ?? `Day ${active + 1}`}</span>
+          <span className="revenue-trend__tip-value">{exactMoney(activeValue, currency)}</span>
+        </div>
+      )}
+      </div>
     </figure>
   )
 }
