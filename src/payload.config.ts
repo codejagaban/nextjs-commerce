@@ -24,6 +24,7 @@ import { Users } from '@/collections/Users'
 import { Footer } from '@/globals/Footer'
 import { Header } from '@/globals/Header'
 import { Settings } from '@/globals/Settings'
+import { emailAdapter } from '@/email'
 import { plugins } from './plugins'
 
 const filename = fileURLToPath(import.meta.url)
@@ -92,7 +93,8 @@ export default buildConfig({
       ]
     },
   }),
-  //email: nodemailerAdapter(),
+  // Resend, SMTP, or a console preview — chosen by environment. See src/email.
+  email: emailAdapter(),
   endpoints: [],
   globals: [Header, Footer, Settings],
   plugins,
