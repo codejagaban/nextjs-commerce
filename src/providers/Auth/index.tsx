@@ -54,10 +54,14 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
       })
 
       if (res.ok) {
-        const { data, errors } = await res.json()
+        // Same flat `{ message, token, user }` the REST API returns everywhere —
+        // `data.loginUser.user` is the GraphQL shape and was always undefined
+        // here, so a new account was created with its cookie set but the client
+        // still believing nobody was signed in.
+        const { errors, user } = await res.json()
         if (errors) throw new Error(errors[0].message)
-        setUser(data?.loginUser?.user)
-        setStatus('loggedIn')
+        setUser(user)
+        setStatus(user ? 'loggedIn' : undefined)
       } else {
         throw new Error('Invalid login')
       }
@@ -156,9 +160,11 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
       })
 
       if (res.ok) {
-        const { data, errors } = await res.json()
+        const { errors } = await res.json()
         if (errors) throw new Error(errors[0].message)
-        setUser(data?.loginUser?.user)
+        // Requesting a reset link says nothing about who is signed in. This used
+        // to assign an always-undefined value here, quietly signing out anyone
+        // who asked for a reset from inside their own account.
       } else {
         throw new Error('Invalid login')
       }
