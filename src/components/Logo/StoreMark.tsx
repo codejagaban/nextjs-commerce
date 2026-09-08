@@ -2,7 +2,8 @@ import clsx from 'clsx'
 import React from 'react'
 
 /**
- * The Marisol mark: a sun rising over a horizon — sol over mar.
+ * The default mark: a sun rising over a horizon — sol over mar, for the demo
+ * brand. Replace this SVG to rebrand; everything else reads Store settings.
  * Two-tone (amber sun + ink horizon) via CSS custom properties, so it adapts
  * to light/dark automatically. Bespoke geometry, no icon-pack default.
  */
@@ -50,7 +51,12 @@ type LogoProps = {
   wordmarkClassName?: string
 }
 
-export function MarisolLogo({ className, variant = 'full', wordmarkClassName }: LogoProps) {
+export function StoreLogo({
+  className,
+  storeName,
+  variant = 'full',
+  wordmarkClassName,
+}: LogoProps & { storeName: string }) {
   return (
     <span className={clsx('inline-flex items-center gap-2.5', className)}>
       <SunMark className="h-7 w-7 shrink-0" />
@@ -61,7 +67,7 @@ export function MarisolLogo({ className, variant = 'full', wordmarkClassName }: 
             wordmarkClassName,
           )}
         >
-          Marisol
+          {storeName}
         </span>
       ) : null}
     </span>

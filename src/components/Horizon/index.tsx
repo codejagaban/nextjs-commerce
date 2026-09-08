@@ -10,7 +10,7 @@ type Props = {
 }
 
 /**
- * The horizon: Marisol's bespoke section silhouette.
+ * The horizon: the store's bespoke section silhouette.
  *
  * Sections hand off along this shallow arc — the same curve as the rising sun in
  * the brand mark — instead of butting at a straight seam. It is painted in the

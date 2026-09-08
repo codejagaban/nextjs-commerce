@@ -2,7 +2,7 @@ import clsx from 'clsx'
 import React from 'react'
 
 /**
- * Marisol's in-house marks.
+ * The store's in-house marks.
  *
  * Every one is built from the same two primitives as the brand's sun mark — an
  * arc and a horizon line — so the set reads as one drawn family rather than an
