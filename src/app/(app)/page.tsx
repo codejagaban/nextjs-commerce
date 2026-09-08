@@ -11,15 +11,25 @@ import { ProductGridItem } from '@/components/ProductGridItem'
 import { NewsletterForm } from '@/components/NewsletterForm'
 import { MarkDroplet, MarkLeaf, MarkTested } from '@/components/Marks'
 import { Horizon } from '@/components/Horizon'
-import { SunMark } from '@/components/Logo/MarisolMark'
+import { SunMark } from '@/components/Logo/StoreMark'
 
 import { priceSelect } from '@/currencies'
 import { getStoreCurrency } from '@/utilities/getStoreCurrency'
+import { getSettings } from '@/utilities/getSettings'
+import { DEFAULT_STORE_NAME } from '@/brand'
 
-export const metadata: Metadata = {
-  title: 'Marisol — Clean skincare for your natural radiance',
-  description:
-    'Naturally-derived serums, moisturisers and cleansers, formulated to reveal skin&rsquo;s own radiance.',
+/** Title and description come from Store settings, so a clone renames its home
+ * page without a code change; the literals below are only the fallback. */
+export async function generateMetadata(): Promise<Metadata> {
+  const settings = await getSettings()
+  return {
+    title:
+      settings?.metaTitle ||
+      `${settings?.storeName || DEFAULT_STORE_NAME} — Clean skincare for your natural radiance`,
+    description:
+      settings?.metaDescription ||
+      'Naturally-derived serums, moisturisers and cleansers, formulated to reveal skin&rsquo;s own radiance.',
+  }
 }
 
 async function getProducts(): Promise<Product[]> {
@@ -95,7 +105,12 @@ const hasCategory = (p: Product, slug: string) =>
   Array.isArray(p.categories) && p.categories.some((c) => typeof c === 'object' && c?.slug === slug)
 
 export default async function HomePage() {
-  const [products, currency] = await Promise.all([getProducts(), getStoreCurrency()])
+  const [products, currency, settings] = await Promise.all([
+    getProducts(),
+    getStoreCurrency(),
+    getSettings(),
+  ])
+  const storeName = settings?.storeName || DEFAULT_STORE_NAME
   const newArrivals = products.slice(0, 4)
   const bestsellers = products.slice(4, 8).length >= 4 ? products.slice(4, 8) : products.slice(0, 4)
 
@@ -272,7 +287,7 @@ export default async function HomePage() {
         <div className="relative h-[86vh] min-h-[560px] w-full">
           <Image
             src="/brand/still-life-01.jpg"
-            alt="Marisol bestselling products"
+            alt={`${storeName} bestselling products`}
             fill
             sizes="100vw"
             className="feather-y object-cover"
@@ -337,7 +352,7 @@ export default async function HomePage() {
           <div className="relative aspect-[5/4] overflow-hidden rounded-2xl">
             <Image
               src="/brand/model-portrait-03.jpg"
-              alt="Customer applying Marisol skincare"
+              alt={`Customer applying ${storeName} skincare`}
               fill
               sizes="(min-width: 768px) 45vw, 90vw"
               className="object-cover"
