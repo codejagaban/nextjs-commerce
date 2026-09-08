@@ -15,9 +15,10 @@ import { useAuth } from '@/providers/Auth'
 
 type Props = {
   header: Header
+  storeName: string
 }
 
-export function HeaderClient({ header }: Props) {
+export function HeaderClient({ header, storeName }: Props) {
   const menu = header.navItems || []
   const pathname = usePathname()
   const isHome = pathname === '/'
@@ -56,7 +57,7 @@ export function HeaderClient({ header }: Props) {
           <div className="flex items-center gap-6">
             <div className="md:hidden">
               <Suspense fallback={null}>
-                <MobileMenu menu={menu} />
+                <MobileMenu menu={menu} storeName={storeName} />
               </Suspense>
             </div>
             {menu.length ? (
@@ -89,10 +90,10 @@ export function HeaderClient({ header }: Props) {
           {/* center: wordmark */}
           <Link
             href="/"
-            aria-label="Marisol — home"
+            aria-label={`${storeName} — home`}
             className="justify-self-center font-display text-2xl tracking-[0.06em]"
           >
-            Marisol
+            {storeName}
           </Link>
 
           {/* right: search + account + cart */}

@@ -21,7 +21,7 @@ type FormData = {
   password: string
 }
 
-export const LoginForm: React.FC = () => {
+export const LoginForm: React.FC<{ storeName: string }> = ({ storeName }) => {
   const searchParams = useSearchParams()
   const allParams = searchParams.toString() ? `?${searchParams.toString()}` : ''
   const redirect = useRef(searchParams.get('redirect'))
@@ -92,7 +92,7 @@ export const LoginForm: React.FC = () => {
       </div>
 
       <p className="mt-6 text-center text-sm text-muted-foreground">
-        New to Marisol?{' '}
+        New to {storeName}?{' '}
         <Link
           href={`/create-account${allParams}`}
           className="font-medium text-foreground underline underline-offset-4"

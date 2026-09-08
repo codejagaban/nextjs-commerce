@@ -20,9 +20,10 @@ import React, { useEffect, useState } from 'react'
 
 interface Props {
   menu: Header['navItems']
+  storeName: string
 }
 
-export function MobileMenu({ menu }: Props) {
+export function MobileMenu({ menu, storeName }: Props) {
   const { user } = useAuth()
 
   const pathname = usePathname()
@@ -53,7 +54,7 @@ export function MobileMenu({ menu }: Props) {
 
       <SheetContent side="left" className="px-4">
         <SheetHeader className="px-0 pt-4 pb-0">
-          <SheetTitle className="font-display text-2xl tracking-[0.06em]">Marisol</SheetTitle>
+          <SheetTitle className="font-display text-2xl tracking-[0.06em]">{storeName}</SheetTitle>
 
           <SheetDescription />
         </SheetHeader>
