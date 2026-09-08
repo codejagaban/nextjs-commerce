@@ -2,6 +2,7 @@ import type { Metadata } from 'next'
 
 import type { Page, Product } from '../payload-types'
 
+import { DEFAULT_STORE_NAME } from '@/brand'
 import { mergeOpenGraph } from './mergeOpenGraph'
 
 export const generateMeta = async (args: { doc: Page | Product }): Promise<Metadata> => {
@@ -28,9 +29,9 @@ export const generateMeta = async (args: { doc: Page | Product }): Promise<Metad
             },
           ]
         : undefined,
-      title: doc?.meta?.title || doc?.title || process.env.SITE_NAME || 'Marisol',
+      title: doc?.meta?.title || doc?.title || DEFAULT_STORE_NAME,
       url: Array.isArray(doc?.slug) ? doc?.slug.join('/') : '/',
     }),
-    title: doc?.meta?.title || doc?.title || process.env.SITE_NAME || 'Marisol',
+    title: doc?.meta?.title || doc?.title || DEFAULT_STORE_NAME,
   }
 }

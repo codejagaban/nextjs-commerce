@@ -4,15 +4,16 @@ import { CMSLink } from '@/components/Link'
 import { ThemeSelector } from '@/providers/Theme/ThemeSelector'
 import { getCachedGlobal } from '@/utilities/getGlobals'
 import { getSettings } from '@/utilities/getSettings'
+import { DEFAULT_STORE_NAME } from '@/brand'
 import Link from 'next/link'
 import React from 'react'
-import { SunMark } from '@/components/Logo/MarisolMark'
+import { SunMark } from '@/components/Logo/StoreMark'
 import { Social } from './Social'
 import { getPayload } from 'payload'
 import { headers as getHeaders } from 'next/headers.js'
 import configPromise from '@payload-config'
 
-const { COMPANY_NAME, SITE_NAME } = process.env
+const { COMPANY_NAME } = process.env
 
 const shopLinks = [
   { label: 'Skin care', url: '/shop?category=skin-care' },
@@ -86,7 +87,7 @@ export async function Footer() {
   const menu = footer.navItems || []
   const currentYear = new Date().getFullYear()
   // Store settings win; the env vars stay as the fallback for a fresh database.
-  const name = settings?.storeName || COMPANY_NAME || SITE_NAME || 'Marisol'
+  const name = settings?.storeName || COMPANY_NAME || DEFAULT_STORE_NAME
 
   let user = null
   try {

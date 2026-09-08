@@ -17,9 +17,10 @@ import { isAdmin } from '@/access/isAdmin'
 import { isDocumentOwner } from '@/access/isDocumentOwner'
 import { DEFAULT_CURRENCY_CODE, SUPPORTED_CURRENCIES } from '@/currencies'
 import { mediaStorage } from '@/storage'
+import { DEFAULT_STORE_NAME } from '@/brand'
 
 const generateTitle: GenerateTitle<Product | Page> = ({ doc }) => {
-  const siteName = process.env.SITE_NAME || 'Marisol'
+  const siteName = DEFAULT_STORE_NAME
   return doc?.title ? `${doc.title} | ${siteName}` : siteName
 }
 

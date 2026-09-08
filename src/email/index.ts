@@ -2,6 +2,7 @@ import type { EmailAdapter } from 'payload'
 
 import { nodemailerAdapter } from '@payloadcms/email-nodemailer'
 import { resendAdapter } from '@payloadcms/email-resend'
+import { DEFAULT_STORE_NAME } from '@/brand'
 
 /**
  * Whichever mail provider this store happens to have.
@@ -25,7 +26,7 @@ import { resendAdapter } from '@payloadcms/email-resend'
  */
 
 const fromAddress = process.env.EMAIL_FROM_ADDRESS || 'onboarding@resend.dev'
-const fromName = process.env.EMAIL_FROM_NAME || process.env.SITE_NAME || 'Marisol'
+const fromName = process.env.EMAIL_FROM_NAME || DEFAULT_STORE_NAME
 
 /**
  * Send every message to one inbox instead of its real recipient.

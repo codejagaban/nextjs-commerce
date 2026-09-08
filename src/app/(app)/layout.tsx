@@ -14,6 +14,7 @@ import { GeistMono } from 'geist/font/mono'
 import localFont from 'next/font/local'
 import React from 'react'
 import './globals.css'
+import { DEFAULT_STORE_NAME } from '@/brand'
 
 // Editorial display serif (self-hosted from Fontshare — off the Google slop shelf).
 const sentient = localFont({
@@ -25,7 +26,7 @@ const sentient = localFont({
   display: 'swap',
 })
 
-const SITE_NAME = process.env.SITE_NAME || 'Marisol'
+const SITE_NAME = DEFAULT_STORE_NAME
 const TWITTER_CREATOR = process.env.TWITTER_CREATOR
 const TWITTER_SITE = process.env.TWITTER_SITE
 const baseUrl = process.env.NEXT_PUBLIC_SERVER_URL || 'http://localhost:3000'
