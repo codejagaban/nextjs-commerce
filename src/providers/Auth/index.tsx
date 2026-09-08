@@ -182,16 +182,31 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
         method: 'POST',
       })
 
-      if (res.ok) {
-        const { data, errors } = await res.json()
-        if (errors) throw new Error(errors[0].message)
-        setUser(data?.loginUser?.user)
-        setStatus(data?.loginUser?.user ? 'loggedIn' : undefined)
-      } else {
-        throw new Error('Invalid login')
+      const { errors, user } = await res.json().catch(() => ({}) as Record<string, never>)
+
+      /**
+       * An expired or already-used token is the single most likely failure here,
+       * and the person needs to be told that rather than "an error occurred" —
+       * the fix is to request a fresh link, which they cannot guess. So the
+       * server's own message is passed through instead of being swallowed.
+       */
+      if (!res.ok || errors) {
+        throw new Error(
+          errors?.[0]?.message ||
+            'That reset link is no longer valid. Request a new one and try again.',
+        )
       }
+
+      /**
+       * The REST endpoint answers with a flat `{ message, token, user }`, the way
+       * `login` above reads it — not the `data.loginUser.user` GraphQL shape this
+       * used to expect. Reading the wrong one left the session cookie set but the
+       * client state empty, so a successful reset still looked logged out.
+       */
+      setUser(user)
+      setStatus(user ? 'loggedIn' : undefined)
     } catch (e) {
-      throw new Error('An error occurred while attempting to login.')
+      throw e instanceof Error ? e : new Error('An error occurred while resetting your password.')
     }
   }, [])
 
