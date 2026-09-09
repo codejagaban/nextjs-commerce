@@ -25,6 +25,7 @@ import { Footer } from '@/globals/Footer'
 import { Header } from '@/globals/Header'
 import { Settings } from '@/globals/Settings'
 import { emailAdapter } from '@/email'
+import { getServerSideURL } from '@/utilities/getURL'
 import { plugins } from './plugins'
 
 const filename = fileURLToPath(import.meta.url)
@@ -95,6 +96,13 @@ export default buildConfig({
   }),
   // Resend, SMTP, or a console preview — chosen by environment. See src/email.
   email: emailAdapter(),
+  /**
+   * Payload compares the request origin against this to protect authenticated
+   * mutations. Left unset it falls back to an empty origin, logs a warning on
+   * every request, and the CSRF check protects nothing.
+   */
+  serverURL: getServerSideURL(),
+  csrf: [getServerSideURL()],
   endpoints: [],
   globals: [Header, Footer, Settings],
   plugins,
