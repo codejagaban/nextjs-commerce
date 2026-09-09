@@ -26,6 +26,17 @@ export const Users: CollectionConfig = {
   auth: {
     tokenExpiration: 1209600,
     /**
+     * Throttle password guessing. Five wrong attempts locks the account for ten
+     * minutes; Payload clears the counter on a successful login. Without these
+     * an attacker can try passwords as fast as the network allows.
+     *
+     * Email verification is deliberately off: this is a shop, and making someone
+     * leave the checkout to open an inbox costs more in abandoned carts than it
+     * saves. Sign-up logs you straight in.
+     */
+    maxLoginAttempts: 5,
+    lockTime: 600000,
+    /**
      * Payload's default reset email points at the admin panel. Customers have no
      * business there, so the link is rewritten to the storefront page that
      * actually collects the new password.
