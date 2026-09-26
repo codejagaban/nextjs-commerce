@@ -5,3 +5,8 @@ allowBuilds:
   esbuild: true
   sharp: true
   unrs-resolver: true
+
+# Security patches for dependencies pinned by upstream tooling.
+overrides:
+  dompurify: 3.4.16
+  '@esbuild-kit/core-utils>esbuild': 0.25.12
