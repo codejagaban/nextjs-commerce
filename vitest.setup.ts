@@ -1,4 +1,3 @@
-// Any setup scripts you might need go here
+import { testEnvironment } from './tests/environment.mjs'
 
-// Load .env files
-import 'dotenv/config'
+Object.assign(process.env, testEnvironment())

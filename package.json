@@ -19,8 +19,11 @@
     "start": "cross-env NODE_OPTIONS=--no-deprecation next start",
     "stripe-webhooks": "stripe listen --forward-to localhost:3000/api/payments/stripe/webhooks",
     "test": "pnpm run test:int && pnpm run test:e2e",
-    "test:e2e": "cross-env NODE_OPTIONS=\"--no-deprecation --import=tsx/esm\" playwright test --config=playwright.config.ts",
-    "test:int": "cross-env NODE_OPTIONS=--no-deprecation vitest run --config ./vitest.config.mts",
+    "typecheck": "tsc --noEmit",
+    "test:e2e": "node scripts/test-runner.mjs e2e",
+    "test:int": "node scripts/test-runner.mjs integration",
+    "test:seed": "node scripts/test-runner.mjs seed",
+    "test:build": "node scripts/test-runner.mjs build",
     "seed:orders": "cross-env NODE_OPTIONS=--no-deprecation payload run scripts/seed-demo-orders.ts",
     "migrate:media": "cross-env NODE_OPTIONS=--no-deprecation payload run scripts/migrate-media.ts"
   },
