@@ -13,6 +13,9 @@
     "ii": "cross-env NODE_OPTIONS=--no-deprecation pnpm --ignore-workspace install",
     "lint": "cross-env NODE_OPTIONS=--no-deprecation eslint .",
     "lint:fix": "cross-env NODE_OPTIONS=--no-deprecation eslint . --fix",
+    "migrate": "cross-env NODE_OPTIONS=--no-deprecation payload migrate",
+    "migrate:adopt": "cross-env NODE_OPTIONS=--no-deprecation PAYLOAD_MIGRATING=true payload run scripts/adopt-baseline-migration.ts",
+    "migrate:status": "cross-env NODE_OPTIONS=--no-deprecation payload migrate:status",
     "payload": "cross-env NODE_OPTIONS=--no-deprecation payload",
     "reinstall": "cross-env NODE_OPTIONS=--no-deprecation rm -rf node_modules && rm pnpm-lock.yaml && pnpm --ignore-workspace install",
     "seed": "cross-env NODE_OPTIONS=--no-deprecation payload run scripts/seed.ts",
@@ -25,6 +28,7 @@
     "test:int": "node scripts/test-runner.mjs integration",
     "test:seed": "node scripts/test-runner.mjs seed",
     "test:build": "node scripts/test-runner.mjs build",
+    "build:production": "pnpm migrate && pnpm build",
     "seed:orders": "cross-env NODE_OPTIONS=--no-deprecation payload run scripts/seed-demo-orders.ts",
     "migrate:media": "cross-env NODE_OPTIONS=--no-deprecation payload run scripts/migrate-media.ts"
   },

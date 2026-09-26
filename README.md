@@ -112,11 +112,47 @@ scripts/                seed + screenshot/dev utilities
 ## Useful scripts
 
 ```bash
-pnpm dev             # start the dev server
-pnpm seed            # (re)seed the demo store + admin user
-pnpm build           # production build
-pnpm generate:types  # regenerate Payload types
+pnpm dev               # start the dev server; Payload pushes schema changes locally
+pnpm seed              # (re)seed the demo store + admin user
+pnpm build             # build without changing a database
+pnpm build:production  # run pending migrations, then build for deployment
+pnpm migrate:status    # show which production migrations have run
+pnpm generate:types    # regenerate Payload types
 ```
+
+## Database migrations
+
+Development keeps Payload's schema-push workflow enabled so a new field appears locally without
+extra steps. Production uses the committed migrations in `src/migrations` instead.
+
+For a new production database, set its `DATABASE_URL` and run:
+
+```bash
+pnpm build:production
+```
+
+Use that command as the deployment build command. It applies each pending migration once and stops
+the deployment if a migration fails.
+
+After changing a Payload collection, global, or field, generate and commit the next migration:
+
+```bash
+pnpm payload migrate:create describe_the_schema_change
+```
+
+### Existing databases created by development push
+
+An existing store may already have the complete schema but no migration history. Back it up, then
+adopt the initial migration exactly once:
+
+```bash
+ADOPT_EXISTING_SCHEMA=true pnpm migrate:adopt
+pnpm migrate:status
+```
+
+The adoption command checks every table column in the baseline before recording it and refuses an
+empty or incomplete database. It does not create, delete, or rewrite store content. Never use it for
+a fresh database; run `pnpm migrate` there instead.
 
 ---
 
