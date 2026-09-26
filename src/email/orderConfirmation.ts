@@ -3,7 +3,7 @@ import { DEFAULT_STORE_NAME } from '@/brand'
 import { getServerSideURL } from '@/utilities/getURL'
 import type { Payload } from 'payload'
 
-import { escapeHTML } from './template'
+import { emailBodyFontFamily, emailFontStyles, escapeHTML } from './template'
 
 const relationshipID = (value: null | number | string | { id: number | string } | undefined) =>
   typeof value === 'object' && value ? value.id : value
@@ -100,6 +100,7 @@ export const renderOrderConfirmationEmail = ({
     <meta name="supported-color-schemes" content="light dark">
     <title>Order ${escapeHTML(order.id)} confirmed</title>
     <style>
+${emailFontStyles}
       @media (prefers-color-scheme: dark) {
         .email-body { background:#201b19 !important; }
         .email-panel { background:#2b2522 !important; }
@@ -110,7 +111,7 @@ export const renderOrderConfirmationEmail = ({
       }
     </style>
   </head>
-  <body class="email-body" style="margin:0;background:#f5f0ec;padding:32px 16px;color:#28211e;font-family:Arial,Helvetica,sans-serif;">
+  <body class="email-body" style="margin:0;background:#f5f0ec;padding:32px 16px;color:#28211e;font-family:${emailBodyFontFamily};">
     <div class="email-panel" style="width:100%;max-width:620px;margin:0 auto;background:#fffaf6;padding:36px;box-sizing:border-box;">
       <p class="email-muted" style="margin:0 0 28px;color:#6d625d;font-size:13px;letter-spacing:.04em;">${escapeHTML(storeName)}</p>
       <h1 class="email-ink" style="margin:0;color:#28211e;font-family:Georgia,'Times New Roman',serif;font-size:32px;font-weight:400;line-height:1.15;">Your order is confirmed</h1>
@@ -129,7 +130,7 @@ export const renderOrderConfirmationEmail = ({
       <p style="margin:32px 0 0;">
         <a class="email-button" href="${escapeHTML(url)}" style="display:inline-block;background:#28211e;color:#fffaf6;padding:13px 20px;text-decoration:none;font-size:14px;font-weight:700;">View order</a>
       </p>
-      <p class="email-muted" style="margin:28px 0 0;color:#8a7e78;font-size:12px;line-height:1.6;">If you did not place this order, contact ${escapeHTML(settings.supportEmail || 'the store team')}.</p>
+      <p class="email-muted" style="margin:28px 0 0;color:#7d716b;font-size:12px;line-height:1.6;">If you did not place this order, contact ${escapeHTML(settings.supportEmail || 'the store team')}.</p>
     </div>
   </body>
 </html>`
