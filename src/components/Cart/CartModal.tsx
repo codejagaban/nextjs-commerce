@@ -30,10 +30,11 @@ export function CartModal() {
 
   const pathname = usePathname()
 
-  useEffect(() => {
-    // Close the cart modal when the pathname changes.
+  const [previousPathname, setPreviousPathname] = useState(pathname)
+  if (previousPathname !== pathname) {
+    setPreviousPathname(pathname)
     setIsOpen(false)
-  }, [pathname])
+  }
 
   const totalQuantity = useMemo(() => {
     if (!cart || !cart.items || !cart.items.length) return undefined

@@ -9,7 +9,7 @@ import { Label } from '@/components/ui/label'
 import { useAuth } from '@/providers/Auth'
 import Link from 'next/link'
 import { useRouter, useSearchParams } from 'next/navigation'
-import React, { useCallback, useRef } from 'react'
+import React, { useCallback } from 'react'
 import { useForm } from 'react-hook-form'
 import {
   emailRules,
@@ -24,13 +24,13 @@ type FormData = {
 export const LoginForm: React.FC<{ storeName: string }> = ({ storeName }) => {
   const searchParams = useSearchParams()
   const allParams = searchParams.toString() ? `?${searchParams.toString()}` : ''
-  const redirect = useRef(searchParams.get('redirect'))
+  const redirect = searchParams.get('redirect')
   const { login } = useAuth()
   const router = useRouter()
   const [error, setError] = React.useState<null | string>(null)
 
   const {
-    formState: { errors, isLoading },
+    formState: { errors, isSubmitting },
     handleSubmit,
     register,
   } = useForm<FormData>()
@@ -39,13 +39,13 @@ export const LoginForm: React.FC<{ storeName: string }> = ({ storeName }) => {
     async (data: FormData) => {
       try {
         await login(data)
-        if (redirect?.current) router.push(redirect.current)
+        if (redirect) router.push(redirect)
         else router.push('/account')
       } catch (_) {
         setError('There was an error with the credentials provided. Please try again.')
       }
     },
-    [login, router],
+    [login, router, redirect],
   )
 
   return (
@@ -83,11 +83,11 @@ export const LoginForm: React.FC<{ storeName: string }> = ({ storeName }) => {
 
         <Button
           className="h-12 w-full rounded-full"
-          disabled={isLoading}
+          disabled={isSubmitting}
           type="submit"
           variant="default"
         >
-          {isLoading ? 'Logging in…' : 'Log in'}
+          {isSubmitting ? 'Logging in…' : 'Log in'}
         </Button>
       </div>
 

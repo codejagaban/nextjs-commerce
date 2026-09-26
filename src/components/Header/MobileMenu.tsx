@@ -30,7 +30,12 @@ export function MobileMenu({ menu, storeName }: Props) {
   const searchParams = useSearchParams()
   const [isOpen, setIsOpen] = useState(false)
 
-  const closeMobileMenu = () => setIsOpen(false)
+  const location = `${pathname}?${searchParams.toString()}`
+  const [previousLocation, setPreviousLocation] = useState(location)
+  if (previousLocation !== location) {
+    setPreviousLocation(location)
+    setIsOpen(false)
+  }
 
   useEffect(() => {
     const handleResize = () => {
@@ -40,11 +45,7 @@ export function MobileMenu({ menu, storeName }: Props) {
     }
     window.addEventListener('resize', handleResize)
     return () => window.removeEventListener('resize', handleResize)
-  }, [isOpen])
-
-  useEffect(() => {
-    setIsOpen(false)
-  }, [pathname, searchParams])
+  }, [])
 
   return (
     <Sheet onOpenChange={setIsOpen} open={isOpen}>

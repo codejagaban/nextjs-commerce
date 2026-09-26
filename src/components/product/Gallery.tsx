@@ -41,6 +41,8 @@ export const Gallery: React.FC<Props> = ({ gallery }) => {
         return Boolean(values.find((value) => value === String(variantID)))
       })
       if (index !== -1) {
+        // Synchronize React's selected image with the imperative Embla instance.
+        // eslint-disable-next-line react-hooks/set-state-in-effect
         setCurrent(index)
         api.scrollTo(index, true)
       }

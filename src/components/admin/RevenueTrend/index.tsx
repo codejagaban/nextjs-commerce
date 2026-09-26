@@ -110,6 +110,8 @@ export const RevenueTrend: React.FC<Props> = ({
   React.useEffect(() => {
     try {
       const saved = window.localStorage.getItem(STORAGE_KEY)
+      // Hydrate a browser-only preference after the server-matching first render.
+      // eslint-disable-next-line react-hooks/set-state-in-effect
       if (saved === 'line' || saved === 'bars') setMode(saved)
     } catch {
       // No stored preference available; the default stands.
