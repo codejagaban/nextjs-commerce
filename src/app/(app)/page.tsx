@@ -301,9 +301,9 @@ export default async function HomePage() {
             }}
           />
           <div className="container relative flex h-full items-center">
-            <div className="max-w-md text-background">
+            <div className="max-w-md text-bone">
               <h2 className="font-display text-4xl md:text-5xl">Bestsellers</h2>
-              <p className="mt-4 max-w-sm text-sm text-background/85">
+              <p className="mt-4 max-w-sm text-sm text-bone/85">
                 The routine our community reaches for first. Tried, tested and quietly effective.
               </p>
               <Link

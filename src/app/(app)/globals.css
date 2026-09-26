@@ -145,7 +145,7 @@
     );
   }
 
-  .dark .atmosphere-page {
+  [data-theme='dark'] .atmosphere-page {
     background-image: linear-gradient(
       to bottom,
       oklch(21.5% 0.018 42deg) 0%,
