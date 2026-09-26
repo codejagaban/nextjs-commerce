@@ -15,6 +15,10 @@ import { Metadata } from 'next'
 
 import { priceFor, priceSelect } from '@/currencies'
 import { getStoreCurrency } from '@/utilities/getStoreCurrency'
+import { getSettings } from '@/utilities/getSettings'
+import { DEFAULT_STORE_NAME } from '@/brand'
+import { getCanonicalURL, getPublicMediaURL } from '@/utilities/siteURL'
+import { mergeOpenGraph } from '@/utilities/mergeOpenGraph'
 
 type Args = {
   params: Promise<{
@@ -34,21 +38,34 @@ export async function generateMetadata({ params }: Args): Promise<Metadata> {
   const canIndex = product._status === 'published'
 
   const seoImage = metaImage || (gallery.length ? (gallery[0]?.image as Media) : undefined)
+  const settings = await getSettings()
+  const storeName = settings?.storeName || DEFAULT_STORE_NAME
+  const title = product.meta?.title || `${product.title} | ${storeName}`
+  const canonical = getCanonicalURL(`/products/${slug}`)
+  const imageURL = seoImage?.url ? getPublicMediaURL(seoImage.url) : undefined
 
   return {
-    description: product.meta?.description || '',
-    openGraph: seoImage?.url
-      ? {
-          images: [
-            {
-              alt: seoImage?.alt,
-              height: seoImage.height!,
-              url: seoImage?.url,
-              width: seoImage.width!,
-            },
-          ],
-        }
-      : null,
+    alternates: { canonical },
+    description: product.meta?.description || undefined,
+    openGraph: mergeOpenGraph({
+      type: 'website',
+      siteName: storeName,
+      title,
+      url: canonical,
+      ...(imageURL
+        ? {
+            images: [
+              {
+                alt: seoImage?.alt || product.title,
+                url: imageURL,
+                width: seoImage?.width || undefined,
+                height: seoImage?.height || undefined,
+              },
+            ],
+          }
+        : {}),
+    }),
+    ...(imageURL ? { twitter: { card: 'summary_large_image', images: [imageURL] } } : {}),
     robots: {
       follow: canIndex,
       googleBot: {
@@ -57,7 +74,7 @@ export async function generateMetadata({ params }: Args): Promise<Metadata> {
       },
       index: canIndex,
     },
-    title: product.meta?.title || product.title,
+    title: { absolute: title },
   }
 }
 
@@ -76,37 +93,54 @@ export default async function ProductPage({ params }: Args) {
       })) || []
 
   const metaImage = typeof product.meta?.image === 'object' ? product.meta?.image : undefined
-  const hasStock = product.enableVariants
-    ? product?.variants?.docs?.some((variant) => {
-        if (typeof variant !== 'object') return false
-        return variant.inventory && variant?.inventory > 0
-      })
-    : product.inventory! > 0
-
-  const currency = await getStoreCurrency()
-  let price = priceFor(product, currency)
-
-  if (product.enableVariants && product?.variants?.docs?.length) {
-    price = product?.variants?.docs?.reduce((acc, variant) => {
-      if (typeof variant !== 'object' || !variant) return acc
-      const variantPrice = priceFor(variant, currency)
-      if (variantPrice !== undefined && acc !== undefined && variantPrice > acc) return variantPrice
-      return acc
-    }, price)
-  }
+  const [currency, settings] = await Promise.all([getStoreCurrency(), getSettings()])
+  const variants = product.enableVariants
+    ? product.variants?.docs
+        ?.filter((variant) => typeof variant === 'object' && variant !== null)
+        .map((variant) => ({
+          price: priceFor(variant, currency),
+          inStock: (variant.inventory || 0) > 0,
+        }))
+        .filter(
+          (variant): variant is { price: number; inStock: boolean } =>
+            typeof variant.price === 'number',
+        ) || []
+    : []
+  const price = priceFor(product, currency)
+  // Google asks for an Offer, not AggregateOffer, for variants. Use the lowest
+  // purchasable variant and keep its price and availability together.
+  const selectedVariant = [...variants].sort(
+    (a, b) => Number(b.inStock) - Number(a.inStock) || a.price - b.price,
+  )[0]
+  const offerPrice = selectedVariant?.price ?? price
+  const offerInStock = selectedVariant?.inStock ?? (product.inventory || 0) > 0
+  const canonical = getCanonicalURL(`/products/${slug}`)
+  const imageURLs = [metaImage, ...gallery.map((item) => item.image)]
+    .filter((image): image is Media => Boolean(image?.url))
+    .map((image) => getPublicMediaURL(image.url!))
 
   const productJsonLd = {
-    name: product.title,
     '@context': 'https://schema.org',
     '@type': 'Product',
-    description: product.description,
-    image: metaImage?.url,
-    offers: {
-      '@type': 'AggregateOffer',
-      availability: hasStock ? 'https://schema.org/InStock' : 'https://schema.org/OutOfStock',
-      price: price,
-      priceCurrency: 'usd',
-    },
+    '@id': `${canonical}#product`,
+    name: product.title,
+    url: canonical,
+    ...(product.meta?.description ? { description: product.meta.description } : {}),
+    ...(imageURLs.length ? { image: [...new Set(imageURLs)] } : {}),
+    brand: { '@type': 'Brand', name: settings?.storeName || DEFAULT_STORE_NAME },
+    ...(typeof offerPrice === 'number'
+      ? {
+          offers: {
+            '@type': 'Offer',
+            url: canonical,
+            priceCurrency: currency,
+            price: (offerPrice / 100).toFixed(2),
+            availability: offerInStock
+              ? 'https://schema.org/InStock'
+              : 'https://schema.org/OutOfStock',
+          },
+        }
+      : {}),
   }
 
   const relatedProducts =
@@ -116,7 +150,7 @@ export default async function ProductPage({ params }: Args) {
     <React.Fragment>
       <script
         dangerouslySetInnerHTML={{
-          __html: JSON.stringify(productJsonLd),
+          __html: JSON.stringify(productJsonLd).replace(/</g, '\\u003c'),
         }}
         type="application/ld+json"
       />

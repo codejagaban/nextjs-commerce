@@ -17,18 +17,21 @@ import { priceSelect } from '@/currencies'
 import { getStoreCurrency } from '@/utilities/getStoreCurrency'
 import { getSettings } from '@/utilities/getSettings'
 import { DEFAULT_STORE_NAME } from '@/brand'
+import { getCanonicalURL } from '@/utilities/siteURL'
+import { mergeOpenGraph } from '@/utilities/mergeOpenGraph'
 
 /** Title and description come from Store settings, so a clone renames its home
  * page without a code change; the literals below are only the fallback. */
 export async function generateMetadata(): Promise<Metadata> {
   const settings = await getSettings()
+  const title = settings?.metaTitle || `${settings?.storeName || DEFAULT_STORE_NAME} — Clean skincare for your natural radiance`
+  const description = settings?.metaDescription || 'Naturally-derived serums, moisturisers and cleansers, formulated to reveal skin’s own radiance.'
   return {
-    title:
-      settings?.metaTitle ||
-      `${settings?.storeName || DEFAULT_STORE_NAME} — Clean skincare for your natural radiance`,
-    description:
-      settings?.metaDescription ||
-      'Naturally-derived serums, moisturisers and cleansers, formulated to reveal skin&rsquo;s own radiance.',
+    alternates: { canonical: getCanonicalURL('/') },
+    title: { absolute: title },
+    description,
+    openGraph: mergeOpenGraph({ siteName: settings?.storeName || DEFAULT_STORE_NAME, title, description, url: getCanonicalURL('/') }),
+    twitter: { card: 'summary_large_image', title, description, images: ['/brand/still-life-01.jpg'] },
   }
 }
 
@@ -111,11 +114,24 @@ export default async function HomePage() {
     getSettings(),
   ])
   const storeName = settings?.storeName || DEFAULT_STORE_NAME
+  const storeJsonLd = {
+    '@context': 'https://schema.org',
+    '@type': 'OnlineStore',
+    '@id': `${getCanonicalURL('/')}#store`,
+    name: storeName,
+    url: getCanonicalURL('/'),
+    ...(settings?.metaDescription || settings?.tagline ? { description: settings.metaDescription || settings.tagline } : {}),
+    image: getCanonicalURL('/brand/still-life-01.jpg'),
+    ...(settings?.supportEmail ? { email: settings.supportEmail } : {}),
+    ...(settings?.supportPhone ? { telephone: settings.supportPhone } : {}),
+    ...(settings?.social?.length ? { sameAs: settings.social.map((profile) => profile.url).filter(Boolean) } : {}),
+  }
   const newArrivals = products.slice(0, 4)
   const bestsellers = products.slice(4, 8).length >= 4 ? products.slice(4, 8) : products.slice(0, 4)
 
   return (
     <>
+      <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(storeJsonLd).replace(/</g, '\\u003c') }} />
       {/* ---------------------------------------------------------------- */}
       {/* Hero                                                             */}
       {/* ---------------------------------------------------------------- */}
