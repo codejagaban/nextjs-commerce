@@ -113,8 +113,8 @@ export default async function Order({ params, searchParams }: PageProps) {
   }
 
   return (
-    <div className="w-full">
-      <div className="mb-6 flex items-center justify-between gap-8">
+    <div className="w-full max-w-3xl">
+      <div className="mb-3 flex items-center justify-between gap-4">
         {user ? (
           <Button asChild variant="ghost" className="-ml-3 rounded-full">
             <Link href="/orders">
@@ -129,15 +129,15 @@ export default async function Order({ params, searchParams }: PageProps) {
         <p className="text-sm text-muted-foreground tabular-nums">Order #{order.id}</p>
       </div>
 
-      <div className="flex flex-col gap-10 rounded-2xl border border-border bg-card p-6 sm:p-8">
-        <div className="flex flex-col gap-8 sm:flex-row sm:justify-between">
+      <div className="flex flex-col gap-6 rounded-lg bg-card p-4 sm:p-5">
+        <div className="grid grid-cols-2 gap-x-4 gap-y-3 sm:grid-cols-[1fr_auto_auto] sm:gap-x-10">
           <div>
             <p className="mb-1 text-xs uppercase tracking-[0.12em] text-muted-foreground">
               Order date
             </p>
             <p className="font-display text-lg text-foreground">
               <time dateTime={order.createdAt}>
-                {formatDateTime({ date: order.createdAt, format: 'MMMM dd, yyyy' })}
+                {formatDateTime({ date: order.createdAt, format: 'MMM d, yyyy' })}
               </time>
             </p>
           </div>
@@ -160,16 +160,16 @@ export default async function Order({ params, searchParams }: PageProps) {
         </div>
 
         {order.items && (
-          <div className="border-t border-border pt-8">
-            <h2 className="mb-5 font-display text-lg text-foreground">Items</h2>
-            <ul className="flex flex-col gap-6">
+          <section aria-label="Order items">
+            <h2 className="mb-3 font-display text-lg text-foreground">Items</h2>
+            <ul className="flex flex-col gap-4">
               {order.items?.map((item, index) => {
                 if (typeof item.product === 'string') {
                   return null
                 }
 
                 if (!item.product || typeof item.product !== 'object') {
-                  return <div key={index}>This item is no longer available.</div>
+                  return <li key={index}>This item is no longer available.</li>
                 }
 
                 const variant =
@@ -178,6 +178,7 @@ export default async function Order({ params, searchParams }: PageProps) {
                 return (
                   <li key={item.id}>
                     <ProductItem
+                      style="compact"
                       currencyCode={order.currency ?? undefined}
                       product={item.product}
                       quantity={item.quantity}
@@ -187,16 +188,16 @@ export default async function Order({ params, searchParams }: PageProps) {
                 )
               })}
             </ul>
-          </div>
+          </section>
         )}
 
         {order.shippingAddress && (
-          <div className="border-t border-border pt-8">
-            <h2 className="mb-5 font-display text-lg text-foreground">Shipping address</h2>
+          <section aria-label="Shipping address">
+            <h2 className="mb-2 font-display text-lg text-foreground">Shipping address</h2>
 
             {/* @ts-expect-error - some kind of type hell */}
-            <AddressItem address={order.shippingAddress} hideActions />
-          </div>
+            <AddressItem address={order.shippingAddress} hideActions appearance="plain" />
+          </section>
         )}
       </div>
     </div>

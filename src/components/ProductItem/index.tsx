@@ -1,9 +1,6 @@
 import { Media } from '@/components/Media'
-import { OrderStatus } from '@/components/OrderStatus'
 import { Price } from '@/components/Price'
-import { Button } from '@/components/ui/button'
-import { Media as MediaType, Order, Product, Variant } from '@/payload-types'
-import { formatDateTime } from '@/utilities/formatDateTime'
+import { Product, Variant } from '@/payload-types'
 import { DEFAULT_CURRENCY_CODE, priceFor } from '@/currencies'
 import Link from 'next/link'
 
@@ -62,17 +59,31 @@ export const ProductItem: React.FC<Props> = ({
   const itemURL = `/products/${product.slug}${variant ? `?variant=${variant.id}` : ''}`
 
   return (
-    <div className="flex items-center gap-4">
-      <div className="flex items-stretch justify-stretch h-20 w-20 p-2 rounded-lg border">
+    <div className={style === 'compact' ? 'flex items-center gap-3' : 'flex items-center gap-4'}>
+      <div
+        className={
+          style === 'compact'
+            ? 'h-12 w-12 shrink-0 overflow-hidden rounded'
+            : 'flex items-stretch justify-stretch h-20 w-20 p-2 rounded-lg border'
+        }
+      >
         <div className="relative w-full h-full">
           {image && typeof image !== 'string' && (
-            <Media fill imgClassName="rounded-lg object-cover" resource={image} />
+            <Media
+              fill
+              imgClassName={style === 'compact' ? 'object-cover' : 'rounded-lg object-cover'}
+              resource={image}
+            />
           )}
         </div>
       </div>
-      <div className="flex grow justify-between items-center">
-        <div className="flex flex-col gap-1">
-          <p className="font-medium text-lg">
+      <div className="flex min-w-0 grow justify-between items-center gap-4">
+        <div className="flex min-w-0 flex-col gap-1">
+          <p
+            className={
+              style === 'compact' ? 'text-sm font-medium break-words' : 'font-medium text-lg'
+            }
+          >
             <Link href={itemURL}>{title}</Link>
           </p>
           {variant && (
@@ -85,17 +96,22 @@ export const ProductItem: React.FC<Props> = ({
                 .join(', ')}
             </p>
           )}
-          <div>
+          <div className={style === 'compact' ? 'text-sm text-muted-foreground' : undefined}>
             {'x'}
             {quantity}
           </div>
         </div>
 
         {itemPrice && quantity && (
-          <div className="text-right">
-            <p className="font-medium text-lg">Subtotal</p>
+          <div className="shrink-0 text-right">
+            {style !== 'compact' && <p className="font-medium text-lg">Subtotal</p>}
+            {style === 'compact' && <span className="sr-only">Subtotal</span>}
             <Price
-              className="font-mono text-primary/50 text-sm"
+              className={
+                style === 'compact'
+                  ? 'text-sm text-foreground tabular-nums'
+                  : 'font-mono text-primary/50 text-sm'
+              }
               amount={itemPrice * quantity}
               currencyCode={currencyCode}
             />

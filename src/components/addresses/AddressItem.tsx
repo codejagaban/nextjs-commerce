@@ -22,6 +22,7 @@ type Props = {
    * Hide all actions
    */
   hideActions?: boolean
+  appearance?: 'card' | 'plain'
 }
 
 export const AddressItem: React.FC<Props> = ({
@@ -30,13 +31,20 @@ export const AddressItem: React.FC<Props> = ({
   hideActions = false,
   beforeActions,
   afterActions,
+  appearance = 'card',
 }) => {
   if (!address) {
     return null
   }
 
   return (
-    <div className="flex items-start justify-between gap-6 rounded-xl border border-border bg-background p-5">
+    <div
+      className={
+        appearance === 'plain'
+          ? 'flex items-start justify-between gap-4'
+          : 'flex items-start justify-between gap-6 rounded-xl border border-border bg-background p-5'
+      }
+    >
       <div className="grow space-y-0.5 text-sm text-muted-foreground">
         <p className="font-medium text-foreground">
           {address.title && <span>{address.title} </span>}
