@@ -5,7 +5,7 @@ import { GenerateTitle, GenerateURL } from '@payloadcms/plugin-seo/types'
 import { FixedToolbarFeature, HeadingFeature, lexicalEditor } from '@payloadcms/richtext-lexical'
 import { ecommercePlugin } from '@payloadcms/plugin-ecommerce'
 
-import { stripeAdapter } from '@payloadcms/plugin-ecommerce/payments/stripe'
+import { storeStripeAdapter } from '@/payments/stripe'
 
 import { Page, Product } from '@/payload-types'
 import { getServerSideURL } from '@/utilities/getURL'
@@ -101,34 +101,21 @@ export const plugins: Plugin[] = [
     customers: {
       slug: 'users',
     },
-    transactions: {
-      /**
-       * The Stripe adapter builds each transaction item by spreading the cart
-       * item, which carries the cart row's own `id` along with it. Payload then
-       * writes `transactions_items` rows using those ids, so the second attempt
-       * to pay for the same cart collides with the first and fails with
-       * "Value must be unique: id" — permanently breaking retry on that cart.
-       *
-       * Drop the inherited id so Payload mints a fresh one per row.
-       */
-      transactionsCollectionOverride: ({ defaultCollection }) => ({
+    carts: {
+      cartsCollectionOverride: ({ defaultCollection }) => ({
         ...defaultCollection,
         hooks: {
           ...defaultCollection.hooks,
-          beforeValidate: [
-            ...(defaultCollection.hooks?.beforeValidate ?? []),
-            ({ data }) => {
-              if (data && Array.isArray(data.items)) {
-                data.items = data.items.map((item: Record<string, unknown>) => {
-                  if (item && typeof item === 'object' && 'id' in item) {
-                    const { id: _inheritedCartRowID, ...rest } = item
-                    return rest
-                  }
-                  return item
-                })
+          beforeChange: [
+            ({ data, originalDoc }) => {
+              // Webhook settlement must empty the cart too: there may be no
+              // browser left to call clearCart after the successful payment.
+              if (data.purchasedAt && data.purchasedAt !== originalDoc?.purchasedAt) {
+                data.items = []
               }
               return data
             },
+            ...(defaultCollection.hooks?.beforeChange ?? []),
           ],
         },
       }),
@@ -163,7 +150,7 @@ export const plugins: Plugin[] = [
     },
     payments: {
       paymentMethods: [
-        stripeAdapter({
+        storeStripeAdapter({
           secretKey: process.env.STRIPE_SECRET_KEY!,
           publishableKey: process.env.NEXT_PUBLIC_STRIPE_PUBLISHABLE_KEY!,
           webhookSecret: process.env.STRIPE_WEBHOOKS_SIGNING_SECRET!,

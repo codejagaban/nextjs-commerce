@@ -10,6 +10,6 @@ export default defineConfig({
     testTimeout: 20000,
     fileParallelism: false,
     setupFiles: ['./vitest.setup.ts'],
-    include: ['tests/int/**/*.int.spec.ts'],
+    include: ['tests/int/**/*.int.spec.{ts,tsx}'],
   },
 })
