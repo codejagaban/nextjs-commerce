@@ -3,13 +3,7 @@ import { DEFAULT_STORE_NAME } from '@/brand'
 import { getServerSideURL } from '@/utilities/getURL'
 import type { Payload } from 'payload'
 
-const escapeHTML = (value: string | number) =>
-  String(value)
-    .replaceAll('&', '&amp;')
-    .replaceAll('<', '&lt;')
-    .replaceAll('>', '&gt;')
-    .replaceAll('"', '&quot;')
-    .replaceAll("'", '&#039;')
+import { escapeHTML } from './template'
 
 const relationshipID = (value: null | number | string | { id: number | string } | undefined) =>
   typeof value === 'object' && value ? value.id : value

@@ -2,6 +2,8 @@
 
 import configPromise from '@payload-config'
 import { getPayload } from 'payload'
+import { DEFAULT_STORE_NAME } from '@/brand'
+import { renderActionEmail } from '@/email/template'
 import { getServerSideURL } from '@/utilities/getURL'
 
 type SendOrderAccessEmailArgs = {
@@ -36,24 +38,25 @@ export async function sendOrderAccessEmail({
       return { success: true }
     }
 
-    const serverURL = getServerSideURL()
-    const orderURL = `${serverURL}/orders/${order.id}?email=${encodeURIComponent(email)}&accessToken=${order.accessToken}`
-
-    const emailBody = `
-        <h1>View Your Order</h1>
-        <p>Click the link below to view your order details:</p>
-        <p><a href="${orderURL}">View Order #${order.id}</a></p>
-        <p>Or copy and paste this URL into your browser:</p>
-        <p>${orderURL}</p>
-        <p>This link will give you access to view your order details.</p>
-      `
-
-    console.log('[sendOrderAccessEmail] Email body:', emailBody)
+    const settings = await payload.findGlobal({ slug: 'settings', depth: 0 })
+    const storeName = settings.storeName || DEFAULT_STORE_NAME
+    const orderURL = new URL(`/orders/${order.id}`, getServerSideURL())
+    orderURL.searchParams.set('email', email)
+    orderURL.searchParams.set('accessToken', order.accessToken)
+    const message = renderActionEmail({
+      actionLabel: `View order #${order.id}`,
+      intro: 'Use this secure link to view your order details.',
+      note: 'Only share this link with someone you trust. It gives access to this order.',
+      storeName,
+      title: 'Your order link',
+      url: orderURL.toString(),
+    })
 
     await payload.sendEmail({
       to: email,
       subject: `Access your order #${order.id}`,
-      html: emailBody,
+      html: message.html,
+      text: message.text,
     })
 
     return { success: true }
