@@ -1,0 +1,6 @@
+.env*
+public/media
+.playwright
+playwright-report
+test-results
+coverage
