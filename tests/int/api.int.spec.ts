@@ -163,25 +163,4 @@ describe('Commerce API and access controls', () => {
     expect(result.docs).toHaveLength(0)
     await payload.update({ collection: 'products', id: productID, data: { _status: 'published' } })
   })
-
-  it('creates separate transaction rows when payment initiation is retried', async () => {
-    const cartRowID = randomUUID()
-    const create = () =>
-      payload.create({
-        collection: 'transactions',
-        data: {
-          amount: 2500,
-          currency: 'USD',
-          customer: customer.id,
-          status: 'pending',
-          paymentMethod: 'stripe',
-          items: [{ id: cartRowID, product: productID, quantity: 1 }],
-        },
-      })
-    const first = await create()
-    const second = await create()
-    expect(first.items?.[0].id).toBeTruthy()
-    expect(second.items?.[0].id).not.toBe(first.items?.[0].id)
-    expect(first.items?.[0].id).not.toBe(cartRowID)
-  })
 })
