@@ -2,6 +2,7 @@ import type { Metadata } from 'next'
 
 import { mergeOpenGraph } from '@/utilities/mergeOpenGraph'
 import React from 'react'
+import { noIndex } from '@/utilities/noIndex'
 
 import { LogoutPage } from './LogoutPage'
 
@@ -14,6 +15,7 @@ export default async function Logout() {
 }
 
 export const metadata: Metadata = {
+  robots: noIndex,
   description: 'You have been logged out.',
   openGraph: mergeOpenGraph({
     title: 'Logout',

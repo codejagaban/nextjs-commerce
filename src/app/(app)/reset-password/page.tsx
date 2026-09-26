@@ -1,4 +1,5 @@
 import type { Metadata } from 'next'
+import { noIndex } from '@/utilities/noIndex'
 
 import { AuthShell } from '@/components/auth/AuthShell'
 import { ResetPasswordForm } from '@/components/forms/ResetPasswordForm'
@@ -23,6 +24,6 @@ export const metadata: Metadata = {
     url: '/reset-password',
   }),
   // A reset link is single-use and personal; it has no business in an index.
-  robots: { follow: false, index: false },
+  robots: noIndex,
   title: 'Set a new password',
 }

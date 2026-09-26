@@ -7,6 +7,7 @@ import { AuthShell } from '@/components/auth/AuthShell'
 import { getPayload } from 'payload'
 import { headers as getHeaders } from 'next/headers.js'
 import configPromise from '@payload-config'
+import { noIndex } from '@/utilities/noIndex'
 
 export default async function FindOrderPage() {
   const headers = await getHeaders()
@@ -24,6 +25,7 @@ export default async function FindOrderPage() {
 }
 
 export const metadata: Metadata = {
+  robots: noIndex,
   description: 'Find your order using your email and order ID.',
   openGraph: mergeOpenGraph({
     title: 'Find order',

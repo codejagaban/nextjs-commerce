@@ -10,6 +10,7 @@ import { getPayload } from 'payload'
 
 import { CreateAccountForm } from '@/components/forms/CreateAccountForm'
 import { redirect } from 'next/navigation'
+import { noIndex } from '@/utilities/noIndex'
 
 export default async function CreateAccount() {
   const headers = await getHeaders()
@@ -32,6 +33,7 @@ export default async function CreateAccount() {
 }
 
 export const metadata: Metadata = {
+  robots: noIndex,
   description: 'Create an account or log in to your existing account.',
   openGraph: mergeOpenGraph({
     title: 'Account',

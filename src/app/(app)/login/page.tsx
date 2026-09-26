@@ -11,6 +11,7 @@ import { LoginForm } from '@/components/forms/LoginForm'
 import { redirect } from 'next/navigation'
 import { getSettings } from '@/utilities/getSettings'
 import { DEFAULT_STORE_NAME } from '@/brand'
+import { noIndex } from '@/utilities/noIndex'
 
 export default async function Login() {
   const headers = await getHeaders()
@@ -34,6 +35,7 @@ export default async function Login() {
 }
 
 export const metadata: Metadata = {
+  robots: noIndex,
   description: 'Login or create an account to get started.',
   openGraph: {
     title: 'Login',

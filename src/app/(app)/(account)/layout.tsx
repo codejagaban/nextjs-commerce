@@ -1,4 +1,8 @@
 import type { ReactNode } from 'react'
+import type { Metadata } from 'next'
+import { noIndex } from '@/utilities/noIndex'
+
+export const metadata: Metadata = { robots: noIndex }
 
 import { headers as getHeaders } from 'next/headers.js'
 import configPromise from '@payload-config'
