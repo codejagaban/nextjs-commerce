@@ -11,6 +11,9 @@ import React from 'react'
 import type { Page } from '@/payload-types'
 import { notFound } from 'next/navigation'
 
+// Draft mode reads request headers, including for slugs absent at build time.
+export const dynamic = 'force-dynamic'
+
 export async function generateStaticParams() {
   const payload = await getPayload({ config: configPromise })
   const pages = await payload.find({

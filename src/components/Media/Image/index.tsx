@@ -3,6 +3,7 @@
 import type { StaticImageData } from 'next/image'
 
 import { cn } from '@/utilities/cn'
+import { getMediaURL } from '@/utilities/getMediaURL'
 import NextImage from 'next/image'
 import React from 'react'
 
@@ -80,7 +81,7 @@ export const Image: React.FC<MediaProps> = (props) => {
       priority={priority}
       quality={90}
       sizes={sizes}
-      src={src}
+      src={typeof src === 'string' ? getMediaURL(src) : src}
       width={!fill ? width || widthFromProps : undefined}
     />
   )

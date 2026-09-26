@@ -1,6 +1,7 @@
 'use client'
 
 import { Price } from '@/components/Price'
+import { getMediaURL } from '@/utilities/getMediaURL'
 import {
   Sheet,
   SheetContent,
@@ -154,7 +155,7 @@ export function CartModal() {
                                 alt={image?.alt || product?.title || ''}
                                 className="h-full w-full object-cover"
                                 height={94}
-                                src={image.url}
+                                src={getMediaURL(image.url)}
                                 width={94}
                               />
                             )}
