@@ -146,19 +146,16 @@
   }
 
   [data-theme='dark'] .atmosphere-page {
-    background-image: linear-gradient(
-      to bottom,
-      oklch(21.5% 0.018 42deg) 0%,
-      oklch(20.8% 0.014 41deg) 9%,
-      oklch(20% 0.012 40deg) 22%,
-      oklch(20.4% 0.013 40deg) 34%,
-      oklch(20% 0.012 40deg) 46%,
-      oklch(20.8% 0.015 41deg) 58%,
-      oklch(21.6% 0.019 42deg) 70%,
-      oklch(22.4% 0.024 42deg) 82%,
-      oklch(23% 0.028 42deg) 92%,
-      oklch(23.6% 0.032 42deg) 100%
-    );
+    background-color: #000;
+    background-image: none;
+  }
+
+  [data-theme='dark'] .home-hero-image {
+    filter: brightness(0.7) saturate(0.82);
+  }
+
+  [data-theme='dark'] .home-hero-warmth {
+    opacity: 0;
   }
 
   /* Dissolve an image's left edge into the surface beside it, so a portrait can
@@ -269,6 +266,9 @@
   --olive: oklch(46% 0.11 37deg);
   --amber: oklch(62% 0.11 45deg);
   --bone: oklch(98.6% 0.006 70deg);
+  --hero-field: radial-gradient(140% 105% at 80% -10%, oklch(68% 0.085 64deg) 0%, oklch(52% 0.082 44deg) 40%, oklch(37% 0.055 36deg) 76%, oklch(29% 0.035 34deg) 100%);
+  --hero-scrim: linear-gradient(to top, oklch(24% 0.04 38deg / 0.86) 0%, oklch(24% 0.04 38deg / 0.6) 30%, oklch(24% 0.04 38deg / 0.26) 58%, transparent 100%);
+  --image-scrim: linear-gradient(to right, oklch(24% 0.04 38deg / 0.82) 0%, oklch(24% 0.04 38deg / 0.66) 26%, oklch(24% 0.04 38deg / 0.34) 46%, oklch(24% 0.04 38deg / 0.1) 62%, transparent 76%);
 
   --chart-1: oklch(64.6% 0.222 41.116deg);
   --chart-2: oklch(60% 0.118 184.704deg);
@@ -290,39 +290,42 @@
 }
 
 [data-theme='dark'] {
-  /* Warm charcoal dark, tinted toward the terracotta brand. */
-  --background: oklch(20% 0.012 40deg);
-  --foreground: oklch(94% 0.008 65deg);
-  --card: oklch(23.5% 0.014 40deg);
-  --card-foreground: oklch(94% 0.008 65deg);
-  --popover: oklch(20% 0.012 40deg);
-  --popover-foreground: oklch(94% 0.008 65deg);
+  /* Black canvas with neutral elevation and clear text contrast. */
+  --background: #000;
+  --foreground: #f4f4f2;
+  --card: #111;
+  --card-foreground: #f4f4f2;
+  --popover: #101010;
+  --popover-foreground: #f4f4f2;
   /* On dark, buttons invert to a warm near-white pill. */
-  --primary: oklch(95% 0.008 65deg);
-  --primary-foreground: oklch(24% 0.012 45deg);
-  --secondary: oklch(28% 0.016 42deg);
-  --secondary-foreground: oklch(94% 0.008 65deg);
-  --muted: oklch(27% 0.014 42deg);
-  --muted-foreground: oklch(72% 0.014 60deg);
-  --accent: oklch(28% 0.016 42deg);
-  --accent-foreground: oklch(94% 0.008 65deg);
+  --primary: #f4f4f2;
+  --primary-foreground: #050505;
+  --secondary: #171717;
+  --secondary-foreground: #f4f4f2;
+  --muted: #1b1b1b;
+  --muted-foreground: #b8b8b8;
+  --accent: #1d1d1d;
+  --accent-foreground: #f4f4f2;
   --destructive: oklch(60% 0.18 25deg);
   --destructive-foreground: oklch(96% 0.008 65deg);
-  --border: oklch(31% 0.014 42deg);
-  --input: oklch(31% 0.014 42deg);
+  --border: #303030;
+  --input: #303030;
   --ring: oklch(64% 0.12 40deg);
 
   --terracotta: oklch(64% 0.12 40deg);
   --terracotta-deep: oklch(54% 0.11 38deg);
-  --blush: oklch(46% 0.05 25deg);
-  --mauve: oklch(44% 0.05 355deg);
-  --lilac: oklch(44% 0.06 305deg);
-  --sand: oklch(44% 0.03 70deg);
-  --cream: oklch(28% 0.014 55deg);
-  --ink: oklch(20% 0.012 40deg);
+  --blush: #1b1b1b;
+  --mauve: #181818;
+  --lilac: #151515;
+  --sand: #1d1d1d;
+  --cream: #171717;
+  --ink: #000;
   --olive: oklch(54% 0.11 38deg);
   --amber: oklch(66% 0.11 45deg);
   --bone: oklch(94% 0.008 65deg);
+  --hero-field: linear-gradient(110deg, #000 0%, #050505 62%, #111 100%);
+  --hero-scrim: linear-gradient(to top, rgb(0 0 0 / 0.94) 0%, rgb(0 0 0 / 0.74) 30%, rgb(0 0 0 / 0.28) 60%, transparent 100%);
+  --image-scrim: linear-gradient(to right, rgb(0 0 0 / 0.9) 0%, rgb(0 0 0 / 0.72) 26%, rgb(0 0 0 / 0.36) 46%, rgb(0 0 0 / 0.12) 62%, transparent 76%);
 
   --chart-1: oklch(48.8% 0.243 264.376deg);
   --chart-2: oklch(69.6% 0.17 162.48deg);

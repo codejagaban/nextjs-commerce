@@ -135,16 +135,13 @@ export default async function HomePage() {
       {/* ---------------------------------------------------------------- */}
       {/* Hero                                                             */}
       {/* ---------------------------------------------------------------- */}
-      <section className="relative isolate flex min-h-svh flex-col justify-end overflow-hidden bg-terracotta-deep">
+      <section className="relative isolate flex min-h-svh flex-col justify-end overflow-hidden bg-terracotta-deep dark:bg-black">
         {/* The field: one low, warm light raking across from the upper right,
             with real falloff. Not a symmetric bloom behind the subject. */}
         <div
           aria-hidden="true"
           className="absolute inset-0"
-          style={{
-            background:
-              'radial-gradient(140% 105% at 80% -10%, oklch(68% 0.085 64deg) 0%, oklch(52% 0.082 44deg) 40%, oklch(37% 0.055 36deg) 76%, oklch(29% 0.035 34deg) 100%)',
-          }}
+          style={{ background: 'var(--hero-field)' }}
         />
 
         {/* The portrait sits in the field and bleeds off the right. Its left edge
@@ -156,14 +153,14 @@ export default async function HomePage() {
             fill
             priority
             sizes="(min-width: 1024px) 56vw, (min-width: 768px) 62vw, 78vw"
-            className="feather-left object-cover object-[38%_center]"
+            className="home-hero-image feather-left object-cover object-[38%_center]"
           />
         </div>
         {/* A whisper of the field's warmth over the portrait, feathered on the
             same curve as the image so the two never meet at an edge. */}
         <div
           aria-hidden="true"
-          className="feather-left absolute inset-y-0 right-0 w-[78%] opacity-40 mix-blend-soft-light md:w-[62%] lg:w-[56%]"
+          className="home-hero-warmth feather-left absolute inset-y-0 right-0 w-[78%] opacity-40 mix-blend-soft-light md:w-[62%] lg:w-[56%]"
           style={{ background: 'oklch(70% 0.1 56deg)' }}
         />
 
@@ -171,10 +168,7 @@ export default async function HomePage() {
         <div
           aria-hidden="true"
           className="absolute inset-x-0 bottom-0 h-[78%]"
-          style={{
-            background:
-              'linear-gradient(to top, oklch(24% 0.04 38deg / 0.86) 0%, oklch(24% 0.04 38deg / 0.6) 30%, oklch(24% 0.04 38deg / 0.26) 58%, transparent 100%)',
-          }}
+          style={{ background: 'var(--hero-scrim)' }}
         />
 
         <div className="container relative z-10 pb-32 pt-32 md:pb-40">
@@ -311,10 +305,7 @@ export default async function HomePage() {
           <div
             aria-hidden="true"
             className="feather-y absolute inset-0"
-            style={{
-              background:
-                'linear-gradient(to right, oklch(24% 0.04 38deg / 0.82) 0%, oklch(24% 0.04 38deg / 0.66) 26%, oklch(24% 0.04 38deg / 0.34) 46%, oklch(24% 0.04 38deg / 0.1) 62%, transparent 76%)',
-            }}
+            style={{ background: 'var(--image-scrim)' }}
           />
           <div className="container relative flex h-full items-center">
             <div className="max-w-md text-bone">
