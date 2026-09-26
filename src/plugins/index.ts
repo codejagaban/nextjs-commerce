@@ -18,6 +18,7 @@ import { isDocumentOwner } from '@/access/isDocumentOwner'
 import { DEFAULT_CURRENCY_CODE, SUPPORTED_CURRENCIES } from '@/currencies'
 import { mediaStorage } from '@/storage'
 import { DEFAULT_STORE_NAME } from '@/brand'
+import { orderEmailPlugin } from '@/email/orderEmailPlugin'
 
 const generateTitle: GenerateTitle<Product | Page> = ({ doc }) => {
   const siteName = DEFAULT_STORE_NAME
@@ -145,6 +146,14 @@ export const plugins: Plugin[] = [
               ],
             },
           },
+          {
+            name: 'confirmationEmailSentAt',
+            type: 'date',
+            admin: {
+              hidden: true,
+              readOnly: true,
+            },
+          },
         ],
       }),
     },
@@ -161,4 +170,6 @@ export const plugins: Plugin[] = [
       productsCollectionOverride: ProductsCollection,
     },
   }),
+  // Runs after ecommerce so it can wrap every provider's confirmation endpoint.
+  orderEmailPlugin,
 ]

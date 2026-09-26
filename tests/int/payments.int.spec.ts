@@ -13,6 +13,7 @@ let customer: User
 let outsider: User
 const carts: number[] = []
 const products: number[] = []
+const sentEmails: Record<string, unknown>[] = []
 const runID = randomUUID()
 const signingSecret = process.env.STRIPE_WEBHOOKS_SIGNING_SECRET!
 const signing = new Stripe('sk_test_signatures_only')
@@ -134,6 +135,10 @@ describe('Stripe settlement and webhooks', () => {
     ).mockImplementation((async (id: string) => intents.get(id)) as never)
     const { default: config } = await import('@/payload.config')
     payload = await getPayload({ config })
+    vi.spyOn(payload, 'sendEmail').mockImplementation(async (message) => {
+      sentEmails.push(message as Record<string, unknown>)
+      return {} as never
+    })
     customer = await payload.create({
       collection: 'users',
       data: {
@@ -196,15 +201,24 @@ describe('Stripe settlement and webhooks', () => {
   for (const guest of [false, true])
     it(`settles ${guest ? 'guest' : 'customer'} orders through webhook alone and tolerates retries`, async () => {
       const f = await fixture(guest)
+      const emailsBeforeSettlement = sentEmails.length
       f.intent.status = 'succeeded'
       expect((await webhook(f.intent)).status).toBe(200)
       const order = await verifySettlement(f.cart, f.product.id)
       expect(order.accessToken).toBeTruthy()
+      expect(sentEmails).toHaveLength(emailsBeforeSettlement + 1)
+      expect(sentEmails.at(-1)).toMatchObject({
+        subject: `Order #${order.id} confirmed`,
+        to: guest ? `guest-${runID}@example.com` : customer.email,
+      })
+      expect(sentEmails.at(-1)?.html).toContain(`Order #${order.id}`)
+      expect(sentEmails.at(-1)?.text).toContain('Payment has been received')
       expect((await webhook(f.intent)).status).toBe(200)
       const confirmation = await endpoint('confirm-order', f.data, f.user)
       expect(confirmation.status).toBe(200)
       expect((await confirmation.json()).orderID).toBe(order.id)
       await verifySettlement(f.cart, f.product.id)
+      expect(sentEmails).toHaveLength(emailsBeforeSettlement + 1)
     })
 
   it('handles the webhook and browser confirmation arriving together', async () => {
@@ -216,6 +230,26 @@ describe('Stripe settlement and webhooks', () => {
     ])
     expect(results.map((r) => r.status)).toEqual([200, 200])
     await verifySettlement(f.cart, f.product.id)
+  })
+
+  it('keeps the order successful when email fails and retries delivery', async () => {
+    const f = await fixture()
+    const emailsBeforeSettlement = sentEmails.length
+    vi.mocked(payload.sendEmail).mockRejectedValueOnce(new Error('SMTP unavailable'))
+    f.intent.status = 'succeeded'
+
+    expect((await webhook(f.intent)).status).toBe(200)
+    const order = await verifySettlement(f.cart, f.product.id)
+    expect(sentEmails).toHaveLength(emailsBeforeSettlement)
+    expect(
+      (await payload.findByID({ collection: 'orders', id: order.id })).confirmationEmailSentAt,
+    ).toBeNull()
+
+    expect((await endpoint('confirm-order', f.data, f.user)).status).toBe(200)
+    expect(sentEmails).toHaveLength(emailsBeforeSettlement + 1)
+    expect(
+      (await payload.findByID({ collection: 'orders', id: order.id })).confirmationEmailSentAt,
+    ).toBeTruthy()
   })
 
   it('rejects missing and invalid webhook signatures without creating an order', async () => {

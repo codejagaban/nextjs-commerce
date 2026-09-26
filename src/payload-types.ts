@@ -261,6 +261,7 @@ export interface Order {
   amount?: number | null;
   currency?: ('USD' | 'EUR' | 'GBP') | null;
   accessToken?: string | null;
+  confirmationEmailSentAt?: string | null;
   updatedAt: string;
   createdAt: string;
 }
@@ -1826,6 +1827,7 @@ export interface OrdersSelect<T extends boolean = true> {
   amount?: T;
   currency?: T;
   accessToken?: T;
+  confirmationEmailSentAt?: T;
   updatedAt?: T;
   createdAt?: T;
 }
