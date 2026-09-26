@@ -3,25 +3,31 @@ import type { Metadata } from 'next'
 import type { Page, Product } from '../payload-types'
 
 import { DEFAULT_STORE_NAME } from '@/brand'
+import { getSettings } from './getSettings'
 import { mergeOpenGraph } from './mergeOpenGraph'
+import { getCanonicalURL, getPublicMediaURL } from './siteURL'
 
 export const generateMeta = async (args: { doc: Page | Product }): Promise<Metadata> => {
   const { doc } = args || {}
+  const settings = await getSettings()
+  const title = doc?.meta?.title || doc?.title || settings?.storeName || DEFAULT_STORE_NAME
+  const description = doc?.meta?.description || settings?.metaDescription || undefined
+  const path = doc?.slug === 'home' ? '/' : `/${doc?.slug || ''}`
+  const canonical = getCanonicalURL(path)
 
   const ogImage =
     typeof doc?.meta?.image === 'object' &&
     doc.meta.image !== null &&
     'url' in doc.meta.image &&
-    `${process.env.NEXT_PUBLIC_SERVER_URL}${doc.meta.image.url}`
+    doc.meta.image.url
+      ? getPublicMediaURL(doc.meta.image.url)
+      : undefined
 
   return {
-    description: doc?.meta?.description,
+    description,
+    alternates: { canonical },
     openGraph: mergeOpenGraph({
-      ...(doc?.meta?.description
-        ? {
-            description: doc?.meta?.description,
-          }
-        : {}),
+      ...(description ? { description } : {}),
       images: ogImage
         ? [
             {
@@ -29,9 +35,11 @@ export const generateMeta = async (args: { doc: Page | Product }): Promise<Metad
             },
           ]
         : undefined,
-      title: doc?.meta?.title || doc?.title || DEFAULT_STORE_NAME,
-      url: Array.isArray(doc?.slug) ? doc?.slug.join('/') : '/',
+      siteName: settings?.storeName || DEFAULT_STORE_NAME,
+      title,
+      url: canonical,
     }),
-    title: doc?.meta?.title || doc?.title || DEFAULT_STORE_NAME,
+    ...(ogImage ? { twitter: { card: 'summary_large_image', images: [ogImage] } } : {}),
+    title: { absolute: title },
   }
 }

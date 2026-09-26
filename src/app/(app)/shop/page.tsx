@@ -7,9 +7,13 @@ import React from 'react'
 
 import { DEFAULT_CURRENCY_CODE, priceSelect } from '@/currencies'
 import { getStoreCurrency } from '@/utilities/getStoreCurrency'
+import { getCanonicalURL } from '@/utilities/siteURL'
+import { mergeOpenGraph } from '@/utilities/mergeOpenGraph'
 
 export const metadata = {
+  alternates: { canonical: getCanonicalURL('/shop') },
   description: 'Search for products in the store.',
+  openGraph: mergeOpenGraph({ title: 'Shop', url: getCanonicalURL('/shop') }),
   title: 'Shop',
 }
 

@@ -15,6 +15,8 @@ import localFont from 'next/font/local'
 import React from 'react'
 import './globals.css'
 import { DEFAULT_STORE_NAME } from '@/brand'
+import { mergeOpenGraph } from '@/utilities/mergeOpenGraph'
+import { getCanonicalURL, getSiteURL } from '@/utilities/siteURL'
 
 // Editorial display serif (self-hosted from Fontshare — off the Google slop shelf).
 const sentient = localFont({
@@ -29,7 +31,6 @@ const sentient = localFont({
 const SITE_NAME = DEFAULT_STORE_NAME
 const TWITTER_CREATOR = process.env.TWITTER_CREATOR
 const TWITTER_SITE = process.env.TWITTER_SITE
-const baseUrl = process.env.NEXT_PUBLIC_SERVER_URL || 'http://localhost:3000'
 const twitterCreator = TWITTER_CREATOR ? ensureStartsWith(TWITTER_CREATOR, '@') : undefined
 const twitterSite = TWITTER_SITE ? ensureStartsWith(TWITTER_SITE, 'https://') : undefined
 
@@ -45,29 +46,27 @@ export async function generateMetadata(): Promise<Metadata> {
   const description = settings?.metaDescription || undefined
 
   return {
-    metadataBase: new URL(baseUrl),
+    metadataBase: new URL(getSiteURL()),
     title: {
       default: title,
       template: `%s | ${name}`,
     },
     ...(description ? { description } : {}),
-    openGraph: {
-      type: 'website',
+    openGraph: mergeOpenGraph({
       siteName: name,
       title,
-      url: baseUrl,
+      url: getCanonicalURL('/'),
       ...(description ? { description } : {}),
-    },
+    }),
     robots: { follow: true, index: true },
-    ...(twitterCreator && twitterSite
-      ? {
-          twitter: {
-            card: 'summary_large_image',
-            creator: twitterCreator,
-            site: twitterSite,
-          },
-        }
-      : {}),
+    twitter: {
+      card: 'summary_large_image',
+      title,
+      ...(description ? { description } : {}),
+      images: ['/brand/still-life-01.jpg'],
+      ...(twitterCreator ? { creator: twitterCreator } : {}),
+      ...(twitterSite ? { site: twitterSite } : {}),
+    },
   }
 }
 
