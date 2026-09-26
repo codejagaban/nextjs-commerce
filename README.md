@@ -82,7 +82,14 @@ Use Stripe test cards (e.g. `4242 4242 4242 4242`) at checkout.
 
 Everything below is designed to be swapped per project.
 
-- **Name & metadata** — `SITE_NAME`, `COMPANY_NAME`, `TWITTER_*` in `.env`.
+- **Name & metadata** — edit Store Settings in the admin; `SITE_NAME` and `COMPANY_NAME`
+  in `.env` are fallbacks, while `TWITTER_*` configures social cards.
+- **SEO origin** — set `SITE_URL` to the public production origin in deployment settings.
+  Robots, sitemap, canonicals, Open Graph URLs and JSON-LD then use that same origin,
+  including on preview builds. The admin's Store Settings control the displayed
+  store name and default metadata.
+  After deployment, run `node scripts/verify-seo.mjs https://yourstore.com` to check
+  the live sitemap, metadata, images, structured data and private route indexing.
 - **Colours & type** — brand tokens live in `src/app/(app)/globals.css` (`--olive`,
   `--amber`, `--terracotta`, `--bone`, `--ink`, plus the semantic `--primary` etc. for
   both light and dark). The display font is wired in `src/app/(app)/layout.tsx`.
