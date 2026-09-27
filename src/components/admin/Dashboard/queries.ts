@@ -29,6 +29,16 @@ export type AttentionCounts = {
   stalledPayments: number
 }
 
+export type RecentOrder = {
+  createdAt: string
+  currency: string
+  customer: string
+  fulfillmentStatus: string
+  id: number
+  paymentStatus: string
+  total: number
+}
+
 type SalesRow = {
   day: string
   discounts: string | number | null
@@ -54,6 +64,15 @@ type AttentionRow = {
   processing_orders: string | number
   stalled_payments: string | number
 }
+type RecentOrderRow = {
+  amount: string | number | null
+  created_at: Date | string
+  currency: string | null
+  customer: string | null
+  fulfillment_status: string | null
+  id: number
+  payment_status: string | null
+}
 
 const rowsFrom = <T>(result: unknown): T[] => {
   if (typeof result !== 'object' || result === null || !('rows' in result)) return []
@@ -76,6 +95,17 @@ export const attentionCountsFrom = (result: unknown): AttentionCounts => {
     stalledPayments: amount(row?.stalled_payments),
   }
 }
+
+export const recentOrdersFrom = (result: unknown): RecentOrder[] =>
+  rowsFrom<RecentOrderRow>(result).map((row) => ({
+    createdAt: new Date(row.created_at).toISOString(),
+    currency: row.currency || 'USD',
+    customer: row.customer || 'Guest customer',
+    fulfillmentStatus: row.fulfillment_status || 'processing',
+    id: row.id,
+    paymentStatus: row.payment_status || 'not_recorded',
+    total: amount(row.amount),
+  }))
 
 const emptySales = (days: number): SalesAggregate => ({
   averageOrderValue: 0,
@@ -166,7 +196,7 @@ export async function getDashboardOrderData({
     ORDER BY "day"
   `)
 
-  const [statusResult, attentionResult, popularResult] = await Promise.all([
+  const [statusResult, attentionResult, popularResult, recentResult] = await Promise.all([
     payload.db.drizzle.execute(sql`
       SELECT COALESCE("status"::text, 'processing') AS "status", COUNT(*) AS "count"
       FROM "orders"
@@ -231,6 +261,32 @@ export async function getDashboardOrderData({
       ORDER BY "units" DESC
       LIMIT 5
     `),
+    payload.db.drizzle.execute(sql`
+      SELECT
+        "orders"."id",
+        COALESCE(
+          NULLIF("users"."name", ''),
+          NULLIF("orders"."customer_email", ''),
+          NULLIF("users"."email", ''),
+          'Guest customer'
+        ) AS "customer",
+        COALESCE("orders"."amount", 0) AS "amount",
+        COALESCE("orders"."currency"::text, ${currency}) AS "currency",
+        COALESCE("orders"."status"::text, 'processing') AS "fulfillment_status",
+        "latest_transaction"."status"::text AS "payment_status",
+        "orders"."created_at"
+      FROM "orders"
+      LEFT JOIN "users" ON "users"."id" = "orders"."customer_id"
+      LEFT JOIN LATERAL (
+        SELECT "transactions"."status"
+        FROM "transactions"
+        WHERE "transactions"."order_id" = "orders"."id"
+        ORDER BY "transactions"."updated_at" DESC, "transactions"."id" DESC
+        LIMIT 1
+      ) AS "latest_transaction" ON TRUE
+      ORDER BY "orders"."created_at" DESC, "orders"."id" DESC
+      LIMIT 5
+    `),
   ])
 
   const current = emptySales(days)
@@ -276,6 +332,7 @@ export async function getDashboardOrderData({
       productID: row.product_id,
       units: amount(row.units),
     })),
+    recentOrders: recentOrdersFrom(recentResult),
     statusCounts,
   }
 }

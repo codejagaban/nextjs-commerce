@@ -8,6 +8,7 @@ import { IconAverage, IconOrders, IconProducts, IconRevenue, IconStock } from '.
 import { KpiStrip, type Kpi } from '../KpiStrip'
 import { OrderHealth } from '../OrderHealth'
 import { PopularProducts, type PopularProduct } from '../PopularProducts'
+import { RecentOrders } from '../RecentOrders'
 import { RevenueTrend } from '../RevenueTrend'
 import { DEFAULT_CURRENCY_CODE } from '@/currencies'
 import {
@@ -147,6 +148,7 @@ async function getOverview(filters: DashboardFilters) {
     products: productCount.totalDocs,
     statusCounts: orderData.statusCounts,
     popular,
+    recentOrders: orderData.recentOrders,
     lowStock,
     window,
   }
@@ -233,6 +235,8 @@ export const Dashboard: React.FC<{
       <KpiStrip items={kpis} />
 
       <AttentionQueue adminPath={adminPath} counts={s.attention} />
+
+      <RecentOrders adminPath={adminPath} orders={s.recentOrders} timeZone={s.timeZone} />
 
       <div className={`${baseClass}__split`}>
         <RevenueTrend
