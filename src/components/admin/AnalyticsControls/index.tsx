@@ -19,6 +19,7 @@ import {
 } from '@/components/ui/select'
 
 import type { AnalyticsComparison, AnalyticsRange } from '../Dashboard/analyticsRange'
+import { useAdminNavigationProgress } from '../AdminNavigationProgress'
 
 import './index.scss'
 
@@ -85,6 +86,7 @@ export const AnalyticsControls: React.FC<Props> = ({
   startDate,
 }) => {
   const router = useRouter()
+  const { start: startNavigation } = useAdminNavigationProgress()
   const [isPending, startTransition] = useTransition()
   const [rangeOpen, setRangeOpen] = useState(false)
   const {
@@ -102,6 +104,7 @@ export const AnalyticsControls: React.FC<Props> = ({
   }, [endDate, reset, startDate])
 
   const navigate = (href: string) => {
+    startNavigation()
     startTransition(() => router.push(href))
   }
 
@@ -130,16 +133,6 @@ export const AnalyticsControls: React.FC<Props> = ({
       aria-label="Analytics date controls"
       data-pending={isPending ? 'true' : undefined}
     >
-      {isPending && (
-        <div
-          aria-label="Loading dashboard data"
-          className="analytics-controls__progress"
-          role="progressbar"
-        >
-          <span />
-        </div>
-      )}
-
       <Popover onOpenChange={setRangeOpen} open={rangeOpen}>
         <PopoverTrigger asChild>
           <Button
