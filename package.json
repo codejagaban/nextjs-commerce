@@ -26,6 +26,7 @@
     "typecheck": "tsc --noEmit",
     "test:e2e": "node scripts/test-runner.mjs e2e",
     "test:int": "node scripts/test-runner.mjs integration",
+    "test:smoke": "playwright test --config playwright.smoke.config.ts",
     "test:unit": "vitest run --config vitest.unit.config.ts",
     "test:seed": "node scripts/test-runner.mjs seed",
     "test:build": "node scripts/test-runner.mjs build",
