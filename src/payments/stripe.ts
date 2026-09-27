@@ -3,6 +3,8 @@ import { stripeAdapter } from '@payloadcms/plugin-ecommerce/payments/stripe'
 import type { PaymentAdapter } from '@payloadcms/plugin-ecommerce/types'
 import { createLocalReq } from 'payload'
 
+import { withOrderFinancialSnapshot } from './orderFinancials'
+
 type StripeAdapterArgs = Parameters<typeof stripeAdapter>[0]
 type WebhookHandler = NonNullable<StripeAdapterArgs['webhooks']>[string]
 
@@ -70,6 +72,15 @@ export const storeStripeAdapter = (options: StripeAdapterArgs): PaymentAdapter =
   })
   return {
     ...base,
+    confirmOrder: (args) =>
+      base.confirmOrder({
+        ...args,
+        finalizeOrder: ({ orderData, transactionID }) =>
+          args.finalizeOrder({
+            orderData: withOrderFinancialSnapshot(orderData),
+            transactionID,
+          }),
+      }),
     initiatePayment: (args) =>
       base.initiatePayment({
         ...args,

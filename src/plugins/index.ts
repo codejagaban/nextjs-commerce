@@ -19,6 +19,7 @@ import { DEFAULT_CURRENCY_CODE, SUPPORTED_CURRENCIES } from '@/currencies'
 import { mediaStorage } from '@/storage'
 import { DEFAULT_STORE_NAME } from '@/brand'
 import { orderEmailPlugin } from '@/email/orderEmailPlugin'
+import { orderFinancialFields } from '@/fields/orderFinancialFields'
 
 const generateTitle: GenerateTitle<Product | Page> = ({ doc }) => {
   const siteName = DEFAULT_STORE_NAME
@@ -126,6 +127,7 @@ export const plugins: Plugin[] = [
         ...defaultCollection,
         fields: [
           ...defaultCollection.fields,
+          ...orderFinancialFields,
           {
             name: 'accessToken',
             type: 'text',

@@ -260,6 +260,34 @@ export interface Order {
   status?: OrderStatus;
   amount?: number | null;
   currency?: ('USD' | 'EUR' | 'GBP') | null;
+  /**
+   * Product value before discounts, shipping, and tax.
+   */
+  subtotal?: number | null;
+  /**
+   * Discounts applied to this order.
+   */
+  discountTotal?: number | null;
+  /**
+   * Shipping charged to the customer.
+   */
+  shippingTotal?: number | null;
+  /**
+   * Tax charged to the customer.
+   */
+  taxTotal?: number | null;
+  /**
+   * Product value returned to the customer so far.
+   */
+  productRefundTotal?: number | null;
+  /**
+   * Shipping charges returned to the customer so far.
+   */
+  shippingRefundTotal?: number | null;
+  /**
+   * Tax returned to the customer so far.
+   */
+  taxRefundTotal?: number | null;
   accessToken?: string | null;
   confirmationEmailSentAt?: string | null;
   updatedAt: string;
@@ -352,6 +380,8 @@ export interface Media {
     };
     [k: string]: unknown;
   } | null;
+  prefix?: string | null;
+  _objectKey?: string | null;
   updatedAt: string;
   createdAt: string;
   url?: string | null;
@@ -1452,6 +1482,8 @@ export interface TagsSelect<T extends boolean = true> {
 export interface MediaSelect<T extends boolean = true> {
   alt?: T;
   caption?: T;
+  prefix?: T;
+  _objectKey?: T;
   updatedAt?: T;
   createdAt?: T;
   url?: T;
@@ -1826,6 +1858,13 @@ export interface OrdersSelect<T extends boolean = true> {
   status?: T;
   amount?: T;
   currency?: T;
+  subtotal?: T;
+  discountTotal?: T;
+  shippingTotal?: T;
+  taxTotal?: T;
+  productRefundTotal?: T;
+  shippingRefundTotal?: T;
+  taxRefundTotal?: T;
   accessToken?: T;
   confirmationEmailSentAt?: T;
   updatedAt?: T;
