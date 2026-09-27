@@ -16,13 +16,13 @@
       align-items: center;
       gap: 0.5rem;
       margin: 0;
-      font-size: 0.95rem;
+      font-size: 1.08rem;
       font-weight: 600;
     }
 
     > span {
       color: var(--theme-elevation-450);
-      font-size: 0.78rem;
+      font-size: 0.925rem;
       font-variant-numeric: tabular-nums;
     }
   }
@@ -73,20 +73,20 @@
 
     strong {
       color: var(--theme-elevation-900);
-      font-size: 0.8rem;
+      font-size: 1rem;
       font-weight: 600;
     }
 
     > span {
       color: var(--theme-elevation-500);
-      font-size: 0.7rem;
+      font-size: 0.925rem;
       line-height: 1.25;
     }
   }
 
   &__count {
     color: var(--theme-elevation-850);
-    font-size: 0.88rem;
+    font-size: 1rem;
     font-weight: 600;
     font-variant-numeric: tabular-nums;
   }

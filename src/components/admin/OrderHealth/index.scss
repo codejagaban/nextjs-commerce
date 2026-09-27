@@ -22,7 +22,7 @@
 
   &__title {
     margin: 0 0 0.85rem;
-    font-size: 0.95rem;
+    font-size: 1.08rem;
     font-weight: 600;
     display: flex;
     align-items: center;
@@ -32,7 +32,7 @@
   &__icon { color: var(--theme-elevation-500); flex: 0 0 auto; }
 
   &__note {
-    font-size: 0.78rem;
+    font-size: 0.925rem;
     font-weight: 400;
     color: var(--theme-elevation-450);
   }
@@ -87,12 +87,12 @@
   }
 
   &__tip-label {
-    font-size: 0.72rem;
+    font-size: 0.85rem;
     color: var(--theme-elevation-500);
   }
 
   &__tip-value {
-    font-size: 0.85rem;
+    font-size: 1rem;
     font-weight: 600;
     font-variant-numeric: tabular-nums;
     color: var(--theme-elevation-900);
@@ -105,7 +105,7 @@
     margin: 0.8rem 0 0;
     padding: 0;
     list-style: none;
-    font-size: 0.85rem;
+    font-size: 0.95rem;
     color: var(--theme-elevation-650);
 
     li { display: flex; align-items: center; gap: 0.45rem; }

@@ -22,14 +22,14 @@
 
   &__hello {
     margin: 0;
-    font-size: 1.55rem;
+    font-size: 1.85rem;
     font-weight: 600;
     letter-spacing: -0.01em;
   }
 
   &__date {
     margin: 0;
-    font-size: 0.875rem;
+    font-size: 1rem;
     color: var(--theme-elevation-450);
   }
 
@@ -69,7 +69,7 @@
   }
 
   &__stat-label {
-    font-size: 0.8rem;
+    font-size: 1rem;
     letter-spacing: 0.04em;
     text-transform: uppercase;
     color: var(--theme-elevation-500);
@@ -83,7 +83,7 @@
   }
 
   &__stat-hint {
-    font-size: 0.8rem;
+    font-size: 0.925rem;
     color: var(--theme-elevation-450);
   }
 
@@ -124,7 +124,7 @@
 
   &__panel-heading {
     margin: 0 0 0.85rem;
-    font-size: 0.95rem;
+    font-size: 1.08rem;
     font-weight: 600;
     display: flex;
     align-items: center;
@@ -134,7 +134,7 @@
   &__panel-icon { color: var(--theme-elevation-500); flex: 0 0 auto; }
 
   &__panel-note {
-    font-size: 0.78rem;
+    font-size: 0.925rem;
     font-weight: 400;
     color: var(--theme-elevation-450);
   }

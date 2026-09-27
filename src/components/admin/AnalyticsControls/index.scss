@@ -20,7 +20,7 @@
     background: var(--theme-elevation-0);
     box-shadow: none;
     font: inherit;
-    font-size: 0.8rem;
+    font-size: 0.95rem;
     font-weight: 500;
     line-height: 1;
     cursor: pointer;
@@ -109,7 +109,7 @@
     margin: 0 0 0.35rem;
     padding: 0 0.45rem;
     color: var(--theme-elevation-450);
-    font-size: 0.7rem;
+    font-size: 0.85rem;
   }
 }
 
@@ -124,7 +124,7 @@
   color: var(--theme-elevation-700);
   background: transparent;
   font: inherit;
-  font-size: 0.78rem;
+  font-size: 0.925rem;
   text-align: left;
   cursor: pointer;
 
@@ -161,14 +161,14 @@
 
     strong {
       color: var(--theme-elevation-900);
-      font-size: 0.82rem;
+      font-size: 1rem;
       font-weight: 600;
     }
 
     span {
       overflow: hidden;
       color: var(--theme-elevation-450);
-      font-size: 0.68rem;
+      font-size: 0.85rem;
       text-overflow: ellipsis;
       white-space: nowrap;
     }
@@ -182,7 +182,7 @@
       background: var(--theme-elevation-900);
       box-shadow: none;
       font: inherit;
-      font-size: 0.75rem;
+      font-size: 0.9rem;
       font-weight: 600;
       cursor: pointer;
 
@@ -206,7 +206,7 @@
 .analytics-controls__error {
   margin: 0.45rem 0 0;
   color: var(--theme-error-500);
-  font-size: 0.75rem;
+  font-size: 0.9rem;
 }
 
 .analytics-controls__select-content {
@@ -229,7 +229,7 @@
   padding: 0.42rem 1.8rem 0.42rem 0.55rem;
   border-radius: var(--style-radius-s, 3px);
   color: var(--theme-elevation-750);
-  font-size: 0.78rem;
+  font-size: 0.925rem;
   outline: none;
   cursor: default;
 
@@ -306,7 +306,7 @@
 
   &__caption-label {
     color: var(--theme-elevation-850);
-    font-size: 0.78rem;
+    font-size: 0.925rem;
     font-weight: 600;
   }
 
@@ -319,7 +319,7 @@
   &__weekday {
     height: 1.65rem;
     color: var(--theme-elevation-400);
-    font-size: 0.65rem;
+    font-size: 0.8rem;
     font-weight: 500;
     text-align: center;
   }
@@ -345,7 +345,7 @@
     background: transparent;
     box-shadow: none;
     font: inherit;
-    font-size: 0.72rem;
+    font-size: 0.875rem;
     font-variant-numeric: tabular-nums;
     cursor: pointer;
 

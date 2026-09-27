@@ -27,7 +27,7 @@
 
   &__title {
     margin: 0;
-    font-size: 0.95rem;
+    font-size: 1.08rem;
     font-weight: 600;
     display: flex;
     align-items: center;
@@ -39,7 +39,7 @@
   &__figure { display: flex; align-items: baseline; flex-wrap: wrap; gap: 0.5rem; }
 
   &__total {
-    font-size: 1.85rem;
+    font-size: 2.1rem;
     font-weight: 600;
     line-height: 1;
     font-variant-numeric: tabular-nums;
@@ -47,7 +47,7 @@
   }
 
   &__delta {
-    font-size: 0.875rem;
+    font-size: 0.95rem;
     font-weight: 600;
     display: inline-flex;
     gap: 0.12rem;
@@ -57,7 +57,7 @@
     &--flat { color: var(--theme-elevation-500); }
   }
 
-  &__compare { font-size: 0.8rem; color: var(--theme-elevation-450); }
+  &__compare { font-size: 0.925rem; color: var(--theme-elevation-450); }
 
   &__controls { display: flex; align-items: center; }
 
@@ -73,13 +73,13 @@
     dt {
       margin: 0 0 0.25rem;
       color: var(--theme-elevation-450);
-      font-size: 0.75rem;
+      font-size: 0.875rem;
     }
 
     dd {
       margin: 0;
       color: var(--theme-elevation-800);
-      font-size: 0.9rem;
+      font-size: 1rem;
       font-weight: 600;
       font-variant-numeric: tabular-nums;
     }
@@ -115,7 +115,7 @@
     background: transparent;
     color: var(--theme-elevation-600);
     font: inherit;
-    font-size: 0.8rem;
+    font-size: 0.925rem;
     cursor: pointer;
     transition: background-color 0.15s ease, color 0.15s ease;
 
@@ -197,12 +197,12 @@
   }
 
   &__tip-day {
-    font-size: 0.72rem;
+    font-size: 0.85rem;
     color: var(--theme-elevation-500);
   }
 
   &__tip-value {
-    font-size: 0.9rem;
+    font-size: 1rem;
     font-weight: 600;
     font-variant-numeric: tabular-nums;
     color: var(--theme-elevation-900);
@@ -212,13 +212,13 @@
 
   &__tick {
     fill: var(--theme-elevation-450);
-    font-size: 12px;
+    font-size: 13px;
     font-weight: 500;
     font-variant-numeric: tabular-nums;
 
     &--date {
       fill: var(--theme-elevation-550);
-      font-size: 12.5px;
+      font-size: 13.5px;
     }
   }
 
