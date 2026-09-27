@@ -64,5 +64,31 @@ Stripe account and mode. Missing configuration fails closed.
 Browser card entry, receipts, cloud uploads and production HTTPS remain separate
 acceptance checks. Successful API payment tests do not establish those flows work.
 
+## Hosted production smoke test
+
+The hosted smoke test uses one synthetic customer and one temporary product to
+exercise the deployed storefront, address book, Stripe test-mode payment,
+webhook settlement, order access, confirmation email acceptance, password-reset
+email acceptance, R2 delivery, and Next.js image optimization. It removes only
+the records it creates, identified by their returned IDs.
+
+It is deliberately opt-in and refuses live Stripe keys. Use a dedicated mailbox
+that supports `+` aliases, and a dedicated admin account with the normal admin
+role. The deployed Stripe account must be in test mode and its webhook must point
+to the deployed `/api/payments/stripe/webhooks` endpoint.
+
+```sh
+SMOKE_BASE_URL=https://your-store.example \
+SMOKE_ADMIN_EMAIL=smoke-admin@your-store.example \
+SMOKE_ADMIN_PASSWORD='...' \
+SMOKE_CUSTOMER_EMAIL=smoke-mailbox@your-store.example \
+SMOKE_STRIPE_SECRET_KEY='sk_test_...' \
+pnpm test:smoke
+```
+
+For a local rehearsal only, also set `SMOKE_ALLOW_LOCALHOST=1`. The test confirms
+that the configured mail transport accepted each message; mailbox placement and
+spam-folder behavior remain a provider-level deliverability check.
+
 CI runs the same checks on Node 24 with a fresh Postgres 16 service for each run.
 Failing browser checks upload screenshots and traces as GitHub Actions artifacts.
