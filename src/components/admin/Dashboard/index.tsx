@@ -4,7 +4,7 @@ import React from 'react'
 
 import { IconAverage, IconOrders, IconProducts, IconRevenue, IconStock } from '../icons'
 import { KpiStrip, type Kpi } from '../KpiStrip'
-import { OrderHealth, type StatusCount } from '../OrderHealth'
+import { OrderHealth } from '../OrderHealth'
 import { PopularProducts, type PopularProduct } from '../PopularProducts'
 import { RevenueTrend } from '../RevenueTrend'
 import { DEFAULT_CURRENCY_CODE } from '@/currencies'
@@ -15,7 +15,7 @@ import {
   reportingWindow,
   zonedMidnight,
 } from '@/utilities/storeTime'
-import { summarizeOrderSales } from './metrics'
+import { getDashboardOrderData } from './queries'
 
 import './index.scss'
 
@@ -35,78 +35,49 @@ type StockRow = { title: string; qty: number }
 async function getOverview() {
   const payload = await getPayload({ config })
 
-  const [orders, users, productCount, settings] = await Promise.all([
-    payload.find({ collection: 'orders', limit: 0, pagination: false, depth: 0 }),
+  const [users, productCount, settings] = await Promise.all([
     payload.count({ collection: 'users' }),
     payload.count({ collection: 'products', where: { _status: { equals: 'published' } } }),
     payload.findGlobal({ slug: 'settings', depth: 0 }),
   ])
-  const transactions = await payload.find({
-    collection: 'transactions',
-    limit: 0,
-    pagination: false,
-    depth: 0,
-  })
 
   const currency = settings.currency || DEFAULT_CURRENCY_CODE
   const timeZone = settings.timeZone || DEFAULT_STORE_TIME_ZONE
-  // These orders still represent sold units. Fully refunded and cancelled
-  // orders are excluded because this model cannot represent partial returns.
-  const earning = orders.docs.filter(
-    (order) =>
-      (order.status === 'processing' || order.status === 'completed' || !order.status) &&
-      (!order.currency || order.currency === currency),
-  )
 
   const { end, priorStart, start: windowStart, today: startOfToday } = reportingWindow({
     days: WINDOW,
     now: new Date(),
     timeZone,
   })
-  const current = summarizeOrderSales({
+  const orderData = await getDashboardOrderData({
     currency,
     days: WINDOW,
     end,
-    orders: orders.docs,
+    payload,
+    priorStart,
     start: windowStart,
     timeZone,
   })
-  const prior = summarizeOrderSales({
-    currency,
-    days: WINDOW,
-    end: windowStart,
-    orders: orders.docs,
-    start: priorStart,
-    timeZone,
-  })
+  const { current, prior } = orderData
 
-  const statusCounts: StatusCount = { completed: 0, processing: 0, cancelled: 0, refunded: 0 }
-  orders.docs.forEach((o) => {
-    const key = String(o.status) as keyof StatusCount
-    if (key in statusCounts) statusCounts[key] += 1
+  // The database returns only the five winning IDs; Payload resolves their
+  // display titles without loading the rest of the catalogue.
+  const popularIDs = orderData.popular.map((item) => item.productID)
+  const popularProducts = popularIDs.length
+    ? await payload.find({
+        collection: 'products',
+        depth: 0,
+        limit: popularIDs.length,
+        where: { id: { in: popularIDs } },
+      })
+    : { docs: [] }
+  const titleFor = new Map(
+    popularProducts.docs.map((product) => [product.id, String(product.title ?? 'Untitled')]),
+  )
+  const popular: PopularProduct[] = orderData.popular.flatMap((item) => {
+    const title = titleFor.get(item.productID)
+    return title ? [{ title, units: item.units }] : []
   })
-
-  // --- best sellers by units, within the window ---
-  const catalogue = await payload.find({ collection: 'products', depth: 0, limit: 200 })
-  const titleFor = new Map(catalogue.docs.map((p) => [p.id, String(p.title ?? 'Untitled')]))
-  const idOf = (rel: unknown) =>
-    typeof rel === 'object' && rel !== null ? (rel as { id?: unknown }).id : rel
-
-  const unitsByProduct = new Map<string, number>()
-  earning.forEach((o) => {
-    if (typeof o.createdAt !== 'string' || new Date(o.createdAt) < windowStart) return
-    const items = Array.isArray(o.items) ? o.items : []
-    items.forEach((item) => {
-      const title = titleFor.get(idOf((item as { product?: unknown }).product) as never)
-      if (!title) return
-      const qty = Number((item as { quantity?: unknown }).quantity ?? 1)
-      unitsByProduct.set(title, (unitsByProduct.get(title) ?? 0) + qty)
-    })
-  })
-  const popular: PopularProduct[] = Array.from(unitsByProduct.entries())
-    .map(([title, units]) => ({ title, units }))
-    .sort((a, b) => b.units - a.units)
-    .slice(0, 5)
 
   /**
    * A product with variants keeps its stock on the variant rows and leaves the
@@ -158,10 +129,10 @@ async function getOverview() {
     timeZone,
     customers: users.totalDocs,
     products: productCount.totalDocs,
-    statusCounts,
+    statusCounts: orderData.statusCounts,
     popular,
     lowStock,
-    unfinishedPayments: transactions.docs.filter((t) => t.status === 'pending').length,
+    unfinishedPayments: orderData.unfinishedPayments,
     windowStart,
     endLabel: startOfToday,
   }

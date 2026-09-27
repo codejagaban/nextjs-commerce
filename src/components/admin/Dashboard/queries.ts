@@ -1,0 +1,209 @@
+import { sql } from '@payloadcms/db-postgres'
+import type { Payload } from 'payload'
+
+import type { StatusCount } from '../OrderHealth'
+import { dayKeysFrom } from '@/utilities/storeTime'
+
+export type SalesAggregate = {
+  averageOrderValue: number
+  dailyNetSales: number[]
+  discounts: number
+  grossSales: number
+  netOrders: number
+  netSales: number
+  productRefunds: number
+  refunds: number
+  shipping: number
+  shippingRefunds: number
+  taxes: number
+  taxRefunds: number
+  totalSales: number
+}
+
+type SalesRow = {
+  day: string
+  discounts: string | number | null
+  gross_sales: string | number | null
+  net_orders: string | number | null
+  net_sales: string | number | null
+  period: 'current' | 'prior'
+  product_refunds: string | number | null
+  shipping: string | number | null
+  shipping_refunds: string | number | null
+  taxes: string | number | null
+  tax_refunds: string | number | null
+  total_sales: string | number | null
+}
+
+type StatusRow = { count: string | number; status: keyof StatusCount }
+type ProductRow = { product_id: number; units: string | number }
+type TransactionRow = { count: string | number; status: string }
+
+const rowsFrom = <T,>(result: unknown): T[] => {
+  if (typeof result !== 'object' || result === null || !('rows' in result)) return []
+  return Array.isArray(result.rows) ? (result.rows as T[]) : []
+}
+
+const amount = (value: string | number | null | undefined): number => {
+  const parsed = Number(value ?? 0)
+  return Number.isFinite(parsed) ? parsed : 0
+}
+
+const emptySales = (days: number): SalesAggregate => ({
+  averageOrderValue: 0,
+  dailyNetSales: new Array<number>(days).fill(0),
+  discounts: 0,
+  grossSales: 0,
+  netOrders: 0,
+  netSales: 0,
+  productRefunds: 0,
+  refunds: 0,
+  shipping: 0,
+  shippingRefunds: 0,
+  taxes: 0,
+  taxRefunds: 0,
+  totalSales: 0,
+})
+
+/**
+ * Aggregate report rows in Postgres. The application receives at most one row
+ * per reporting day instead of every order ever placed.
+ */
+export async function getDashboardOrderData({
+  currency,
+  days,
+  end,
+  payload,
+  priorStart,
+  start,
+  timeZone,
+}: {
+  currency: string
+  days: number
+  end: Date
+  payload: Payload
+  priorStart: Date
+  start: Date
+  timeZone: string
+}) {
+  const salesResult = await payload.db.drizzle.execute(sql`
+    WITH report_orders AS (
+      SELECT
+        "created_at",
+        "status",
+        COALESCE("subtotal", "amount", 0) AS "subtotal",
+        COALESCE("discount_total", 0) AS "discount_total",
+        COALESCE("shipping_total", 0) AS "shipping_total",
+        COALESCE("tax_total", 0) AS "tax_total",
+        COALESCE("product_refund_total", 0) AS "product_refund_total",
+        COALESCE("shipping_refund_total", 0) AS "shipping_refund_total",
+        COALESCE("tax_refund_total", 0) AS "tax_refund_total"
+      FROM "orders"
+      WHERE "created_at" >= ${priorStart}
+        AND "created_at" < ${end}
+        AND ("currency" = ${currency} OR "currency" IS NULL)
+        AND "status" IS DISTINCT FROM 'cancelled'
+    )
+    SELECT
+      CASE WHEN "created_at" >= ${start} THEN 'current' ELSE 'prior' END AS "period",
+      TO_CHAR("created_at" AT TIME ZONE ${timeZone}, 'YYYY-MM-DD') AS "day",
+      SUM("subtotal") AS "gross_sales",
+      SUM("discount_total") AS "discounts",
+      SUM("product_refund_total") AS "product_refunds",
+      SUM("shipping_total") AS "shipping",
+      SUM("shipping_refund_total") AS "shipping_refunds",
+      SUM("tax_total") AS "taxes",
+      SUM("tax_refund_total") AS "tax_refunds",
+      SUM(GREATEST(0, "subtotal" - "discount_total" - "product_refund_total")) AS "net_sales",
+      SUM(
+        GREATEST(0, "subtotal" - "discount_total" - "product_refund_total")
+        + "shipping_total" - "shipping_refund_total"
+        + "tax_total" - "tax_refund_total"
+      ) AS "total_sales",
+      COUNT(*) FILTER (
+        WHERE NOT (
+          "status" = 'refunded'
+          AND GREATEST(0, "subtotal" - "discount_total" - "product_refund_total") = 0
+        )
+      ) AS "net_orders"
+    FROM report_orders
+    GROUP BY "period", "day"
+    ORDER BY "day"
+  `)
+
+  const [statusResult, transactionResult, popularResult] = await Promise.all([
+    payload.db.drizzle.execute(sql`
+      SELECT COALESCE("status"::text, 'processing') AS "status", COUNT(*) AS "count"
+      FROM "orders"
+      GROUP BY "status"
+    `),
+    payload.db.drizzle.execute(sql`
+      SELECT "status"::text AS "status", COUNT(*) AS "count"
+      FROM "transactions"
+      WHERE "status" = 'pending'
+      GROUP BY "status"
+    `),
+    payload.db.drizzle.execute(sql`
+      SELECT "items"."product_id", SUM("items"."quantity") AS "units"
+      FROM "orders_items" AS "items"
+      INNER JOIN "orders" ON "orders"."id" = "items"."_parent_id"
+      WHERE "orders"."created_at" >= ${start}
+        AND "orders"."created_at" < ${end}
+        AND ("orders"."currency" = ${currency} OR "orders"."currency" IS NULL)
+        AND ("orders"."status" IN ('processing', 'completed') OR "orders"."status" IS NULL)
+        AND "items"."product_id" IS NOT NULL
+      GROUP BY "items"."product_id"
+      ORDER BY "units" DESC
+      LIMIT 5
+    `),
+  ])
+
+  const current = emptySales(days)
+  const prior = emptySales(days)
+  const keys = {
+    current: new Map(dayKeysFrom(start, days, timeZone).map((key, index) => [key, index])),
+    prior: new Map(dayKeysFrom(priorStart, days, timeZone).map((key, index) => [key, index])),
+  }
+
+  for (const row of rowsFrom<SalesRow>(salesResult)) {
+    const summary = row.period === 'current' ? current : prior
+    summary.grossSales += amount(row.gross_sales)
+    summary.discounts += amount(row.discounts)
+    summary.productRefunds += amount(row.product_refunds)
+    summary.shipping += amount(row.shipping)
+    summary.shippingRefunds += amount(row.shipping_refunds)
+    summary.taxes += amount(row.taxes)
+    summary.taxRefunds += amount(row.tax_refunds)
+    summary.netSales += amount(row.net_sales)
+    summary.totalSales += amount(row.total_sales)
+    summary.netOrders += amount(row.net_orders)
+    const index = keys[row.period].get(row.day)
+    if (index !== undefined) summary.dailyNetSales[index] = amount(row.net_sales)
+  }
+
+  for (const summary of [current, prior]) {
+    summary.refunds = summary.productRefunds + summary.shippingRefunds + summary.taxRefunds
+    summary.averageOrderValue = summary.netOrders
+      ? Math.round(summary.totalSales / summary.netOrders)
+      : 0
+  }
+
+  const statusCounts: StatusCount = { completed: 0, processing: 0, cancelled: 0, refunded: 0 }
+  for (const row of rowsFrom<StatusRow>(statusResult)) {
+    if (row.status in statusCounts) statusCounts[row.status] = amount(row.count)
+  }
+
+  return {
+    current,
+    prior,
+    popular: rowsFrom<ProductRow>(popularResult).map((row) => ({
+      productID: row.product_id,
+      units: amount(row.units),
+    })),
+    statusCounts,
+    unfinishedPayments: rowsFrom<TransactionRow>(transactionResult).reduce(
+      (total, row) => total + amount(row.count),
+      0,
+    ),
+  }
+}
