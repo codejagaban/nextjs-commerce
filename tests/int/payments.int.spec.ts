@@ -232,6 +232,40 @@ describe('Stripe settlement and webhooks', () => {
     await verifySettlement(f.cart, f.product.id)
   })
 
+  it('restores paid inventory once when terminal order updates race', async () => {
+    const f = await fixture()
+    f.intent.status = 'succeeded'
+    expect((await webhook(f.intent)).status).toBe(200)
+    const order = await verifySettlement(f.cart, f.product.id)
+
+    await payload.update({ collection: 'orders', id: order.id, data: { status: 'completed' } })
+    expect((await payload.findByID({ collection: 'products', id: f.product.id })).inventory).toBe(8)
+    await payload.update({
+      collection: 'orders',
+      id: order.id,
+      data: { inventoryRestockedAt: '2000-01-01T00:00:00.000Z' },
+    })
+    expect(
+      (await payload.findByID({ collection: 'orders', id: order.id })).inventoryRestockedAt,
+    ).toBeNull()
+
+    await Promise.all([
+      payload.update({ collection: 'orders', id: order.id, data: { status: 'cancelled' } }),
+      payload.update({ collection: 'orders', id: order.id, data: { status: 'refunded' } }),
+    ])
+
+    const terminalOrder = await payload.findByID({ collection: 'orders', id: order.id })
+    expect(terminalOrder.inventoryRestockedAt).toBeTruthy()
+    expect((await payload.findByID({ collection: 'products', id: f.product.id })).inventory).toBe(
+      10,
+    )
+
+    await payload.update({ collection: 'orders', id: order.id, data: { status: 'refunded' } })
+    expect((await payload.findByID({ collection: 'products', id: f.product.id })).inventory).toBe(
+      10,
+    )
+  })
+
   it('keeps the order successful when email fails and retries delivery', async () => {
     const f = await fixture()
     const emailsBeforeSettlement = sentEmails.length
