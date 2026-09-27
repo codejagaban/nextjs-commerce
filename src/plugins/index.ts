@@ -1,6 +1,6 @@
 import { formBuilderPlugin } from '@payloadcms/plugin-form-builder'
 import { seoPlugin } from '@payloadcms/plugin-seo'
-import { Plugin } from 'payload'
+import { Plugin, type Field } from 'payload'
 import { GenerateTitle, GenerateURL } from '@payloadcms/plugin-seo/types'
 import { FixedToolbarFeature, HeadingFeature, lexicalEditor } from '@payloadcms/richtext-lexical'
 import { ecommercePlugin } from '@payloadcms/plugin-ecommerce'
@@ -30,6 +30,13 @@ const generateURL: GenerateURL<Product | Page> = ({ doc }) => {
   const url = getServerSideURL()
 
   return doc?.slug ? `${url}/${doc.slug}` : url
+}
+
+const indexReportingFields = (field: Field): Field => {
+  if ('name' in field && (field.name === 'status' || field.name === 'currency')) {
+    return { ...field, index: true } as Field
+  }
+  return field
 }
 
 export const plugins: Plugin[] = [
@@ -126,7 +133,7 @@ export const plugins: Plugin[] = [
       ordersCollectionOverride: ({ defaultCollection }) => ({
         ...defaultCollection,
         fields: [
-          ...defaultCollection.fields,
+          ...defaultCollection.fields.map(indexReportingFields),
           ...orderFinancialFields,
           {
             name: 'accessToken',
@@ -157,6 +164,12 @@ export const plugins: Plugin[] = [
             },
           },
         ],
+      }),
+    },
+    transactions: {
+      transactionsCollectionOverride: ({ defaultCollection }) => ({
+        ...defaultCollection,
+        fields: defaultCollection.fields.map(indexReportingFields),
       }),
     },
     payments: {
