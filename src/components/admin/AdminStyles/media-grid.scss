@@ -1,0 +1,171 @@
+/**
+ * Media is selected visually, so its list uses image-first cards while keeping
+ * Payload's real table controls underneath: search, filters, bulk selection,
+ * pagination, permissions, and links all continue to work as shipped.
+ */
+.collection-list--media {
+  .table-wrap,
+  .table {
+    overflow: visible;
+  }
+
+  table,
+  thead,
+  tbody {
+    display: block;
+    width: 100%;
+  }
+
+  thead {
+    margin-block: 0.9rem;
+
+    tr {
+      display: flex;
+      align-items: center;
+      min-height: 1.5rem;
+    }
+
+    th {
+      display: none;
+    }
+
+    th:first-child {
+      display: flex;
+      align-items: center;
+      gap: 0.55rem;
+      padding: 0;
+
+      &::after {
+        content: 'Select all media';
+        color: var(--theme-elevation-550);
+        font-size: 0.8rem;
+        font-weight: 500;
+      }
+    }
+  }
+
+  tbody {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(min(17rem, 100%), 1fr));
+    gap: 1.25rem;
+  }
+
+  tbody tr {
+    position: relative;
+    display: grid;
+    grid-template-rows: auto auto 1fr;
+    min-width: 0;
+    overflow: hidden;
+    border: 1px solid var(--theme-elevation-150);
+    border-radius: var(--style-radius-s);
+    background: var(--theme-elevation-0) !important;
+    transition: border-color 140ms ease, background-color 140ms ease;
+
+    &:hover {
+      border-color: var(--theme-elevation-300);
+      background: var(--theme-elevation-50) !important;
+    }
+
+    &:has(.cell-_select input:checked) {
+      border-color: var(--theme-elevation-700);
+      box-shadow: inset 0 0 0 1px var(--theme-elevation-700);
+    }
+  }
+
+  tbody td {
+    min-width: 0;
+    padding: 0;
+    border: 0;
+    background: transparent !important;
+  }
+
+  .cell-_select {
+    position: absolute;
+    z-index: 1;
+    top: 0.75rem;
+    left: 0.75rem;
+
+    .checkbox-input__input {
+      border-radius: 4px;
+      background: var(--theme-elevation-0);
+    }
+  }
+
+  .cell-filename {
+    a {
+      display: block;
+      color: inherit;
+      text-decoration: none;
+
+      &:focus-visible {
+        outline: 2px solid var(--theme-elevation-800);
+        outline-offset: -2px;
+      }
+    }
+
+    .file {
+      display: grid;
+      grid-template-rows: auto auto;
+      align-items: stretch;
+      gap: 0;
+    }
+
+    .file__thumbnail {
+      width: 100%;
+      max-width: none;
+      height: auto;
+      aspect-ratio: 4 / 3;
+      border-radius: 0;
+      background: var(--theme-elevation-50);
+    }
+
+    .file__thumbnail img {
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+    }
+
+    .file__filename {
+      min-width: 0;
+      overflow: hidden;
+      padding: 0.9rem 0.9rem 0.3rem;
+      color: var(--theme-elevation-900);
+      font-weight: 600;
+      line-height: 1.3;
+      text-overflow: ellipsis;
+      white-space: nowrap;
+    }
+  }
+
+  .cell-alt {
+    display: -webkit-box;
+    min-height: 3.5rem;
+    overflow: hidden;
+    padding: 0 0.9rem 0.95rem;
+    color: var(--theme-elevation-550);
+    font-size: 0.82rem;
+    line-height: 1.45;
+    -webkit-box-orient: vertical;
+    -webkit-line-clamp: 2;
+  }
+
+  .cell-caption,
+  .cell-prefix {
+    display: none;
+  }
+}
+
+:root[data-theme='dark'] .collection-list--media tbody tr {
+  background-color: var(--theme-elevation-0) !important;
+
+  &:hover {
+    background-color: var(--theme-elevation-50) !important;
+  }
+}
+
+@media (max-width: 720px) {
+  .collection-list--media tbody {
+    grid-template-columns: repeat(auto-fill, minmax(min(12rem, 100%), 1fr));
+    gap: 1rem;
+  }
+}
