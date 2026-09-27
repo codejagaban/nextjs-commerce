@@ -3,7 +3,7 @@
 import { CalendarBlank, CaretDown } from '@phosphor-icons/react'
 import { format, parseISO } from 'date-fns'
 import { useRouter } from 'next/navigation'
-import React, { useEffect, useState } from 'react'
+import React, { useEffect, useState, useTransition } from 'react'
 import { type DateRange } from 'react-day-picker'
 import { useForm, useWatch } from 'react-hook-form'
 
@@ -85,6 +85,7 @@ export const AnalyticsControls: React.FC<Props> = ({
   startDate,
 }) => {
   const router = useRouter()
+  const [isPending, startTransition] = useTransition()
   const [rangeOpen, setRangeOpen] = useState(false)
   const {
     control,
@@ -100,14 +101,18 @@ export const AnalyticsControls: React.FC<Props> = ({
     reset({ from: startDate, to: endDate })
   }, [endDate, reset, startDate])
 
+  const navigate = (href: string) => {
+    startTransition(() => router.push(href))
+  }
+
   const applyCustom = handleSubmit(({ from: customFrom, to: customTo }) => {
     setRangeOpen(false)
-    router.push(hrefFor(adminPath, 'custom', comparison, customFrom, customTo))
+    navigate(hrefFor(adminPath, 'custom', comparison, customFrom, customTo))
   })
 
   const choosePreset = (nextRange: Exclude<AnalyticsRange, 'custom'>) => {
     setRangeOpen(false)
-    router.push(hrefFor(adminPath, nextRange, comparison))
+    navigate(hrefFor(adminPath, nextRange, comparison))
   }
 
   const selectCustomRange = (selected: DateRange | undefined) => {
@@ -119,12 +124,28 @@ export const AnalyticsControls: React.FC<Props> = ({
   }
 
   return (
-    <div className="analytics-controls" aria-label="Analytics date controls">
+    <div
+      className="analytics-controls"
+      aria-busy={isPending}
+      aria-label="Analytics date controls"
+      data-pending={isPending ? 'true' : undefined}
+    >
+      {isPending && (
+        <div
+          aria-label="Loading dashboard data"
+          className="analytics-controls__progress"
+          role="progressbar"
+        >
+          <span />
+        </div>
+      )}
+
       <Popover onOpenChange={setRangeOpen} open={rangeOpen}>
         <PopoverTrigger asChild>
           <Button
             aria-label="Choose analytics date range"
             className="analytics-controls__trigger"
+            disabled={isPending}
             size="sm"
             type="button"
             variant="outline"
@@ -142,6 +163,7 @@ export const AnalyticsControls: React.FC<Props> = ({
               <Button
                 aria-current={range === option.value ? 'true' : undefined}
                 className="analytics-controls__preset"
+                disabled={isPending}
                 key={option.value}
                 onClick={() => choosePreset(option.value)}
                 size="clear"
@@ -161,7 +183,7 @@ export const AnalyticsControls: React.FC<Props> = ({
                   {from && to ? rangeLabel('custom', from, to) : 'Choose a start and end date'}
                 </span>
               </div>
-              <Button disabled={!from || !to} size="sm" type="submit">
+              <Button disabled={isPending || !from || !to} size="sm" type="submit">
                 Apply
               </Button>
             </div>
@@ -211,8 +233,9 @@ export const AnalyticsControls: React.FC<Props> = ({
       </Popover>
 
       <Select
+        disabled={isPending}
         onValueChange={(value: AnalyticsComparison) =>
-          router.push(hrefFor(adminPath, range, value, startDate, endDate))
+          navigate(hrefFor(adminPath, range, value, startDate, endDate))
         }
         value={comparison}
       >
