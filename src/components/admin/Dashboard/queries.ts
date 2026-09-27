@@ -39,7 +39,7 @@ type StatusRow = { count: string | number; status: keyof StatusCount }
 type ProductRow = { product_id: number; units: string | number }
 type TransactionRow = { count: string | number; status: string }
 
-const rowsFrom = <T,>(result: unknown): T[] => {
+const rowsFrom = <T>(result: unknown): T[] => {
   if (typeof result !== 'object' || result === null || !('rows' in result)) return []
   return Array.isArray(result.rows) ? (result.rows as T[]) : []
 }
@@ -74,6 +74,7 @@ export async function getDashboardOrderData({
   days,
   end,
   payload,
+  priorEnd,
   priorStart,
   start,
   timeZone,
@@ -82,6 +83,7 @@ export async function getDashboardOrderData({
   days: number
   end: Date
   payload: Payload
+  priorEnd: Date
   priorStart: Date
   start: Date
   timeZone: string
@@ -99,13 +101,18 @@ export async function getDashboardOrderData({
         COALESCE("shipping_refund_total", 0) AS "shipping_refund_total",
         COALESCE("tax_refund_total", 0) AS "tax_refund_total"
       FROM "orders"
-      WHERE "created_at" >= ${priorStart}
-        AND "created_at" < ${end}
+      WHERE (
+          ("created_at" >= ${start} AND "created_at" < ${end})
+          OR ("created_at" >= ${priorStart} AND "created_at" < ${priorEnd})
+        )
         AND ("currency" = ${currency} OR "currency" IS NULL)
         AND "status" IS DISTINCT FROM 'cancelled'
     )
     SELECT
-      CASE WHEN "created_at" >= ${start} THEN 'current' ELSE 'prior' END AS "period",
+      CASE
+        WHEN "created_at" >= ${start} AND "created_at" < ${end} THEN 'current'
+        ELSE 'prior'
+      END AS "period",
       TO_CHAR("created_at" AT TIME ZONE ${timeZone}, 'YYYY-MM-DD') AS "day",
       SUM("subtotal") AS "gross_sales",
       SUM("discount_total") AS "discounts",
@@ -135,6 +142,8 @@ export async function getDashboardOrderData({
     payload.db.drizzle.execute(sql`
       SELECT COALESCE("status"::text, 'processing') AS "status", COUNT(*) AS "count"
       FROM "orders"
+      WHERE "created_at" >= ${start} AND "created_at" < ${end}
+        AND ("currency" = ${currency} OR "currency" IS NULL)
       GROUP BY "status"
     `),
     payload.db.drizzle.execute(sql`

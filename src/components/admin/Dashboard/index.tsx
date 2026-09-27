@@ -2,6 +2,7 @@ import config from '@payload-config'
 import { getPayload } from 'payload'
 import React from 'react'
 
+import { AnalyticsControls } from '../AnalyticsControls'
 import { IconAverage, IconOrders, IconProducts, IconRevenue, IconStock } from '../icons'
 import { KpiStrip, type Kpi } from '../KpiStrip'
 import { OrderHealth } from '../OrderHealth'
@@ -12,15 +13,14 @@ import {
   addCalendarDays,
   dateTimeInZone,
   DEFAULT_STORE_TIME_ZONE,
-  reportingWindow,
   zonedMidnight,
 } from '@/utilities/storeTime'
+import { analyticsWindow } from './analyticsRange'
 import { getDashboardOrderData } from './queries'
 
 import './index.scss'
 
 const baseClass = 'store-overview'
-const WINDOW = 30
 const LOW_STOCK_AT = 25
 
 const money = (minor: number, currency: string) =>
@@ -32,7 +32,14 @@ const change = (now: number, before: number) =>
 
 type StockRow = { title: string; qty: number }
 
-async function getOverview() {
+type DashboardFilters = {
+  comparison?: string
+  from?: string
+  range?: string
+  to?: string
+}
+
+async function getOverview(filters: DashboardFilters) {
   const payload = await getPayload({ config })
 
   const [users, productCount, settings] = await Promise.all([
@@ -44,18 +51,22 @@ async function getOverview() {
   const currency = settings.currency || DEFAULT_CURRENCY_CODE
   const timeZone = settings.timeZone || DEFAULT_STORE_TIME_ZONE
 
-  const { end, priorStart, start: windowStart, today: startOfToday } = reportingWindow({
-    days: WINDOW,
+  const window = analyticsWindow({
+    comparison: filters.comparison,
+    from: filters.from,
     now: new Date(),
+    range: filters.range,
     timeZone,
+    to: filters.to,
   })
   const orderData = await getDashboardOrderData({
     currency,
-    days: WINDOW,
-    end,
+    days: window.days,
+    end: window.end,
     payload,
-    priorStart,
-    start: windowStart,
+    priorEnd: window.priorEnd,
+    priorStart: window.priorStart,
+    start: window.start,
     timeZone,
   })
   const { current, prior } = orderData
@@ -101,7 +112,10 @@ async function getOverview() {
     }),
   ])
   const lowStock: StockRow[] = [
-    ...simple.docs.map((p) => ({ title: String(p.title ?? 'Untitled'), qty: Number(p.inventory ?? 0) })),
+    ...simple.docs.map((p) => ({
+      title: String(p.title ?? 'Untitled'),
+      qty: Number(p.inventory ?? 0),
+    })),
     ...variants.docs.map((v) => ({
       title: String((typeof v.product === 'object' && v.product?.title) || v.title || 'Variant'),
       qty: Number(v.inventory ?? 0),
@@ -133,8 +147,7 @@ async function getOverview() {
     popular,
     lowStock,
     unfinishedPayments: orderData.unfinishedPayments,
-    windowStart,
-    endLabel: startOfToday,
+    window,
   }
 }
 
@@ -155,8 +168,12 @@ const dayLabelsFrom = (start: Date, count: number, timeZone: string) => {
   )
 }
 
-export const Dashboard: React.FC<{ name?: string }> = async ({ name }) => {
-  const s = await getOverview()
+export const Dashboard: React.FC<{
+  adminPath: string
+  filters?: DashboardFilters
+  name?: string
+}> = async ({ adminPath, filters = {}, name }) => {
+  const s = await getOverview(filters)
 
   const kpis: Kpi[] = [
     {
@@ -164,11 +181,28 @@ export const Dashboard: React.FC<{ name?: string }> = async ({ name }) => {
       label: 'Net sales',
       value: money(s.currentRevenue, s.currency),
       delta: s.revenueChange,
-      compare: `${money(s.grossSales, s.currency)} gross · ${money(s.refunds, s.currency)} refunded`,
+      compare: s.window.comparisonLabel,
     },
-    { Icon: IconOrders, label: 'Orders', value: s.currentOrders.toLocaleString('en-US'), delta: s.ordersChange, compare: 'vs previous 30 days' },
-    { Icon: IconAverage, label: 'Average order', value: money(s.currentAov, s.currency), delta: s.aovChange, compare: 'vs previous 30 days' },
-    { Icon: IconProducts, label: 'Products live', value: String(s.products), compare: `${s.customers} customers` },
+    {
+      Icon: IconOrders,
+      label: 'Orders',
+      value: s.currentOrders.toLocaleString('en-US'),
+      delta: s.ordersChange,
+      compare: s.window.comparisonLabel,
+    },
+    {
+      Icon: IconAverage,
+      label: 'Average order',
+      value: money(s.currentAov, s.currency),
+      delta: s.aovChange,
+      compare: s.window.comparisonLabel,
+    },
+    {
+      Icon: IconProducts,
+      label: 'Products live',
+      value: String(s.products),
+      compare: `${s.customers} customers`,
+    },
   ]
 
   return (
@@ -186,6 +220,15 @@ export const Dashboard: React.FC<{ name?: string }> = async ({ name }) => {
         </p>
       </header>
 
+      <AnalyticsControls
+        adminPath={adminPath}
+        comparison={s.window.comparison}
+        endDate={s.window.endDate}
+        maxDate={s.window.todayDate}
+        range={s.window.range}
+        startDate={s.window.startDate}
+      />
+
       <KpiStrip items={kpis} />
 
       <div className={`${baseClass}__split`}>
@@ -201,12 +244,13 @@ export const Dashboard: React.FC<{ name?: string }> = async ({ name }) => {
             { label: 'Net tax', value: money(s.taxes - s.taxRefunds, s.currency) },
             { label: 'Total sales', value: money(s.totalSales, s.currency) },
           ]}
-          current={{ label: 'Last 30 days', points: s.currentDaily }}
+          comparisonLabel={s.window.comparisonLabel}
+          current={{ label: s.window.rangeLabel, points: s.currentDaily }}
           currency={s.currency}
-          dayLabels={dayLabelsFrom(s.windowStart, s.currentDaily.length, s.timeZone)}
+          dayLabels={dayLabelsFrom(s.window.start, s.currentDaily.length, s.timeZone)}
           delta={s.revenueChange}
-          endLabel={dayLabel(s.endLabel, s.timeZone)}
-          startLabel={dayLabel(s.windowStart, s.timeZone)}
+          endLabel={dayLabel(new Date(s.window.end.getTime() - 1), s.timeZone)}
+          startLabel={dayLabel(s.window.start, s.timeZone)}
           title="Net sales"
           total={money(s.currentRevenue, s.currency)}
         />

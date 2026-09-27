@@ -18,6 +18,7 @@ type Props = {
   /** One label per point, so a hovered day can name itself. */
   dayLabels?: string[]
   currency?: string
+  comparisonLabel?: string
   title?: string
 }
 
@@ -100,6 +101,7 @@ export const RevenueTrend: React.FC<Props> = ({
   endLabel,
   dayLabels,
   currency = 'USD',
+  comparisonLabel = 'vs previous period',
   title = 'Total revenue',
 }) => {
   const [mode, setMode] = React.useState<Mode>('bars')
@@ -133,14 +135,16 @@ export const RevenueTrend: React.FC<Props> = ({
 
   const plotW = W - PAD.left - PAD.right
   const plotH = H - PAD.top - PAD.bottom
-  const n = Math.max(current.points.length, 2)
+  const pointCount = current.points.length
+  const n = Math.max(pointCount, 2)
 
   const peak = Math.max(1, ...current.points)
   const magnitude = Math.pow(10, Math.floor(Math.log10(peak)))
   const top = Math.ceil(peak / (magnitude / 2)) * (magnitude / 2)
   const ticks = [top, top / 2, 0]
 
-  const x = (i: number) => PAD.left + (i / (n - 1)) * plotW
+  const x = (i: number) =>
+    pointCount === 1 ? PAD.left + plotW / 2 : PAD.left + (i / (n - 1)) * plotW
   const y = (v: number) => PAD.top + plotH - (v / top) * plotH
   const path = (pts: number[]) => smoothPath(pts.map((v, i) => ({ x: x(i), y: y(v) })))
 
@@ -200,7 +204,7 @@ export const RevenueTrend: React.FC<Props> = ({
                 {Math.abs(delta as number).toFixed(0)}%
               </span>
             )}
-            <span className="revenue-trend__compare">vs previous 30 days</span>
+            <span className="revenue-trend__compare">{comparisonLabel}</span>
           </div>
         </div>
         <div className="revenue-trend__controls">
@@ -251,7 +255,7 @@ export const RevenueTrend: React.FC<Props> = ({
         tabIndex={0}
         viewBox={`0 0 ${W} ${H}`}
       >
-        <title>{`Revenue for each of the last ${n} days`}</title>
+        <title>{`${current.label} revenue by day`}</title>
 
         {ticks.map((t) => (
           <g key={t}>
@@ -272,13 +276,13 @@ export const RevenueTrend: React.FC<Props> = ({
         ) : (
           current.points.map((v, i) => {
             // Keep each day visually distinct instead of forming a dense block.
-            const w = Math.max(4, (plotW / n) * 0.66)
+            const w = Math.min(48, Math.max(0.8, (plotW / n) * 0.66))
             return (
               <rect
                 className={`revenue-trend__bar${i === active ? ' revenue-trend__bar--active' : ''}`}
                 height={Math.max(v > 0 ? 1.5 : 0, PAD.top + plotH - y(v))}
                 key={i}
-                rx={2}
+                rx={Math.min(2, w / 2)}
                 width={w}
                 x={x(i) - w / 2}
                 y={y(v)}
