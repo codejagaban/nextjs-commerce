@@ -8,6 +8,13 @@ import { OrderHealth, type StatusCount } from '../OrderHealth'
 import { PopularProducts, type PopularProduct } from '../PopularProducts'
 import { RevenueTrend } from '../RevenueTrend'
 import { DEFAULT_CURRENCY_CODE } from '@/currencies'
+import {
+  addCalendarDays,
+  dateTimeInZone,
+  DEFAULT_STORE_TIME_ZONE,
+  reportingWindow,
+  zonedMidnight,
+} from '@/utilities/storeTime'
 import { summarizeOrderSales } from './metrics'
 
 import './index.scss'
@@ -42,6 +49,7 @@ async function getOverview() {
   })
 
   const currency = settings.currency || DEFAULT_CURRENCY_CODE
+  const timeZone = settings.timeZone || DEFAULT_STORE_TIME_ZONE
   // These orders still represent sold units. Fully refunded and cancelled
   // orders are excluded because this model cannot represent partial returns.
   const earning = orders.docs.filter(
@@ -50,18 +58,18 @@ async function getOverview() {
       (!order.currency || order.currency === currency),
   )
 
-  const dayMs = 86400000
-  const startOfToday = new Date()
-  startOfToday.setUTCHours(0, 0, 0, 0)
-  const end = new Date(startOfToday.getTime() + dayMs)
-  const windowStart = new Date(startOfToday.getTime() - (WINDOW - 1) * dayMs)
-  const priorStart = new Date(windowStart.getTime() - WINDOW * dayMs)
+  const { end, priorStart, start: windowStart, today: startOfToday } = reportingWindow({
+    days: WINDOW,
+    now: new Date(),
+    timeZone,
+  })
   const current = summarizeOrderSales({
     currency,
     days: WINDOW,
     end,
     orders: orders.docs,
     start: windowStart,
+    timeZone,
   })
   const prior = summarizeOrderSales({
     currency,
@@ -69,6 +77,7 @@ async function getOverview() {
     end: windowStart,
     orders: orders.docs,
     start: priorStart,
+    timeZone,
   })
 
   const statusCounts: StatusCount = { completed: 0, processing: 0, cancelled: 0, refunded: 0 }
@@ -146,6 +155,7 @@ async function getOverview() {
     ordersChange: change(current.netOrders, prior.netOrders),
     aovChange: change(current.averageOrderValue, prior.averageOrderValue),
     currency,
+    timeZone,
     customers: users.totalDocs,
     products: productCount.totalDocs,
     statusCounts,
@@ -157,19 +167,22 @@ async function getOverview() {
   }
 }
 
-const dayLabel = (d: Date) =>
-  d.toLocaleDateString('en-US', { day: 'numeric', month: 'short', timeZone: 'UTC' })
+const dayLabel = (d: Date, timeZone: string) =>
+  d.toLocaleDateString('en-US', { day: 'numeric', month: 'short', timeZone })
 
 /** One label per bucket, matching how the daily totals were bucketed. */
-const dayLabelsFrom = (start: Date, count: number) =>
-  Array.from({ length: count }, (_, i) =>
-    new Date(start.getTime() + i * 86400000).toLocaleDateString('en-US', {
+const dayLabelsFrom = (start: Date, count: number, timeZone: string) => {
+  const localStart = dateTimeInZone(start, timeZone)
+  const startDate = { year: localStart.year, month: localStart.month, day: localStart.day }
+  return Array.from({ length: count }, (_, i) =>
+    zonedMidnight(addCalendarDays(startDate, i), timeZone).toLocaleDateString('en-US', {
       weekday: 'short',
       day: 'numeric',
       month: 'short',
-      timeZone: 'UTC',
+      timeZone,
     }),
   )
+}
 
 export const Dashboard: React.FC<{ name?: string }> = async ({ name }) => {
   const s = await getOverview()
@@ -197,6 +210,7 @@ export const Dashboard: React.FC<{ name?: string }> = async ({ name }) => {
             day: 'numeric',
             month: 'long',
             year: 'numeric',
+            timeZone: s.timeZone,
           })}
         </p>
       </header>
@@ -218,10 +232,10 @@ export const Dashboard: React.FC<{ name?: string }> = async ({ name }) => {
           ]}
           current={{ label: 'Last 30 days', points: s.currentDaily }}
           currency={s.currency}
-          dayLabels={dayLabelsFrom(s.windowStart, s.currentDaily.length)}
+          dayLabels={dayLabelsFrom(s.windowStart, s.currentDaily.length, s.timeZone)}
           delta={s.revenueChange}
-          endLabel={dayLabel(s.endLabel)}
-          startLabel={dayLabel(s.windowStart)}
+          endLabel={dayLabel(s.endLabel, s.timeZone)}
+          startLabel={dayLabel(s.windowStart, s.timeZone)}
           title="Net sales"
           total={money(s.currentRevenue, s.currency)}
         />

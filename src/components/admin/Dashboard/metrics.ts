@@ -1,4 +1,5 @@
 import type { OrderStatus } from '@/payload-types'
+import { dayKeysFrom, zonedDateKey } from '@/utilities/storeTime'
 
 type SalesOrder = {
   amount?: number | null
@@ -44,14 +45,17 @@ export function summarizeOrderSales({
   end,
   orders,
   start,
+  timeZone = 'UTC',
 }: {
   currency: string
   days: number
   end: Date
   orders: SalesOrder[]
   start: Date
+  timeZone?: string
 }): SalesSummary {
   const dailyNetSales = new Array<number>(days).fill(0)
+  const dayIndex = new Map(dayKeysFrom(start, days, timeZone).map((key, index) => [key, index]))
   let grossSales = 0
   let discounts = 0
   let productRefunds = 0
@@ -96,8 +100,8 @@ export function summarizeOrderSales({
     if (status === 'refunded' && orderNetSales === 0) continue
 
     netOrders += 1
-    const index = Math.floor((placed.getTime() - start.getTime()) / 86_400_000)
-    if (index >= 0 && index < days) {
+    const index = dayIndex.get(zonedDateKey(placed, timeZone))
+    if (index !== undefined) {
       dailyNetSales[index] += orderNetSales
     }
   }

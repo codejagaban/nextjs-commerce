@@ -2,6 +2,12 @@ import type { GlobalConfig } from 'payload'
 
 import { adminOnly } from '@/access/adminOnly'
 import { DEFAULT_CURRENCY_CODE, SUPPORTED_CURRENCIES } from '@/currencies'
+import { DEFAULT_STORE_TIME_ZONE, STORE_TIME_ZONES } from '@/utilities/storeTime'
+
+const timeZoneOptions = STORE_TIME_ZONES.map((timeZone) => ({
+  label: timeZone.replaceAll('_', ' '),
+  value: timeZone,
+}))
 
 /**
  * The one place a clone of this template gets its identity.
@@ -47,6 +53,17 @@ export const Settings: GlobalConfig = {
               admin: {
                 description:
                   'The currency the storefront sells in. Each product holds a separate price per currency — nothing is converted — so fill in the matching price field on your products. Adding a currency to this list is a code change, since it adds a price field.',
+              },
+            },
+            {
+              name: 'timeZone',
+              type: 'select',
+              required: true,
+              defaultValue: DEFAULT_STORE_TIME_ZONE,
+              options: timeZoneOptions,
+              admin: {
+                description:
+                  'Controls dashboard reporting days and dates. Use the location where the store closes its business day. Adding another region is a code change.',
               },
             },
             {

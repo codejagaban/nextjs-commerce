@@ -2018,6 +2018,53 @@ export interface Setting {
    */
   currency: 'USD' | 'EUR' | 'GBP';
   /**
+   * Controls dashboard reporting days and dates. Use the location where the store closes its business day. Adding another region is a code change.
+   */
+  timeZone:
+    | 'UTC'
+    | 'Europe/London'
+    | 'Europe/Dublin'
+    | 'Europe/Paris'
+    | 'Europe/Berlin'
+    | 'Europe/Madrid'
+    | 'Europe/Rome'
+    | 'Europe/Amsterdam'
+    | 'Europe/Warsaw'
+    | 'Europe/Athens'
+    | 'Europe/Istanbul'
+    | 'Europe/Moscow'
+    | 'Africa/Lagos'
+    | 'Africa/Cairo'
+    | 'Africa/Johannesburg'
+    | 'Africa/Nairobi'
+    | 'Asia/Dubai'
+    | 'Asia/Karachi'
+    | 'Asia/Kolkata'
+    | 'Asia/Dhaka'
+    | 'Asia/Bangkok'
+    | 'Asia/Singapore'
+    | 'Asia/Hong_Kong'
+    | 'Asia/Shanghai'
+    | 'Asia/Tokyo'
+    | 'Asia/Seoul'
+    | 'Australia/Perth'
+    | 'Australia/Adelaide'
+    | 'Australia/Sydney'
+    | 'Pacific/Auckland'
+    | 'Pacific/Honolulu'
+    | 'America/St_Johns'
+    | 'America/Halifax'
+    | 'America/New_York'
+    | 'America/Chicago'
+    | 'America/Denver'
+    | 'America/Phoenix'
+    | 'America/Los_Angeles'
+    | 'America/Anchorage'
+    | 'America/Mexico_City'
+    | 'America/Bogota'
+    | 'America/Lima'
+    | 'America/Sao_Paulo';
+  /**
    * One or two sentences under the footer wordmark.
    */
   tagline?: string | null;
@@ -2103,6 +2150,7 @@ export interface FooterSelect<T extends boolean = true> {
 export interface SettingsSelect<T extends boolean = true> {
   storeName?: T;
   currency?: T;
+  timeZone?: T;
   tagline?: T;
   supportEmail?: T;
   supportPhone?: T;

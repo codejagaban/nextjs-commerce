@@ -116,4 +116,24 @@ describe('dashboard sales metrics', () => {
     expect(result.averageOrderValue).toBe(8_200)
     expect(result.dailyNetSales.reduce((sum, amount) => sum + amount, 0)).toBe(7_000)
   })
+
+  it('buckets orders by the store calendar rather than fixed UTC days', () => {
+    const result = summarizeOrderSales({
+      currency: 'GBP',
+      days: 2,
+      start: new Date('2026-03-29T00:00:00.000Z'),
+      end: new Date('2026-03-30T23:00:00.000Z'),
+      timeZone: 'Europe/London',
+      orders: [
+        {
+          amount: 2500,
+          createdAt: '2026-03-29T23:30:00.000Z',
+          currency: 'GBP',
+          status: 'completed',
+        },
+      ],
+    })
+
+    expect(result.dailyNetSales).toEqual([0, 2_500])
+  })
 })

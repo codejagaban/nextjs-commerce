@@ -530,6 +530,7 @@ export const seed = async ({
       data: {
         storeName: 'Marisol',
         currency: 'USD',
+        timeZone: 'Europe/London',
         tagline:
           "Clean, effective skincare made with naturally-derived ingredients, for skin's own natural radiance.",
         supportEmail: 'hello@marisol.store',
