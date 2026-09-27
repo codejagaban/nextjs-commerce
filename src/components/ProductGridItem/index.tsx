@@ -32,8 +32,8 @@ export const ProductGridItem: React.FC<Props> = ({ currency, product, priority, 
     gallery?.[0]?.image && typeof gallery[0]?.image !== 'string' ? gallery[0]?.image : false
 
   return (
-    <div className="group flex flex-col">
-      <Link href={`/products/${product.slug}`} className="block">
+    <div className="group flex min-w-0 flex-col">
+      <Link href={`/products/${product.slug}`} className="block min-w-0">
         <div
           className="relative aspect-[4/5] overflow-hidden rounded-2xl"
           style={{ backgroundColor: tile ? `var(--${tile})` : 'var(--secondary)' }}
@@ -48,7 +48,9 @@ export const ProductGridItem: React.FC<Props> = ({ currency, product, priority, 
             />
           ) : null}
         </div>
-        <h3 className="mt-4 font-display text-lg leading-snug text-foreground">{title}</h3>
+        <h3 className="mt-4 truncate font-display text-lg leading-snug text-foreground" title={title}>
+          {title}
+        </h3>
         {typeof price === 'number' && (
           <p className="mt-1 text-sm text-muted-foreground tabular-nums">
             {enableVariants ? <span className="mr-1 text-xs">from</span> : null}
