@@ -63,12 +63,15 @@
 
   &__breakdown {
     display: grid;
-    grid-template-columns: repeat(3, minmax(0, 1fr));
-    gap: 0.85rem 1.25rem;
-    margin: 1.15rem 0 0.35rem;
+    grid-template-columns: repeat(6, minmax(0, 1fr));
+    gap: 0;
+    margin: 1rem 0 0.55rem;
+    padding: 0.7rem 0;
+    border-radius: var(--style-radius-s, 3px);
+    background: var(--theme-elevation-50);
 
     dt {
-      margin: 0 0 0.2rem;
+      margin: 0 0 0.25rem;
       color: var(--theme-elevation-450);
       font-size: 0.75rem;
     }
@@ -82,7 +85,15 @@
     }
   }
 
-  &__breakdown-item { min-width: 0; }
+  &__breakdown-item {
+    min-width: 0;
+    padding: 0 0.8rem;
+    border-left: 1px solid var(--theme-elevation-100);
+
+    &:first-child {
+      border-left: 0;
+    }
+  }
 
   /* A real control, so it looks pressable and shows which mode is on. */
   &__switch {
@@ -228,7 +239,25 @@
 }
 
 @media (max-width: 760px) {
-  .revenue-trend__breakdown { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+  .revenue-trend__breakdown {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 0.7rem 0;
+
+    &-item:nth-child(odd) {
+      border-left: 0;
+    }
+  }
+}
+
+@media (min-width: 761px) and (max-width: 1100px) {
+  .revenue-trend__breakdown {
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+    gap: 0.7rem 0;
+
+    &-item:nth-child(3n + 1) {
+      border-left: 0;
+    }
+  }
 }
 
 @media (prefers-color-scheme: dark) {
