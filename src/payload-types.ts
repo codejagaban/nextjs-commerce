@@ -290,6 +290,7 @@ export interface Order {
   taxRefundTotal?: number | null;
   accessToken?: string | null;
   confirmationEmailSentAt?: string | null;
+  inventoryRestockedAt?: string | null;
   updatedAt: string;
   createdAt: string;
 }
@@ -1867,6 +1868,7 @@ export interface OrdersSelect<T extends boolean = true> {
   taxRefundTotal?: T;
   accessToken?: T;
   confirmationEmailSentAt?: T;
+  inventoryRestockedAt?: T;
   updatedAt?: T;
   createdAt?: T;
 }

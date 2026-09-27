@@ -20,6 +20,7 @@ import { mediaStorage } from '@/storage'
 import { DEFAULT_STORE_NAME } from '@/brand'
 import { orderEmailPlugin } from '@/email/orderEmailPlugin'
 import { orderFinancialFields } from '@/fields/orderFinancialFields'
+import { restockTerminalOrder } from '@/inventory/restockOrder'
 
 const generateTitle: GenerateTitle<Product | Page> = ({ doc }) => {
   const siteName = DEFAULT_STORE_NAME
@@ -132,6 +133,10 @@ export const plugins: Plugin[] = [
     orders: {
       ordersCollectionOverride: ({ defaultCollection }) => ({
         ...defaultCollection,
+        hooks: {
+          ...defaultCollection.hooks,
+          beforeChange: [...(defaultCollection.hooks?.beforeChange ?? []), restockTerminalOrder],
+        },
         fields: [
           ...defaultCollection.fields.map(indexReportingFields),
           ...orderFinancialFields,
@@ -158,6 +163,18 @@ export const plugins: Plugin[] = [
           {
             name: 'confirmationEmailSentAt',
             type: 'date',
+            admin: {
+              hidden: true,
+              readOnly: true,
+            },
+          },
+          {
+            name: 'inventoryRestockedAt',
+            type: 'date',
+            access: {
+              create: () => false,
+              update: () => false,
+            },
             admin: {
               hidden: true,
               readOnly: true,
