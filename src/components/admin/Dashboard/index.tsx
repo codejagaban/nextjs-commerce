@@ -7,6 +7,8 @@ import { KpiStrip, type Kpi } from '../KpiStrip'
 import { OrderHealth, type StatusCount } from '../OrderHealth'
 import { PopularProducts, type PopularProduct } from '../PopularProducts'
 import { RevenueTrend } from '../RevenueTrend'
+import { DEFAULT_CURRENCY_CODE } from '@/currencies'
+import { summarizeOrderSales } from './metrics'
 
 import './index.scss'
 
@@ -14,7 +16,7 @@ const baseClass = 'store-overview'
 const WINDOW = 30
 const LOW_STOCK_AT = 25
 
-const money = (minor: number, currency = 'USD') =>
+const money = (minor: number, currency: string) =>
   new Intl.NumberFormat('en-US', { style: 'currency', currency }).format(minor / 100)
 
 /** Percentage change, or undefined when there is no previous period to compare against. */
@@ -26,10 +28,11 @@ type StockRow = { title: string; qty: number }
 async function getOverview() {
   const payload = await getPayload({ config })
 
-  const [orders, users, productCount] = await Promise.all([
+  const [orders, users, productCount, settings] = await Promise.all([
     payload.find({ collection: 'orders', limit: 0, pagination: false, depth: 0 }),
     payload.count({ collection: 'users' }),
     payload.count({ collection: 'products', where: { _status: { equals: 'published' } } }),
+    payload.findGlobal({ slug: 'settings', depth: 0 }),
   ])
   const transactions = await payload.find({
     collection: 'transactions',
@@ -38,38 +41,35 @@ async function getOverview() {
     depth: 0,
   })
 
-  // Cancelled orders were never money in the till.
-  const earning = orders.docs.filter((o) => o.status !== 'cancelled')
+  const currency = settings.currency || DEFAULT_CURRENCY_CODE
+  // These orders still represent sold units. Fully refunded and cancelled
+  // orders are excluded because this model cannot represent partial returns.
+  const earning = orders.docs.filter(
+    (order) =>
+      (order.status === 'processing' || order.status === 'completed' || !order.status) &&
+      (!order.currency || order.currency === currency),
+  )
 
   const dayMs = 86400000
   const startOfToday = new Date()
   startOfToday.setUTCHours(0, 0, 0, 0)
+  const end = new Date(startOfToday.getTime() + dayMs)
   const windowStart = new Date(startOfToday.getTime() - (WINDOW - 1) * dayMs)
   const priorStart = new Date(windowStart.getTime() - WINDOW * dayMs)
-
-  const currentDaily = new Array(WINDOW).fill(0)
-  let currentRevenue = 0
-  let priorRevenue = 0
-  let currentOrders = 0
-  let priorOrders = 0
-
-  earning.forEach((o) => {
-    if (typeof o.createdAt !== 'string') return
-    const placed = new Date(o.createdAt)
-    const amount = typeof o.amount === 'number' ? o.amount : 0
-    if (placed >= windowStart) {
-      const i = Math.floor((placed.getTime() - windowStart.getTime()) / dayMs)
-      if (i >= 0 && i < WINDOW) currentDaily[i] += amount
-      currentRevenue += amount
-      currentOrders += 1
-    } else if (placed >= priorStart) {
-      priorRevenue += amount
-      priorOrders += 1
-    }
+  const current = summarizeOrderSales({
+    currency,
+    days: WINDOW,
+    end,
+    orders: orders.docs,
+    start: windowStart,
   })
-
-  const currentAov = currentOrders ? Math.round(currentRevenue / currentOrders) : 0
-  const priorAov = priorOrders ? Math.round(priorRevenue / priorOrders) : 0
+  const prior = summarizeOrderSales({
+    currency,
+    days: WINDOW,
+    end: windowStart,
+    orders: orders.docs,
+    start: priorStart,
+  })
 
   const statusCounts: StatusCount = { completed: 0, processing: 0, cancelled: 0, refunded: 0 }
   orders.docs.forEach((o) => {
@@ -129,13 +129,16 @@ async function getOverview() {
   ].sort((a, b) => a.qty - b.qty)
 
   return {
-    currentDaily,
-    currentRevenue,
-    currentOrders,
-    currentAov,
-    revenueChange: change(currentRevenue, priorRevenue),
-    ordersChange: change(currentOrders, priorOrders),
-    aovChange: change(currentAov, priorAov),
+    currentDaily: current.dailyNetSales,
+    currentRevenue: current.netSales,
+    currentOrders: current.netOrders,
+    currentAov: current.averageOrderValue,
+    grossSales: current.grossSales,
+    refunds: current.refunds,
+    revenueChange: change(current.netSales, prior.netSales),
+    ordersChange: change(current.netOrders, prior.netOrders),
+    aovChange: change(current.averageOrderValue, prior.averageOrderValue),
+    currency,
     customers: users.totalDocs,
     products: productCount.totalDocs,
     statusCounts,
@@ -165,9 +168,15 @@ export const Dashboard: React.FC<{ name?: string }> = async ({ name }) => {
   const s = await getOverview()
 
   const kpis: Kpi[] = [
-    { Icon: IconRevenue, label: 'Revenue', value: money(s.currentRevenue), delta: s.revenueChange, compare: 'vs previous 30 days' },
+    {
+      Icon: IconRevenue,
+      label: 'Net sales',
+      value: money(s.currentRevenue, s.currency),
+      delta: s.revenueChange,
+      compare: `${money(s.grossSales, s.currency)} gross · ${money(s.refunds, s.currency)} refunded`,
+    },
     { Icon: IconOrders, label: 'Orders', value: s.currentOrders.toLocaleString('en-US'), delta: s.ordersChange, compare: 'vs previous 30 days' },
-    { Icon: IconAverage, label: 'Average order', value: money(s.currentAov), delta: s.aovChange, compare: 'vs previous 30 days' },
+    { Icon: IconAverage, label: 'Average order', value: money(s.currentAov, s.currency), delta: s.aovChange, compare: 'vs previous 30 days' },
     { Icon: IconProducts, label: 'Products live', value: String(s.products), compare: `${s.customers} customers` },
   ]
 
@@ -190,11 +199,13 @@ export const Dashboard: React.FC<{ name?: string }> = async ({ name }) => {
       <div className={`${baseClass}__split`}>
         <RevenueTrend
           current={{ label: 'Last 30 days', points: s.currentDaily }}
+          currency={s.currency}
           dayLabels={dayLabelsFrom(s.windowStart, s.currentDaily.length)}
           delta={s.revenueChange}
           endLabel={dayLabel(s.endLabel)}
           startLabel={dayLabel(s.windowStart)}
-          total={money(s.currentRevenue)}
+          title="Net sales"
+          total={money(s.currentRevenue, s.currency)}
         />
         <PopularProducts data={s.popular} />
       </div>

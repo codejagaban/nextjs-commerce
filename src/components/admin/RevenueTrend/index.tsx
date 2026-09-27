@@ -17,6 +17,7 @@ type Props = {
   /** One label per point, so a hovered day can name itself. */
   dayLabels?: string[]
   currency?: string
+  title?: string
 }
 
 const W = 780
@@ -97,6 +98,7 @@ export const RevenueTrend: React.FC<Props> = ({
   endLabel,
   dayLabels,
   currency = 'USD',
+  title = 'Total revenue',
 }) => {
   const [mode, setMode] = React.useState<Mode>('bars')
   const [hover, setHover] = React.useState<number | null>(null)
@@ -186,7 +188,7 @@ export const RevenueTrend: React.FC<Props> = ({
         <div className="revenue-trend__headline">
           <h3 className="revenue-trend__title">
             <IconTrend className="revenue-trend__icon" />
-            Total revenue
+            {title}
           </h3>
           <div className="revenue-trend__figure">
             <span className="revenue-trend__total">{total}</span>
