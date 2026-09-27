@@ -4,16 +4,30 @@ type SalesOrder = {
   amount?: number | null
   createdAt: string
   currency?: string | null
+  discountTotal?: number | null
+  productRefundTotal?: number | null
+  shippingRefundTotal?: number | null
+  shippingTotal?: number | null
   status?: OrderStatus
+  subtotal?: number | null
+  taxRefundTotal?: number | null
+  taxTotal?: number | null
 }
 
 type SalesSummary = {
   averageOrderValue: number
   dailyNetSales: number[]
+  discounts: number
   grossSales: number
   netOrders: number
   netSales: number
+  productRefunds: number
   refunds: number
+  shipping: number
+  shippingRefunds: number
+  taxes: number
+  taxRefunds: number
+  totalSales: number
 }
 
 /**
@@ -39,7 +53,12 @@ export function summarizeOrderSales({
 }): SalesSummary {
   const dailyNetSales = new Array<number>(days).fill(0)
   let grossSales = 0
-  let refunds = 0
+  let discounts = 0
+  let productRefunds = 0
+  let shipping = 0
+  let shippingRefunds = 0
+  let taxes = 0
+  let taxRefunds = 0
   let netOrders = 0
 
   for (const order of orders) {
@@ -51,27 +70,55 @@ export function summarizeOrderSales({
     if (status === 'cancelled') continue
 
     const amount = typeof order.amount === 'number' ? order.amount : 0
-    grossSales += amount
+    const subtotal = typeof order.subtotal === 'number' ? order.subtotal : amount
+    const discountTotal = typeof order.discountTotal === 'number' ? order.discountTotal : 0
+    const shippingTotal = typeof order.shippingTotal === 'number' ? order.shippingTotal : 0
+    const taxTotal = typeof order.taxTotal === 'number' ? order.taxTotal : 0
+    const productRefundTotal =
+      typeof order.productRefundTotal === 'number'
+        ? order.productRefundTotal
+        : status === 'refunded'
+          ? amount
+          : 0
+    const shippingRefundTotal =
+      typeof order.shippingRefundTotal === 'number' ? order.shippingRefundTotal : 0
+    const taxRefundTotal = typeof order.taxRefundTotal === 'number' ? order.taxRefundTotal : 0
 
-    if (status === 'refunded') {
-      refunds += amount
-      continue
-    }
+    grossSales += subtotal
+    discounts += discountTotal
+    shipping += shippingTotal
+    shippingRefunds += shippingRefundTotal
+    taxes += taxTotal
+    taxRefunds += taxRefundTotal
+    productRefunds += productRefundTotal
+
+    const orderNetSales = Math.max(0, subtotal - discountTotal - productRefundTotal)
+    if (status === 'refunded' && orderNetSales === 0) continue
 
     netOrders += 1
     const index = Math.floor((placed.getTime() - start.getTime()) / 86_400_000)
-    if (index >= 0 && index < days) dailyNetSales[index] += amount
+    if (index >= 0 && index < days) {
+      dailyNetSales[index] += orderNetSales
+    }
   }
 
-  const netSales = grossSales - refunds
+  const refunds = productRefunds + shippingRefunds + taxRefunds
+  const netSales = grossSales - discounts - productRefunds
+  const totalSales = netSales + shipping - shippingRefunds + taxes - taxRefunds
 
   return {
-    averageOrderValue: netOrders ? Math.round(netSales / netOrders) : 0,
+    averageOrderValue: netOrders ? Math.round(totalSales / netOrders) : 0,
     dailyNetSales,
+    discounts,
     grossSales,
     netOrders,
     netSales,
+    productRefunds,
     refunds,
+    shipping,
+    shippingRefunds,
+    taxes,
+    taxRefunds,
+    totalSales,
   }
 }
-

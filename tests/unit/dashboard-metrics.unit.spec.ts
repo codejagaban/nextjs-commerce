@@ -79,5 +79,41 @@ describe('dashboard sales metrics', () => {
     expect(result.netSales).toBe(2_500)
     expect(result.netOrders).toBe(1)
   })
-})
 
+  it('reports discounts, shipping, tax, and partial refunds separately', () => {
+    const result = summarizeOrderSales({
+      currency: 'USD',
+      days: 30,
+      start,
+      end,
+      orders: [
+        {
+          amount: 10_500,
+          createdAt: '2026-09-12T12:00:00.000Z',
+          currency: 'USD',
+          discountTotal: 1_000,
+          productRefundTotal: 2_000,
+          shippingRefundTotal: 200,
+          shippingTotal: 500,
+          status: 'completed',
+          subtotal: 10_000,
+          taxRefundTotal: 100,
+          taxTotal: 1_000,
+        },
+      ],
+    })
+
+    expect(result.grossSales).toBe(10_000)
+    expect(result.discounts).toBe(1_000)
+    expect(result.productRefunds).toBe(2_000)
+    expect(result.shippingRefunds).toBe(200)
+    expect(result.taxRefunds).toBe(100)
+    expect(result.refunds).toBe(2_300)
+    expect(result.netSales).toBe(7_000)
+    expect(result.shipping).toBe(500)
+    expect(result.taxes).toBe(1_000)
+    expect(result.totalSales).toBe(8_200)
+    expect(result.averageOrderValue).toBe(8_200)
+    expect(result.dailyNetSales.reduce((sum, amount) => sum + amount, 0)).toBe(7_000)
+  })
+})

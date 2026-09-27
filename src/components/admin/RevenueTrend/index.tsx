@@ -9,6 +9,7 @@ import './index.scss'
 export type Series = { label: string; points: number[] }
 
 type Props = {
+  breakdown?: Array<{ label: string; value: string }>
   current: Series
   total: string
   delta?: number
@@ -91,6 +92,7 @@ type Mode = 'line' | 'bars'
 const STORAGE_KEY = 'marisol-admin:revenue-chart-mode:v2'
 
 export const RevenueTrend: React.FC<Props> = ({
+  breakdown,
   current,
   total,
   delta,
@@ -224,6 +226,17 @@ export const RevenueTrend: React.FC<Props> = ({
           </div>
         </div>
       </figcaption>
+
+      {breakdown && breakdown.length > 0 && (
+        <dl className="revenue-trend__breakdown">
+          {breakdown.map((item) => (
+            <div className="revenue-trend__breakdown-item" key={item.label}>
+              <dt>{item.label}</dt>
+              <dd>{item.value}</dd>
+            </div>
+          ))}
+        </dl>
+      )}
 
       <div className={`revenue-trend__plot${active !== null ? ' revenue-trend__plot--reading' : ''}`}>
       <svg

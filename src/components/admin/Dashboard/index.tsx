@@ -133,8 +133,15 @@ async function getOverview() {
     currentRevenue: current.netSales,
     currentOrders: current.netOrders,
     currentAov: current.averageOrderValue,
+    discounts: current.discounts,
     grossSales: current.grossSales,
+    productRefunds: current.productRefunds,
     refunds: current.refunds,
+    shipping: current.shipping,
+    shippingRefunds: current.shippingRefunds,
+    taxes: current.taxes,
+    taxRefunds: current.taxRefunds,
+    totalSales: current.totalSales,
     revenueChange: change(current.netSales, prior.netSales),
     ordersChange: change(current.netOrders, prior.netOrders),
     aovChange: change(current.averageOrderValue, prior.averageOrderValue),
@@ -198,6 +205,17 @@ export const Dashboard: React.FC<{ name?: string }> = async ({ name }) => {
 
       <div className={`${baseClass}__split`}>
         <RevenueTrend
+          breakdown={[
+            { label: 'Gross sales', value: money(s.grossSales, s.currency) },
+            { label: 'Discounts', value: money(s.discounts, s.currency) },
+            { label: 'Product returns', value: money(s.productRefunds, s.currency) },
+            {
+              label: 'Net shipping',
+              value: money(s.shipping - s.shippingRefunds, s.currency),
+            },
+            { label: 'Net tax', value: money(s.taxes - s.taxRefunds, s.currency) },
+            { label: 'Total sales', value: money(s.totalSales, s.currency) },
+          ]}
           current={{ label: 'Last 30 days', points: s.currentDaily }}
           currency={s.currency}
           dayLabels={dayLabelsFrom(s.windowStart, s.currentDaily.length)}
