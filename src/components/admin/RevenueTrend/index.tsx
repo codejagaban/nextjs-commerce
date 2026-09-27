@@ -20,8 +20,8 @@ type Props = {
 }
 
 const W = 780
-const H = 240
-const PAD = { top: 16, right: 12, bottom: 28, left: 54 }
+const H = 286
+const PAD = { top: 18, right: 16, bottom: 42, left: 64 }
 
 /**
  * Monotone cubic interpolation (Fritsch–Carlson).
@@ -241,7 +241,7 @@ export const RevenueTrend: React.FC<Props> = ({
         {ticks.map((t) => (
           <g key={t}>
             <line className="revenue-trend__grid" x1={PAD.left} x2={W - PAD.right} y1={y(t)} y2={y(t)} />
-            <text className="revenue-trend__tick" x={PAD.left - 10} y={y(t) + 3.5} textAnchor="end">
+            <text className="revenue-trend__tick" x={PAD.left - 14} y={y(t) + 4} textAnchor="end">
               {money(t, currency)}
             </text>
           </g>
@@ -256,8 +256,8 @@ export const RevenueTrend: React.FC<Props> = ({
           </>
         ) : (
           current.points.map((v, i) => {
-            // Leave a couple of pixels of surface between bars so they never touch.
-            const w = Math.max(2, plotW / n - 3)
+            // Keep each day visually distinct instead of forming a dense block.
+            const w = Math.max(4, (plotW / n) * 0.66)
             return (
               <rect
                 className={`revenue-trend__bar${i === active ? ' revenue-trend__bar--active' : ''}`}
@@ -280,8 +280,17 @@ export const RevenueTrend: React.FC<Props> = ({
           </g>
         )}
 
-        <text className="revenue-trend__tick" x={PAD.left} y={H - 9}>{startLabel}</text>
-        <text className="revenue-trend__tick" x={W - PAD.right} y={H - 9} textAnchor="end">{endLabel}</text>
+        <text className="revenue-trend__tick revenue-trend__tick--date" x={PAD.left} y={H - 8}>
+          {startLabel}
+        </text>
+        <text
+          className="revenue-trend__tick revenue-trend__tick--date"
+          x={W - PAD.right}
+          y={H - 8}
+          textAnchor="end"
+        >
+          {endLabel}
+        </text>
       </svg>
 
       {active !== null && (
