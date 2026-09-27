@@ -38,7 +38,10 @@ export const IconRevenue: React.FC<Props> = (p) => (
 /** Orders — a shopping bag. */
 export const IconOrders: React.FC<Props> = (p) => (
   <Icon {...p}>
-    <path d="M5.4 7.6h13.2l-1 11.2a1.8 1.8 0 0 1-1.8 1.6H8.2a1.8 1.8 0 0 1-1.8-1.6z" stroke="currentColor" />
+    <path
+      d="M5.4 7.6h13.2l-1 11.2a1.8 1.8 0 0 1-1.8 1.6H8.2a1.8 1.8 0 0 1-1.8-1.6z"
+      stroke="currentColor"
+    />
     <path d="M9 9.4V7a3 3 0 0 1 6 0v2.4" stroke="currentColor" />
   </Icon>
 )
@@ -84,10 +87,21 @@ export const IconHealth: React.FC<Props> = (p) => (
   </Icon>
 )
 
+/** Attention queue — three work marks with one open task. */
+export const IconAttention: React.FC<Props> = (p) => (
+  <Icon {...p}>
+    <path d="M5 6.2h2.2M10 6.2h9M5 12h2.2M10 12h9M5 17.8h2.2M10 17.8h5.2" stroke="currentColor" />
+    <path d="M18.2 16.2v3.2M18.2 21v.1" stroke="currentColor" />
+  </Icon>
+)
+
 /** Low stock — a box with a warning. */
 export const IconStock: React.FC<Props> = (p) => (
   <Icon {...p}>
-    <path d="M4.4 8.2h15.2v10.4a1.8 1.8 0 0 1-1.8 1.8H6.2a1.8 1.8 0 0 1-1.8-1.8z" stroke="currentColor" />
+    <path
+      d="M4.4 8.2h15.2v10.4a1.8 1.8 0 0 1-1.8 1.8H6.2a1.8 1.8 0 0 1-1.8-1.8z"
+      stroke="currentColor"
+    />
     <path d="M3.4 4.6h17.2v3.6H3.4z" stroke="currentColor" />
     <path d="M12 11.4v3.2M12 17.4v.1" stroke="currentColor" />
   </Icon>

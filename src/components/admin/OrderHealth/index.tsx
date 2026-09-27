@@ -8,7 +8,7 @@ import './index.scss'
 
 export type StatusCount = { completed: number; processing: number; cancelled: number; refunded: number }
 
-type Props = { counts: StatusCount; unfinishedPayments: number }
+type Props = { counts: StatusCount }
 
 /**
  * The state of the order pipeline, as one bar.
@@ -18,7 +18,7 @@ type Props = { counts: StatusCount; unfinishedPayments: number }
  * healthy to unhealthy so a growing problem shows as the bar filling from the right.
  * Hovering a segment names it and adds its share, which the key below cannot show.
  */
-export const OrderHealth: React.FC<Props> = ({ counts, unfinishedPayments }) => {
+export const OrderHealth: React.FC<Props> = ({ counts }) => {
   const [hover, setHover] = React.useState<string | null>(null)
   const total = counts.completed + counts.processing + counts.cancelled + counts.refunded
 
@@ -70,7 +70,7 @@ export const OrderHealth: React.FC<Props> = ({ counts, unfinishedPayments }) => 
           </div>
 
           <ul className="order-health__key">
-            {segments.map((s, i) => (
+            {segments.map((s) => (
               <li key={s.key}>
                 <span className={`order-health__swatch order-health__swatch--${s.key}`} />
                 {s.label} <b>{s.n}</b>
@@ -78,13 +78,6 @@ export const OrderHealth: React.FC<Props> = ({ counts, unfinishedPayments }) => 
             ))}
           </ul>
         </>
-      )}
-
-      {unfinishedPayments > 0 && (
-        <p className="order-health__aside">
-          {unfinishedPayments} checkout{unfinishedPayments === 1 ? '' : 's'} started at the payment
-          step without finishing.
-        </p>
       )}
     </section>
   )

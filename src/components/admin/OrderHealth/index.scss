@@ -124,14 +124,6 @@
     &--cancelled { background: var(--bad); }
   }
 
-  &__aside {
-    margin: 0.9rem 0 0;
-    padding-top: 0.8rem;
-    border-top: 1px solid var(--theme-elevation-100);
-    font-size: 0.85rem;
-    color: var(--theme-elevation-500);
-  }
-
   &__empty { margin: 0; color: var(--theme-elevation-450); }
 }
 

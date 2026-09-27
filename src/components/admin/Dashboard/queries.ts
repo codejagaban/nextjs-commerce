@@ -20,6 +20,15 @@ export type SalesAggregate = {
   totalSales: number
 }
 
+export type AttentionCounts = {
+  failedPayments: number
+  incompleteCheckouts: number
+  outOfStockProducts: number
+  outOfStockVariants: number
+  processingOrders: number
+  stalledPayments: number
+}
+
 type SalesRow = {
   day: string
   discounts: string | number | null
@@ -37,7 +46,14 @@ type SalesRow = {
 
 type StatusRow = { count: string | number; status: keyof StatusCount }
 type ProductRow = { product_id: number; units: string | number }
-type TransactionRow = { count: string | number; status: string }
+type AttentionRow = {
+  failed_payments: string | number
+  incomplete_checkouts: string | number
+  out_of_stock_products: string | number
+  out_of_stock_variants: string | number
+  processing_orders: string | number
+  stalled_payments: string | number
+}
 
 const rowsFrom = <T>(result: unknown): T[] => {
   if (typeof result !== 'object' || result === null || !('rows' in result)) return []
@@ -47,6 +63,18 @@ const rowsFrom = <T>(result: unknown): T[] => {
 const amount = (value: string | number | null | undefined): number => {
   const parsed = Number(value ?? 0)
   return Number.isFinite(parsed) ? parsed : 0
+}
+
+export const attentionCountsFrom = (result: unknown): AttentionCounts => {
+  const row = rowsFrom<AttentionRow>(result)[0]
+  return {
+    failedPayments: amount(row?.failed_payments),
+    incompleteCheckouts: amount(row?.incomplete_checkouts),
+    outOfStockProducts: amount(row?.out_of_stock_products),
+    outOfStockVariants: amount(row?.out_of_stock_variants),
+    processingOrders: amount(row?.processing_orders),
+    stalledPayments: amount(row?.stalled_payments),
+  }
 }
 
 const emptySales = (days: number): SalesAggregate => ({
@@ -138,7 +166,7 @@ export async function getDashboardOrderData({
     ORDER BY "day"
   `)
 
-  const [statusResult, transactionResult, popularResult] = await Promise.all([
+  const [statusResult, attentionResult, popularResult] = await Promise.all([
     payload.db.drizzle.execute(sql`
       SELECT COALESCE("status"::text, 'processing') AS "status", COUNT(*) AS "count"
       FROM "orders"
@@ -147,10 +175,48 @@ export async function getDashboardOrderData({
       GROUP BY "status"
     `),
     payload.db.drizzle.execute(sql`
-      SELECT "status"::text AS "status", COUNT(*) AS "count"
-      FROM "transactions"
-      WHERE "status" = 'pending'
-      GROUP BY "status"
+      SELECT
+        (SELECT COUNT(*) FROM "orders" WHERE "status" = 'processing') AS "processing_orders",
+        (
+          SELECT COUNT(*) FROM "transactions"
+          WHERE "status" = 'failed' AND "created_at" >= NOW() - INTERVAL '24 hours'
+        ) AS "failed_payments",
+        (
+          SELECT COUNT(*) FROM "transactions"
+          WHERE "status" = 'pending' AND "created_at" < NOW() - INTERVAL '30 minutes'
+        ) AS "stalled_payments",
+        (
+          SELECT COUNT(DISTINCT "carts"."id")
+          FROM "carts"
+          WHERE "carts"."purchased_at" IS NULL
+            AND "carts"."updated_at" < NOW() - INTERVAL '24 hours'
+            AND EXISTS (
+              SELECT 1 FROM "carts_items"
+              WHERE "carts_items"."_parent_id" = "carts"."id"
+            )
+            AND NOT EXISTS (
+              SELECT 1 FROM "transactions"
+              WHERE "transactions"."cart_id" = "carts"."id"
+                AND "transactions"."status" IN ('pending', 'processing', 'succeeded')
+            )
+        ) AS "incomplete_checkouts",
+        (
+          SELECT COUNT(*) FROM "products"
+          WHERE "enable_variants" IS DISTINCT FROM TRUE
+            AND COALESCE("inventory", 0) <= 0
+            AND "deleted_at" IS NULL
+            AND "_status" = 'published'
+        ) AS "out_of_stock_products",
+        (
+          SELECT COUNT(*)
+          FROM "variants"
+          INNER JOIN "products" ON "products"."id" = "variants"."product_id"
+          WHERE COALESCE("variants"."inventory", 0) <= 0
+            AND "variants"."deleted_at" IS NULL
+            AND "variants"."_status" = 'published'
+            AND "products"."deleted_at" IS NULL
+            AND "products"."_status" = 'published'
+        ) AS "out_of_stock_variants"
     `),
     payload.db.drizzle.execute(sql`
       SELECT "items"."product_id", SUM("items"."quantity") AS "units"
@@ -203,6 +269,7 @@ export async function getDashboardOrderData({
   }
 
   return {
+    attention: attentionCountsFrom(attentionResult),
     current,
     prior,
     popular: rowsFrom<ProductRow>(popularResult).map((row) => ({
@@ -210,9 +277,5 @@ export async function getDashboardOrderData({
       units: amount(row.units),
     })),
     statusCounts,
-    unfinishedPayments: rowsFrom<TransactionRow>(transactionResult).reduce(
-      (total, row) => total + amount(row.count),
-      0,
-    ),
   }
 }

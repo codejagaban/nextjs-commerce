@@ -3,6 +3,7 @@ import { getPayload } from 'payload'
 import React from 'react'
 
 import { AnalyticsControls } from '../AnalyticsControls'
+import { AttentionQueue } from '../AttentionQueue'
 import { IconAverage, IconOrders, IconProducts, IconRevenue, IconStock } from '../icons'
 import { KpiStrip, type Kpi } from '../KpiStrip'
 import { OrderHealth } from '../OrderHealth'
@@ -124,6 +125,7 @@ async function getOverview(filters: DashboardFilters) {
 
   return {
     currentDaily: current.dailyNetSales,
+    attention: orderData.attention,
     currentRevenue: current.netSales,
     currentOrders: current.netOrders,
     currentAov: current.averageOrderValue,
@@ -146,7 +148,6 @@ async function getOverview(filters: DashboardFilters) {
     statusCounts: orderData.statusCounts,
     popular,
     lowStock,
-    unfinishedPayments: orderData.unfinishedPayments,
     window,
   }
 }
@@ -231,6 +232,8 @@ export const Dashboard: React.FC<{
 
       <KpiStrip items={kpis} />
 
+      <AttentionQueue adminPath={adminPath} counts={s.attention} />
+
       <div className={`${baseClass}__split`}>
         <RevenueTrend
           breakdown={[
@@ -258,7 +261,7 @@ export const Dashboard: React.FC<{
       </div>
 
       <div className={`${baseClass}__columns`}>
-        <OrderHealth counts={s.statusCounts} unfinishedPayments={s.unfinishedPayments} />
+        <OrderHealth counts={s.statusCounts} />
 
         <div className={`${baseClass}__panel`}>
           <h3 className={`${baseClass}__panel-heading`}>
