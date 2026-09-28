@@ -50,12 +50,15 @@
   }
 
   .template-default .nav {
-    display: block !important;
     width: 248px !important;
     min-width: 248px !important;
     opacity: 1 !important;
     transform: none !important;
     visibility: visible !important;
+  }
+
+  .template-default .custom-admin-nav {
+    display: flex !important;
   }
 }
 
@@ -91,134 +94,6 @@
   color: var(--admin-sidebar-text);
   border-radius: var(--admin-radius-shell);
   background: var(--admin-sidebar);
-}
-
-.template-default .nav::before {
-  position: absolute;
-  z-index: 2;
-  top: 1.05rem;
-  left: 1.5rem;
-  color: #fff;
-  content: 'Marisol';
-  font-family: Georgia, 'Times New Roman', serif;
-  font-size: 1.28rem;
-  letter-spacing: 0.01em;
-  pointer-events: none;
-}
-
-.template-default .nav::after {
-  position: absolute;
-  z-index: 2;
-  top: 2.65rem;
-  left: 1.5rem;
-  color: var(--admin-sidebar-muted);
-  content: 'Ecommerce';
-  font-size: 0.72rem;
-  pointer-events: none;
-}
-
-.template-default .nav__scroll {
-  padding: 4.8rem 0.75rem 5rem;
-  scrollbar-width: thin;
-  scrollbar-color: rgb(255 255 255 / 0.18) transparent;
-}
-
-.template-default .admin-nav-search {
-  margin-bottom: 0.6rem;
-
-  a {
-    display: grid;
-    min-height: 2.55rem;
-    grid-template-columns: 1.1rem minmax(0, 1fr) auto;
-    align-items: center;
-    gap: 0.65rem;
-    padding: 0.5rem 0.7rem;
-    border-radius: var(--admin-radius-control);
-    color: var(--admin-sidebar-text);
-    background: rgb(255 255 255 / 0.055);
-    text-decoration: none;
-    transition: background-color 140ms ease;
-  }
-
-  a:hover { background: rgb(255 255 255 / 0.1); }
-  a:focus-visible { outline: 2px solid rgb(255 255 255 / 0.8); outline-offset: 2px; }
-  svg { width: 1.05rem; height: 1.05rem; stroke: currentColor; stroke-width: 1.7; }
-  kbd {
-    padding: 0.15rem 0.35rem;
-    border: 0;
-    border-radius: 5px;
-    color: var(--admin-sidebar-muted);
-    background: rgb(255 255 255 / 0.07);
-    font: inherit;
-    font-size: 0.68rem;
-  }
-}
-
-.template-default .nav__wrap {
-  width: 100%;
-}
-
-.template-default .nav__group,
-.template-default .nav-group {
-  margin-bottom: 0.35rem;
-}
-
-.template-default .nav-group__toggle,
-.template-default .nav-group__label {
-  color: var(--admin-sidebar-muted);
-}
-
-.template-default .nav-group__toggle {
-  min-height: 1.75rem;
-  padding-inline: 0.65rem;
-  font-size: 0.75rem;
-  font-weight: 500;
-  letter-spacing: 0.01em;
-}
-
-.template-default .nav-group__indicator .stroke {
-  stroke: currentColor;
-}
-
-.template-default .nav__link {
-  min-height: 2.15rem;
-  padding: 0.42rem 0.65rem;
-  border-radius: var(--admin-radius-control);
-  color: var(--admin-sidebar-text);
-  font-weight: 450;
-  line-height: 1.2;
-  transition: color 140ms ease, background-color 140ms ease;
-}
-
-.template-default .nav__link:hover {
-  color: #fff;
-  background: var(--admin-sidebar-hover);
-}
-
-.template-default .nav__link.active {
-  color: #fff;
-  background: var(--admin-sidebar-active);
-  font-weight: 600;
-}
-
-.template-default .nav__link-indicator {
-  display: none;
-}
-
-.template-default .nav__controls {
-  left: 0.75rem;
-  bottom: 0.85rem;
-  color: var(--admin-sidebar-muted);
-}
-
-.template-default .nav__log-out {
-  border-radius: var(--admin-radius-control);
-  color: var(--admin-sidebar-muted);
-}
-
-.template-default .nav__log-out:hover {
-  color: var(--admin-sidebar-text);
-  background: var(--admin-sidebar-hover);
 }
 
 .template-default__nav-toggler-wrapper {
@@ -718,11 +593,13 @@
 
 @media (max-width: 1024px) {
   .template-default {
+    display: block;
     gap: 0;
     padding: 0;
   }
 
   .template-default__wrap {
+    width: 100%;
     min-height: 100vh;
     border: 0;
     border-radius: 0;
@@ -741,7 +618,15 @@
     top: 1rem;
     right: auto;
     left: 1rem;
+    width: 2.5rem;
+    height: 2.5rem;
     z-index: 4;
+  }
+
+  .template-default__nav-toggler {
+    width: 2.5rem;
+    height: 2.5rem;
+    padding: 0.65rem;
   }
 }
 

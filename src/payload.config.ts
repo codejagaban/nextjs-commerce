@@ -37,9 +37,9 @@ export default buildConfig({
       // The `BeforeLogin` component renders a message that you see while logging into your admin panel.
       // Feel free to delete this at any time. Simply remove the line below and the import `BeforeLogin` statement on line 15.
       beforeLogin: ['@/components/BeforeLogin#BeforeLogin'],
-      // Payload's nav is built from collections and globals, so the admin home
-      // has no entry of its own. This adds one.
-      beforeNavLinks: ['@/components/admin/DashboardNavLink#DashboardNavLink'],
+      // A commerce-focused navigation replaces Payload's collection-group list
+      // while preserving the same routes, permissions, and editing screens.
+      Nav: '@/components/admin/AdminNav#AdminNav',
       views: {
         // Replaces the default home, which listed every collection as a card grid
         // that duplicates the sidebar. Seeding moved to the CLI: `pnpm seed`.

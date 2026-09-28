@@ -260,7 +260,7 @@ export const Dashboard: React.FC<{
 
       <AttentionQueue adminPath={adminPath} counts={s.attention} />
 
-      <div className={`${baseClass}__split`}>
+      <div className={`${baseClass}__split`} id="analytics">
         <RevenueTrend
           comparisonLabel={s.window.comparisonLabel}
           current={{ label: s.window.rangeLabel, points: s.currentDaily }}
