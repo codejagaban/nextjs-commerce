@@ -77,7 +77,7 @@ export const AttentionQueue: React.FC<Props> = ({ adminPath, counts }) => {
       ]),
       label: 'Variants out of stock',
     },
-  ].filter((item) => item.count > 0)
+  ].filter((item) => item.count > 0).slice(0, 3)
   const total = items.reduce((sum, item) => sum + item.count, 0)
 
   return (

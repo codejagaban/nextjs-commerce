@@ -11,7 +11,7 @@ export type StatusCount = { completed: number; processing: number; cancelled: nu
 type Props = { counts: StatusCount }
 
 /**
- * The state of the order pipeline, as one bar.
+ * The state of the order pipeline, as a compact ring.
  *
  * Status is a reserved role, not a series — each state gets its own fixed colour
  * and a written label, so it never reads by colour alone. Segments are ordered
@@ -19,7 +19,6 @@ type Props = { counts: StatusCount }
  * Hovering a segment names it and adds its share, which the key below cannot show.
  */
 export const OrderHealth: React.FC<Props> = ({ counts }) => {
-  const [hover, setHover] = React.useState<string | null>(null)
   const total = counts.completed + counts.processing + counts.cancelled + counts.refunded
 
   const segments = [
@@ -40,40 +39,45 @@ export const OrderHealth: React.FC<Props> = ({ counts }) => {
         <p className="order-health__empty">Nothing to report until the first order lands.</p>
       ) : (
         <>
-          <div
-            aria-label={segments.map((s) => `${s.n} ${s.label.toLowerCase()}`).join(', ')}
-            className="order-health__bar"
-            role="img"
-          >
-            {segments.map((s, i) => (
-              <span
-                className={`order-health__seg order-health__seg--${s.key}`}
-                key={s.key}
-                onPointerEnter={() => setHover(s.key)}
-                onPointerLeave={() => setHover((h) => (h === s.key ? null : h))}
-                style={{ width: `${(s.n / total) * 100}%` }}
-              >
-                {hover === s.key && (
-                  <span
-                    className={`order-health__tip${
-                      i === 0 ? ' order-health__tip--start' : ''
-                    }${i === segments.length - 1 ? ' order-health__tip--end' : ''}`}
-                  >
-                    <span className="order-health__tip-label">{s.label}</span>
-                    <span className="order-health__tip-value">
-                      {s.n} · {Math.round((s.n / total) * 100)}%
-                    </span>
-                  </span>
-                )}
-              </span>
-            ))}
+          <div className="order-health__visual">
+            <svg
+              aria-label={segments.map((s) => `${s.n} ${s.label.toLowerCase()}`).join(', ')}
+              className="order-health__ring"
+              role="img"
+              viewBox="0 0 120 120"
+            >
+              <circle className="order-health__ring-track" cx="60" cy="60" r="46" />
+              {segments.reduce<React.ReactNode[]>((nodes, segment, index) => {
+                const previous = segments.slice(0, index).reduce((sum, item) => sum + item.n, 0)
+                const length = (segment.n / total) * 100
+                nodes.push(
+                  <circle
+                    className={`order-health__ring-segment order-health__ring-segment--${segment.key}`}
+                    cx="60"
+                    cy="60"
+                    key={segment.key}
+                    pathLength="100"
+                    r="46"
+                    strokeDasharray={`${Math.max(0, length - 0.8)} ${100 - Math.max(0, length - 0.8)}`}
+                    strokeDashoffset={-(previous / total) * 100}
+                  />,
+                )
+                return nodes
+              }, [])}
+            </svg>
+            <span className="order-health__score">
+              <strong>{Math.round((counts.completed / total) * 100)}%</strong>
+              <span>Healthy</span>
+            </span>
           </div>
 
           <ul className="order-health__key">
             {segments.map((s) => (
               <li key={s.key}>
                 <span className={`order-health__swatch order-health__swatch--${s.key}`} />
-                {s.label} <b>{s.n}</b>
+                <span>{s.label}</span>
+                <b>{Math.round((s.n / total) * 100)}%</b>
+                <em>{s.n}</em>
               </li>
             ))}
           </ul>

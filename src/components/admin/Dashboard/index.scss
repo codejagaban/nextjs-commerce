@@ -1,183 +1,73 @@
-/**
- * Store overview, shown above the collection index on the admin home.
- *
- * Drawn entirely from Payload's own theme variables so it reads as part of the
- * panel rather than something bolted on, and follows the light and dark themes
- * without a second palette.
- */
-
 .store-overview {
   display: flex;
   flex-direction: column;
-  gap: 1.5rem;
-  margin-bottom: 2.5rem;
+  gap: 1.15rem;
+  max-width: 94rem;
+  margin: 0 auto 2.5rem;
 
-
-  &__greeting {
+  &__topline {
     display: flex;
-    flex-direction: column;
-    gap: 0.2rem;
-    margin-bottom: 0.25rem;
+    align-items: flex-end;
+    justify-content: space-between;
+    gap: 1.5rem;
+    padding: 0.3rem 0 0.25rem;
   }
 
-  &__hello {
-    margin: 0;
-    font-size: 1.85rem;
-    font-weight: 600;
-    letter-spacing: -0.01em;
-  }
+  &__greeting { display: flex; flex-direction: column; gap: 0.22rem; }
+  &__hello { margin: 0; color: var(--theme-elevation-950); font-size: clamp(1.7rem, 2.5vw, 2.15rem); font-weight: 680; letter-spacing: -0.03em; }
+  &__date { margin: 0; color: var(--theme-elevation-500); font-size: 0.98rem; }
 
-  &__date {
-    margin: 0;
-    font-size: 1rem;
-    color: var(--theme-elevation-450);
-  }
-
-  /* The trend needs room to read; best sellers is a list and does not. */
   &__split {
     display: grid;
-    grid-template-columns: minmax(0, 1.65fr) minmax(0, 1fr);
-    gap: 1.25rem;
+    grid-template-columns: minmax(0, 1.65fr) minmax(21rem, 0.9fr);
+    gap: 0.9rem;
   }
 
-  @media (max-width: 68rem) {
-    &__split { grid-template-columns: minmax(0, 1fr); }
-  }
-
-  &__heading {
-    margin: 0;
-    font-size: 1.5rem;
-    font-weight: 600;
-  }
-
-  &__stats {
+  &__lower {
     display: grid;
-    grid-template-columns: repeat(auto-fit, minmax(11rem, 1fr));
-    gap: 1px;
-    background: var(--admin-edge, var(--theme-elevation-100));
-    border: 1px solid var(--admin-edge, var(--theme-elevation-100));
-    border-radius: var(--admin-radius-panel, 10px);
-    overflow: hidden;
-  }
-
-  &__stat {
-    display: flex;
-    flex-direction: column;
-    gap: 0.35rem;
-    padding: 1.1rem 1.25rem;
-    background: var(--admin-panel, var(--theme-elevation-0));
-  }
-
-  &__stat-label {
-    font-size: 1rem;
-    letter-spacing: 0.04em;
-    text-transform: uppercase;
-    color: var(--theme-elevation-500);
-  }
-
-  &__stat-value {
-    font-size: 1.9rem;
-    line-height: 1.05;
-    font-weight: 600;
-    font-variant-numeric: tabular-nums;
-  }
-
-  &__stat-hint {
-    font-size: 0.925rem;
-    color: var(--theme-elevation-450);
-  }
-
-  /**
-   * No accent rail. A coloured bar down one edge is decoration standing in for
-   * hierarchy, and a radius curving a 3px bar reads as broken. This is the same
-   * panel as everything else, set apart by its surface and the weight of the
-   * opening line.
-   */
-  &__notice {
-    display: flex;
-    flex-direction: column;
-    gap: 0.5rem;
-    padding: 1rem 1.15rem;
-    border: 1px solid var(--theme-elevation-150);
-    border-radius: var(--admin-radius-panel, 10px);
-    background: var(--admin-panel-muted, var(--theme-elevation-50));
-
-    p {
-      margin: 0;
-      max-width: 68ch;
-      color: var(--theme-elevation-650);
-    }
-  }
-
-  &__columns {
-    display: grid;
-    grid-template-columns: repeat(auto-fit, minmax(17rem, 1fr));
-    gap: 1.25rem;
+    grid-template-columns: minmax(31rem, 1.7fr) minmax(15rem, 0.78fr) minmax(16rem, 0.82fr);
+    gap: 0.9rem;
+    align-items: stretch;
   }
 
   &__panel {
     border: 1px solid var(--admin-edge, var(--theme-elevation-100));
-    border-radius: var(--admin-radius-panel, 10px);
+    border-radius: var(--admin-radius-panel, 12px);
     padding: 1.15rem 1.25rem;
     background: var(--admin-panel, var(--theme-elevation-0));
   }
 
   &__panel-heading {
-    margin: 0 0 0.85rem;
-    font-size: 1.08rem;
-    font-weight: 600;
-    display: flex;
-    align-items: center;
-    gap: 0.5rem;
+    display: flex; align-items: center; gap: 0.5rem;
+    margin: 0 0 0.7rem; font-size: 1.08rem; font-weight: 650;
   }
-
-  &__panel-icon { color: var(--theme-elevation-500); flex: 0 0 auto; }
-
-  &__panel-note {
-    font-size: 0.925rem;
-    font-weight: 400;
-    color: var(--theme-elevation-450);
-  }
-
-  &__rows {
-    margin: 0;
-    display: flex;
-    flex-direction: column;
-  }
-
+  &__panel-icon { width: 1rem; height: 1rem; color: var(--theme-elevation-500); }
+  &__panel-note { color: var(--theme-elevation-450); font-size: 0.84rem; font-weight: 400; }
+  &__rows { display: flex; flex-direction: column; margin: 0; }
   &__row {
-    display: flex;
-    align-items: baseline;
-    justify-content: space-between;
-    gap: 1rem;
-    padding: 0.5rem 0;
-    border-bottom: 1px solid var(--theme-elevation-100);
-
-    &:last-child {
-      border-bottom: 0;
-      padding-bottom: 0;
-    }
-
-    dt {
-      color: var(--theme-elevation-650);
-      min-width: 0;
-      overflow-wrap: anywhere;
-    }
-
-    dd {
-      margin: 0;
-      font-variant-numeric: tabular-nums;
-      font-weight: 600;
-      white-space: nowrap;
-    }
+    display: flex; align-items: center; justify-content: space-between; gap: 0.75rem;
+    min-height: 3.35rem; border-bottom: 1px solid var(--admin-edge);
+    &:last-child { border-bottom: 0; }
+    dt { display: flex; min-width: 0; align-items: center; gap: 0.65rem; color: var(--theme-elevation-750); }
+    dt img, .store-overview__row-image { width: 2.25rem; height: 2.25rem; flex: 0 0 auto; border-radius: 7px; object-fit: cover; background: var(--admin-panel-muted); }
+    dt span:last-child { min-width: 0; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+    dd { margin: 0; color: #b47500; font-size: 0.9rem; font-weight: 650; font-variant-numeric: tabular-nums; white-space: nowrap; }
   }
+  &__out { color: #c93c35 !important; }
+  &__empty { margin: 0; color: var(--theme-elevation-450); }
+}
+@media (max-width: 82rem) {
+  .store-overview__lower { grid-template-columns: minmax(0, 1.4fr) minmax(16rem, 0.7fr); }
+  .store-overview__lower .store-overview__panel { grid-column: 1 / -1; }
+}
 
-  &__out {
-    color: var(--theme-error-500, #a3231e);
-  }
+@media (max-width: 68rem) {
+  .store-overview__topline { align-items: flex-start; flex-direction: column; }
+  .store-overview__split, .store-overview__lower { grid-template-columns: minmax(0, 1fr); }
+  .store-overview__lower .store-overview__panel { grid-column: auto; }
+}
 
-  &__empty {
-    margin: 0;
-    color: var(--theme-elevation-450);
-  }
+@media (max-width: 42rem) {
+  .store-overview { gap: 0.85rem; }
+  .store-overview__topline { gap: 1rem; }
 }

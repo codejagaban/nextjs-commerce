@@ -1,6 +1,7 @@
 import config from '@payload-config'
 import { getPayload } from 'payload'
 import React from 'react'
+import Image from 'next/image'
 
 import { AnalyticsControls } from '../AnalyticsControls'
 import { AttentionQueue } from '../AttentionQueue'
@@ -11,6 +12,7 @@ import { PopularProducts, type PopularProduct } from '../PopularProducts'
 import { RecentOrders } from '../RecentOrders'
 import { RevenueTrend } from '../RevenueTrend'
 import { DEFAULT_CURRENCY_CODE } from '@/currencies'
+import type { Media, Product } from '@/payload-types'
 import {
   addCalendarDays,
   dateTimeInZone,
@@ -32,7 +34,7 @@ const money = (minor: number, currency: string) =>
 const change = (now: number, before: number) =>
   before > 0 ? ((now - before) / before) * 100 : undefined
 
-type StockRow = { title: string; qty: number }
+type StockRow = { alt?: string; image?: string; title: string; qty: number }
 
 type DashboardFilters = {
   comparison?: string
@@ -79,17 +81,31 @@ async function getOverview(filters: DashboardFilters) {
   const popularProducts = popularIDs.length
     ? await payload.find({
         collection: 'products',
-        depth: 0,
+        depth: 1,
         limit: popularIDs.length,
         where: { id: { in: popularIDs } },
       })
     : { docs: [] }
-  const titleFor = new Map(
-    popularProducts.docs.map((product) => [product.id, String(product.title ?? 'Untitled')]),
-  )
+  const mediaFor = (product: Product) => {
+    const media = product.gallery?.[0]?.image
+    return typeof media === 'object' ? (media as Media) : undefined
+  }
+  const displayPrice = (product: Product) => {
+    const value = product[`priceIn${currency}` as keyof Product]
+    return typeof value === 'number' ? money(value, currency) : undefined
+  }
+  const productFor = new Map(popularProducts.docs.map((product) => [product.id, product]))
   const popular: PopularProduct[] = orderData.popular.flatMap((item) => {
-    const title = titleFor.get(item.productID)
-    return title ? [{ title, units: item.units }] : []
+    const product = productFor.get(item.productID)
+    if (!product) return []
+    const image = mediaFor(product)
+    return [{
+      alt: image?.alt,
+      image: image?.sizes?.thumbnail?.url || image?.thumbnailURL || image?.url || undefined,
+      price: displayPrice(product),
+      title: String(product.title ?? 'Untitled'),
+      units: item.units,
+    }]
   })
 
   /**
@@ -100,7 +116,7 @@ async function getOverview(filters: DashboardFilters) {
   const [simple, variants] = await Promise.all([
     payload.find({
       collection: 'products',
-      depth: 0,
+      depth: 1,
       limit: 100,
       where: {
         and: [{ enableVariants: { not_equals: true } }, { inventory: { less_than: LOW_STOCK_AT } }],
@@ -114,11 +130,25 @@ async function getOverview(filters: DashboardFilters) {
     }),
   ])
   const lowStock: StockRow[] = [
-    ...simple.docs.map((p) => ({
-      title: String(p.title ?? 'Untitled'),
-      qty: Number(p.inventory ?? 0),
-    })),
+    ...simple.docs.map((p) => {
+      const image = mediaFor(p)
+      return {
+        alt: image?.alt,
+        image: image?.sizes?.thumbnail?.url || image?.thumbnailURL || image?.url || undefined,
+        title: String(p.title ?? 'Untitled'),
+        qty: Number(p.inventory ?? 0),
+      }
+    }),
     ...variants.docs.map((v) => ({
+      ...(typeof v.product === 'object' && v.product
+        ? (() => {
+            const image = mediaFor(v.product)
+            return {
+              alt: image?.alt,
+              image: image?.sizes?.thumbnail?.url || image?.thumbnailURL || image?.url || undefined,
+            }
+          })()
+        : {}),
       title: String((typeof v.product === 'object' && v.product?.title) || v.title || 'Variant'),
       qty: Number(v.inventory ?? 0),
     })),
@@ -210,47 +240,28 @@ export const Dashboard: React.FC<{
 
   return (
     <section className={baseClass}>
-      <header className={`${baseClass}__greeting`}>
-        <h2 className={`${baseClass}__hello`}>Hey{name ? `, ${name}` : ' there'}</h2>
-        <p className={`${baseClass}__date`}>
-          {new Date().toLocaleDateString('en-US', {
-            weekday: 'long',
-            day: 'numeric',
-            month: 'long',
-            year: 'numeric',
-            timeZone: s.timeZone,
-          })}
-        </p>
-      </header>
+      <div className={`${baseClass}__topline`}>
+        <header className={`${baseClass}__greeting`}>
+          <h2 className={`${baseClass}__hello`}>Good morning{name ? `, ${name}` : ''}</h2>
+          <p className={`${baseClass}__date`}>Here’s what’s happening with your store today.</p>
+        </header>
 
-      <AnalyticsControls
-        adminPath={adminPath}
-        comparison={s.window.comparison}
-        endDate={s.window.endDate}
-        maxDate={s.window.todayDate}
-        range={s.window.range}
-        startDate={s.window.startDate}
-      />
+        <AnalyticsControls
+          adminPath={adminPath}
+          comparison={s.window.comparison}
+          endDate={s.window.endDate}
+          maxDate={s.window.todayDate}
+          range={s.window.range}
+          startDate={s.window.startDate}
+        />
+      </div>
 
       <KpiStrip items={kpis} />
 
       <AttentionQueue adminPath={adminPath} counts={s.attention} />
 
-      <RecentOrders adminPath={adminPath} orders={s.recentOrders} timeZone={s.timeZone} />
-
       <div className={`${baseClass}__split`}>
         <RevenueTrend
-          breakdown={[
-            { label: 'Gross sales', value: money(s.grossSales, s.currency) },
-            { label: 'Discounts', value: money(s.discounts, s.currency) },
-            { label: 'Product returns', value: money(s.productRefunds, s.currency) },
-            {
-              label: 'Net shipping',
-              value: money(s.shipping - s.shippingRefunds, s.currency),
-            },
-            { label: 'Net tax', value: money(s.taxes - s.taxRefunds, s.currency) },
-            { label: 'Total sales', value: money(s.totalSales, s.currency) },
-          ]}
           comparisonLabel={s.window.comparisonLabel}
           current={{ label: s.window.rangeLabel, points: s.currentDaily }}
           currency={s.currency}
@@ -258,13 +269,14 @@ export const Dashboard: React.FC<{
           delta={s.revenueChange}
           endLabel={dayLabel(new Date(s.window.end.getTime() - 1), s.timeZone)}
           startLabel={dayLabel(s.window.start, s.timeZone)}
-          title="Net sales"
+          title="Revenue"
           total={money(s.currentRevenue, s.currency)}
         />
         <PopularProducts data={s.popular} />
       </div>
 
-      <div className={`${baseClass}__columns`}>
+      <div className={`${baseClass}__lower`}>
+        <RecentOrders adminPath={adminPath} orders={s.recentOrders} timeZone={s.timeZone} />
         <OrderHealth counts={s.statusCounts} />
 
         <div className={`${baseClass}__panel`}>
@@ -278,7 +290,14 @@ export const Dashboard: React.FC<{
             <dl className={`${baseClass}__rows`}>
               {s.lowStock.slice(0, 6).map((row, i) => (
                 <div className={`${baseClass}__row`} key={`${row.title}-${i}`}>
-                  <dt>{row.title}</dt>
+                  <dt>
+                    {row.image ? (
+                      <Image alt={row.alt || ''} height={40} src={row.image} width={40} />
+                    ) : (
+                      <span aria-hidden="true" className={`${baseClass}__row-image`} />
+                    )}
+                    <span>{row.title}</span>
+                  </dt>
                   <dd className={row.qty === 0 ? `${baseClass}__out` : undefined}>
                     {row.qty === 0 ? 'Out of stock' : `${row.qty} left`}
                   </dd>

@@ -24,10 +24,10 @@ export const KpiStrip: React.FC<{ items: Kpi[] }> = ({ items }) => (
       const dir = k.delta === undefined ? null : k.delta > 0 ? 'up' : k.delta < 0 ? 'down' : 'flat'
       return (
         <div className="kpi-strip__item" key={k.label}>
-          <span className="kpi-strip__label">
+          <div className="kpi-strip__heading">
             {k.Icon && <k.Icon className="kpi-strip__icon" />}
-            {k.label}
-          </span>
+            <span className="kpi-strip__label">{k.label}</span>
+          </div>
           <div className="kpi-strip__figure">
             <span className="kpi-strip__value">{k.value}</span>
             {dir && (

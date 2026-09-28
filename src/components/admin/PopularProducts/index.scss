@@ -1,105 +1,21 @@
-/**
- * Best sellers.
- *
- * Hues are the validated bright set — orange, violet, green, sky, pink — which
- * clears colour-blind separation in both themes. Only the orange changes between
- * light and dark; the rest hold their step.
- *
- * The hatched strip under each bar is the full scale the bar is measured against,
- * so a short bar still reads as a share of the same whole.
- */
-
 .popular {
-  --c1: #f97316;
-  --c2: #7c3aed;
-  --c3: #16a34a;
-  --c4: #0284c7;
-  --c5: #db2777;
-
   border: 1px solid var(--admin-edge, var(--theme-elevation-100));
-  border-radius: var(--admin-radius-panel, 10px);
-  padding: 1.4rem 1.5rem 1.25rem;
+  border-radius: var(--admin-radius-panel, 12px); padding: 1.25rem 1.35rem;
   background: var(--admin-panel, var(--theme-elevation-0));
 
-  &__title {
-    margin: 0 0 1.15rem;
-    font-size: 1.08rem;
-    font-weight: 600;
-    display: flex;
-    align-items: center;
-    gap: 0.5rem;
+  &__title { display: flex; align-items: center; gap: 0.55rem; margin: 0 0 0.85rem; font-size: 1.08rem; font-weight: 650; }
+  &__icon { width: 1rem; height: 1rem; color: var(--theme-elevation-500); }
+  &__list { display: flex; flex-direction: column; margin: 0; padding: 0; list-style: none; }
+  &__row {
+    display: grid; grid-template-columns: 1rem 2.65rem minmax(0, 1fr) auto auto;
+    align-items: center; gap: 0.75rem; min-height: 3.55rem; border-bottom: 1px solid var(--admin-edge);
+    &:last-child { border-bottom: 0; }
   }
-
-  &__icon { color: var(--theme-elevation-500); flex: 0 0 auto; }
-
-  &__list {
-    margin: 0;
-    padding: 0;
-    list-style: none;
-    display: flex;
-    flex-direction: column;
-    gap: 1.05rem;
-  }
-
-  &__label {
-    display: flex;
-    align-items: baseline;
-    justify-content: space-between;
-    gap: 1rem;
-    margin-bottom: 0.4rem;
-  }
-
-  &__name { font-size: 1rem; min-width: 0; overflow-wrap: anywhere; }
-
-  &__units {
-    font-size: 0.925rem;
-    color: var(--theme-elevation-500);
-    font-variant-numeric: tabular-nums;
-    white-space: nowrap;
-  }
-
-  /* Hatched remainder: the rest of the scale, shown rather than implied. */
-  &__track {
-    position: relative;
-    height: 9px;
-    border-radius: 5px;
-    background-image: repeating-linear-gradient(
-      -45deg,
-      var(--theme-elevation-100) 0 3px,
-      transparent 3px 6px
-    );
-    background-color: var(--theme-elevation-50);
-    overflow: hidden;
-  }
-
-  &__bar {
-    height: 100%;
-    border-radius: 5px;
-    background: var(--theme-elevation-400);
-  }
-
-  &__row--1 .popular__bar { background: var(--c1); }
-  &__row--2 .popular__bar { background: var(--c2); }
-  &__row--3 .popular__bar { background: var(--c3); }
-  &__row--4 .popular__bar { background: var(--c4); }
-  &__row--5 .popular__bar { background: var(--c5); }
-
-  &__axis {
-    display: flex;
-    justify-content: space-between;
-    margin-top: 0.9rem;
-    padding-top: 0.6rem;
-    border-top: 1px solid var(--theme-elevation-100);
-    font-size: 0.85rem;
-    color: var(--theme-elevation-450);
-    font-variant-numeric: tabular-nums;
-  }
-
+  &__rank { color: var(--theme-elevation-450); font-size: 0.9rem; text-align: center; }
+  &__image { width: 2.65rem; height: 2.65rem; object-fit: cover; border-radius: 8px; background: var(--admin-panel-muted); }
+  &__image--empty { display: block; }
+  &__name { min-width: 0; overflow: hidden; color: var(--theme-elevation-900); font-size: 0.95rem; font-weight: 550; text-overflow: ellipsis; white-space: nowrap; }
+  &__units { color: var(--theme-elevation-500); font-size: 0.86rem; font-variant-numeric: tabular-nums; white-space: nowrap; }
+  &__price { min-width: 4.5rem; color: var(--theme-elevation-850); font-size: 0.93rem; font-weight: 600; text-align: right; font-variant-numeric: tabular-nums; }
   &__empty { margin: 0; color: var(--theme-elevation-450); }
 }
-
-@media (prefers-color-scheme: dark) {
-  :root:where(:not([data-theme='light'])) .popular { --c1: #ea580c; }
-}
-
-:root[data-theme='dark'] .popular { --c1: #ea580c; }
