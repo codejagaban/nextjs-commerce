@@ -44,12 +44,18 @@
 }
 
 @media (min-width: 1025px) {
-  .template-default--nav-open {
-    grid-template-columns: 238px minmax(0, 1fr) !important;
+  .template-default--nav-open,
+  .template-default:not(.template-default--nav-open) {
+    grid-template-columns: 248px minmax(0, 1fr) !important;
   }
 
-  .template-default:not(.template-default--nav-open) {
-    grid-template-columns: 0 minmax(0, 1fr) !important;
+  .template-default .nav {
+    display: block !important;
+    width: 248px !important;
+    min-width: 248px !important;
+    opacity: 1 !important;
+    transform: none !important;
+    visibility: visible !important;
   }
 }
 
@@ -61,7 +67,16 @@
   border-radius: var(--admin-radius-shell);
   background: var(--admin-canvas);
   box-shadow: 0 8px 20px rgb(28 30 26 / 0.08);
-  --gutter-h: clamp(1.25rem, 3vw, 3rem);
+  --gutter-h: clamp(1.5rem, 2.4vw, 2.75rem);
+}
+
+/* The dashboard is the admin home, so its content starts where the reference starts. */
+.template-default__wrap:has(.store-overview) .app-header {
+  display: none;
+}
+
+.template-default__wrap:has(.store-overview) > .gutter {
+  padding-top: 2rem;
 }
 
 :root[data-theme='dark'] .template-default__wrap {
@@ -82,7 +97,7 @@
   position: absolute;
   z-index: 2;
   top: 1.05rem;
-  left: 4.1rem;
+  left: 1.5rem;
   color: #fff;
   content: 'Marisol';
   font-family: Georgia, 'Times New Roman', serif;
@@ -95,7 +110,7 @@
   position: absolute;
   z-index: 2;
   top: 2.65rem;
-  left: 4.1rem;
+  left: 1.5rem;
   color: var(--admin-sidebar-muted);
   content: 'Ecommerce';
   font-size: 0.72rem;
@@ -103,9 +118,40 @@
 }
 
 .template-default .nav__scroll {
-  padding: 4.8rem 0.75rem 1rem;
+  padding: 4.8rem 0.75rem 5rem;
   scrollbar-width: thin;
   scrollbar-color: rgb(255 255 255 / 0.18) transparent;
+}
+
+.template-default .admin-nav-search {
+  margin-bottom: 0.6rem;
+
+  a {
+    display: grid;
+    min-height: 2.55rem;
+    grid-template-columns: 1.1rem minmax(0, 1fr) auto;
+    align-items: center;
+    gap: 0.65rem;
+    padding: 0.5rem 0.7rem;
+    border-radius: var(--admin-radius-control);
+    color: var(--admin-sidebar-text);
+    background: rgb(255 255 255 / 0.055);
+    text-decoration: none;
+    transition: background-color 140ms ease;
+  }
+
+  a:hover { background: rgb(255 255 255 / 0.1); }
+  a:focus-visible { outline: 2px solid rgb(255 255 255 / 0.8); outline-offset: 2px; }
+  svg { width: 1.05rem; height: 1.05rem; stroke: currentColor; stroke-width: 1.7; }
+  kbd {
+    padding: 0.15rem 0.35rem;
+    border: 0;
+    border-radius: 5px;
+    color: var(--admin-sidebar-muted);
+    background: rgb(255 255 255 / 0.07);
+    font: inherit;
+    font-size: 0.68rem;
+  }
 }
 
 .template-default .nav__wrap {
@@ -176,9 +222,7 @@
 }
 
 .template-default__nav-toggler-wrapper {
-  top: 1rem;
-  left: 1rem;
-  z-index: 4;
+  display: none;
 }
 
 .template-default__nav-toggler {
@@ -186,6 +230,15 @@
   border: 1px solid rgb(255 255 255 / 0.14);
   border-radius: var(--admin-radius-control);
   background: rgb(255 255 255 / 0.06);
+}
+
+.template-default__nav-toggler .hamburger {
+  color: var(--admin-sidebar-text);
+  background: transparent;
+}
+
+.template-default__nav-toggler .stroke {
+  stroke: currentColor;
 }
 
 .template-default__nav-toggler:hover {
@@ -680,6 +733,15 @@
     top: 0;
     height: 100vh;
     border-radius: 0 var(--admin-radius-shell) var(--admin-radius-shell) 0;
+  }
+
+  .template-default__nav-toggler-wrapper {
+    display: block;
+    position: fixed;
+    top: 1rem;
+    right: auto;
+    left: 1rem;
+    z-index: 4;
   }
 }
 

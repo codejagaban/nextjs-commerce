@@ -5,7 +5,7 @@ import Image from 'next/image'
 
 import { AnalyticsControls } from '../AnalyticsControls'
 import { AttentionQueue } from '../AttentionQueue'
-import { IconAverage, IconOrders, IconProducts, IconRevenue, IconStock } from '../icons'
+import { IconAverage, IconCustomers, IconOrders, IconRevenue, IconStock } from '../icons'
 import { KpiStrip, type Kpi } from '../KpiStrip'
 import { OrderHealth } from '../OrderHealth'
 import { PopularProducts, type PopularProduct } from '../PopularProducts'
@@ -211,30 +211,30 @@ export const Dashboard: React.FC<{
   const kpis: Kpi[] = [
     {
       Icon: IconRevenue,
-      label: 'Net sales',
+      label: 'Total revenue',
       value: money(s.currentRevenue, s.currency),
       delta: s.revenueChange,
       compare: s.window.comparisonLabel,
     },
     {
       Icon: IconOrders,
-      label: 'Orders',
+      label: 'Total orders',
       value: s.currentOrders.toLocaleString('en-US'),
       delta: s.ordersChange,
       compare: s.window.comparisonLabel,
     },
     {
+      Icon: IconCustomers,
+      label: 'Total customers',
+      value: s.customers.toLocaleString('en-US'),
+      compare: `${s.products} products live`,
+    },
+    {
       Icon: IconAverage,
-      label: 'Average order',
+      label: 'Average order value',
       value: money(s.currentAov, s.currency),
       delta: s.aovChange,
       compare: s.window.comparisonLabel,
-    },
-    {
-      Icon: IconProducts,
-      label: 'Products live',
-      value: String(s.products),
-      compare: `${s.customers} customers`,
     },
   ]
 

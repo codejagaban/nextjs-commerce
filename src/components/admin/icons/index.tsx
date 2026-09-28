@@ -63,6 +63,41 @@ export const IconProducts: React.FC<Props> = (p) => (
   </Icon>
 )
 
+/** Customers — two people, kept open and legible at dashboard scale. */
+export const IconCustomers: React.FC<Props> = (p) => (
+  <Icon {...p}>
+    <circle cx="9" cy="8" r="3.2" stroke="currentColor" />
+    <path d="M3.8 19.5c0-3.4 2.2-5.6 5.2-5.6s5.2 2.2 5.2 5.6" stroke="currentColor" />
+    <path d="M15.1 5.4a3.1 3.1 0 0 1 0 5.8M16 14c2.6.3 4.2 2.3 4.2 5.2" stroke="currentColor" />
+  </Icon>
+)
+
+/** Fulfilment — a parcel ready to leave the store. */
+export const IconFulfilment: React.FC<Props> = (p) => (
+  <Icon {...p}>
+    <path d="M4 8.2 12 4l8 4.2-8 4.2zM4 8.2v8.2l8 4.2 8-4.2V8.2M12 12.4v8.2" stroke="currentColor" />
+    <path d="m8.2 10.4 7.9-4.2" stroke="currentColor" />
+  </Icon>
+)
+
+/** Payment warning — a card with an interrupted payment mark. */
+export const IconPaymentWarning: React.FC<Props> = (p) => (
+  <Icon {...p}>
+    <rect height="13.5" rx="2" stroke="currentColor" width="18" x="3" y="5.2" />
+    <path d="M3 9.6h18M12 13v2.4M12 17.5v.1" stroke="currentColor" />
+  </Icon>
+)
+
+/** Incomplete checkout — a cart waiting for action. */
+export const IconCheckout: React.FC<Props> = (p) => (
+  <Icon {...p}>
+    <path d="M3 4h2.3l2.4 10.2h9.4l2.1-7.4H6.1" stroke="currentColor" />
+    <circle cx="9.2" cy="19" r="1.3" stroke="currentColor" />
+    <circle cx="16.5" cy="19" r="1.3" stroke="currentColor" />
+    <path d="M14 10.5h3.4" stroke="currentColor" />
+  </Icon>
+)
+
 /** Trend — a rising line. */
 export const IconTrend: React.FC<Props> = (p) => (
   <Icon {...p}>

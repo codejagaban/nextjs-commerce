@@ -2,7 +2,13 @@ import Link from 'next/link'
 import React from 'react'
 
 import type { AttentionCounts } from '../Dashboard/queries'
-import { IconAttention } from '../icons'
+import {
+  IconAttention,
+  IconCheckout,
+  IconFulfilment,
+  IconPaymentWarning,
+  IconStock,
+} from '../icons'
 
 import './index.scss'
 
@@ -31,7 +37,9 @@ export const AttentionQueue: React.FC<Props> = ({ adminPath, counts }) => {
       href: filteredHref(adminPath, 'orders', [
         { field: 'status', operator: 'equals', value: 'processing' },
       ]),
+      Icon: IconFulfilment,
       label: 'Orders to process',
+      tone: 'danger',
     },
     {
       count: counts.failedPayments,
@@ -39,6 +47,7 @@ export const AttentionQueue: React.FC<Props> = ({ adminPath, counts }) => {
       href: filteredHref(adminPath, 'transactions', [
         { field: 'status', operator: 'equals', value: 'failed' },
       ]),
+      Icon: IconPaymentWarning,
       label: 'Failed payments',
       tone: 'urgent',
     },
@@ -48,7 +57,9 @@ export const AttentionQueue: React.FC<Props> = ({ adminPath, counts }) => {
       href: filteredHref(adminPath, 'transactions', [
         { field: 'status', operator: 'equals', value: 'pending' },
       ]),
+      Icon: IconPaymentWarning,
       label: 'Stalled payments',
+      tone: 'warning',
     },
     {
       count: counts.incompleteCheckouts,
@@ -56,7 +67,9 @@ export const AttentionQueue: React.FC<Props> = ({ adminPath, counts }) => {
       href: filteredHref(adminPath, 'carts', [
         { field: 'purchasedAt', operator: 'exists', value: 'false' },
       ]),
+      Icon: IconCheckout,
       label: 'Incomplete checkouts',
+      tone: 'neutral',
     },
     {
       count: counts.outOfStockProducts,
@@ -66,7 +79,9 @@ export const AttentionQueue: React.FC<Props> = ({ adminPath, counts }) => {
         { field: 'inventory', operator: 'less_than_equal', value: '0' },
         { field: '_status', operator: 'equals', value: 'published' },
       ]),
+      Icon: IconStock,
       label: 'Products out of stock',
+      tone: 'warning',
     },
     {
       count: counts.outOfStockVariants,
@@ -75,7 +90,9 @@ export const AttentionQueue: React.FC<Props> = ({ adminPath, counts }) => {
         { field: 'inventory', operator: 'less_than_equal', value: '0' },
         { field: '_status', operator: 'equals', value: 'published' },
       ]),
+      Icon: IconStock,
       label: 'Variants out of stock',
+      tone: 'warning',
     },
   ].filter((item) => item.count > 0).slice(0, 3)
   const total = items.reduce((sum, item) => sum + item.count, 0)
@@ -86,6 +103,7 @@ export const AttentionQueue: React.FC<Props> = ({ adminPath, counts }) => {
         <h3>
           <IconAttention className="attention-queue__icon" />
           Needs attention
+          <span className="attention-queue__badge">{items.length}</span>
         </h3>
         {total > 0 && <span>{total} open</span>}
       </header>
@@ -102,6 +120,9 @@ export const AttentionQueue: React.FC<Props> = ({ adminPath, counts }) => {
               href={item.href}
               key={item.label}
             >
+              <span className={`attention-queue__item-icon attention-queue__item-icon--${item.tone || 'neutral'}`}>
+                <item.Icon />
+              </span>
               <span className="attention-queue__copy">
                 <strong>{item.label}</strong>
                 <span>{item.detail}</span>

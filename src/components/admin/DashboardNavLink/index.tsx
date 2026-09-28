@@ -17,14 +17,26 @@ export const DashboardNavLink: React.FC = () => {
   const isActive = pathname === '/admin'
 
   return (
-    <div className="nav__group">
-      <Link
-        className={`nav__link${isActive ? ' active' : ''}`}
-        href="/admin"
-        id="nav-dashboard"
-      >
-        <span className="nav__link-label">Dashboard</span>
-      </Link>
-    </div>
+    <>
+      <div className="admin-nav-search">
+        <Link href="/admin/collections/products?limit=10">
+          <svg aria-hidden="true" fill="none" viewBox="0 0 24 24">
+            <circle cx="10.8" cy="10.8" r="6.3" />
+            <path d="m15.5 15.5 4.2 4.2" />
+          </svg>
+          <span>Search</span>
+          <kbd>⌘ K</kbd>
+        </Link>
+      </div>
+      <div className="nav__group">
+        <Link
+          className={`nav__link${isActive ? ' active' : ''}`}
+          href="/admin"
+          id="nav-dashboard"
+        >
+          <span className="nav__link-label">Dashboard</span>
+        </Link>
+      </div>
+    </>
   )
 }

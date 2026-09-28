@@ -1,25 +1,25 @@
 .store-overview {
   display: flex;
   flex-direction: column;
-  gap: 1.15rem;
-  max-width: 94rem;
-  margin: 0 auto 2.5rem;
+  width: 100%;
+  gap: 1rem;
+  margin: 0 0 2.5rem;
 
   &__topline {
     display: flex;
     align-items: flex-end;
     justify-content: space-between;
     gap: 1.5rem;
-    padding: 0.3rem 0 0.25rem;
+    padding: 0 0 0.25rem;
   }
 
   &__greeting { display: flex; flex-direction: column; gap: 0.22rem; }
-  &__hello { margin: 0; color: var(--theme-elevation-950); font-size: clamp(1.7rem, 2.5vw, 2.15rem); font-weight: 680; letter-spacing: -0.03em; }
+  &__hello { margin: 0; color: var(--theme-elevation-950); font-size: clamp(2rem, 2.5vw, 2.55rem); font-weight: 700; letter-spacing: -0.04em; }
   &__date { margin: 0; color: var(--theme-elevation-500); font-size: 0.98rem; }
 
   &__split {
     display: grid;
-    grid-template-columns: minmax(0, 1.65fr) minmax(21rem, 0.9fr);
+    grid-template-columns: minmax(0, 1.55fr) minmax(22rem, 0.82fr);
     gap: 0.9rem;
   }
 
