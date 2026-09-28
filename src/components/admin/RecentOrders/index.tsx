@@ -66,7 +66,9 @@ export const RecentOrders: React.FC<Props> = ({ adminPath, orders, timeZone }) =
             >
               {words(order.paymentStatus)}
             </span>
-            <span className="recent-orders__status recent-orders__status--fulfilment">
+            <span
+              className={`recent-orders__status recent-orders__status--fulfilment recent-orders__status--${order.fulfillmentStatus}`}
+            >
               {fulfillmentLabel(order.fulfillmentStatus)}
             </span>
             <time dateTime={order.createdAt}>

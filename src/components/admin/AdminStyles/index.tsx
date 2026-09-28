@@ -1,4 +1,8 @@
+'use client'
+
 import React from 'react'
+
+import { AdminNavigationProgress } from '../AdminNavigationProgress'
 
 import './nav-icons.scss'
 import './fields.scss'
@@ -12,5 +16,5 @@ import './media-grid.scss'
  * sheet loads on every admin screen, including login.
  */
 export const AdminStyles: React.FC<{ children?: React.ReactNode }> = ({ children }) => {
-  return <>{children}</>
+  return <AdminNavigationProgress>{children}</AdminNavigationProgress>
 }

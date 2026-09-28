@@ -18,7 +18,7 @@
   }
 
   &__label {
-    font-size: 0.85rem;
+    font-size: 1rem;
     color: var(--theme-elevation-500);
     display: flex;
     align-items: center;
@@ -38,7 +38,7 @@
   }
 
   &__value {
-    font-size: 1.7rem;
+    font-size: 2rem;
     font-weight: 600;
     line-height: 1.05;
     font-variant-numeric: tabular-nums;
@@ -46,7 +46,7 @@
   }
 
   &__delta {
-    font-size: 0.85rem;
+    font-size: 0.95rem;
     font-weight: 600;
     font-variant-numeric: tabular-nums;
     display: inline-flex;
@@ -59,7 +59,7 @@
   }
 
   &__compare {
-    font-size: 0.8rem;
+    font-size: 0.925rem;
     color: var(--theme-elevation-450);
     margin-top: -0.15rem;
   }
