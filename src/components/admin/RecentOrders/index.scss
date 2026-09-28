@@ -1,8 +1,8 @@
 .recent-orders {
   padding: 1.15rem 1.25rem;
-  border: 1px solid var(--theme-elevation-100);
-  border-radius: var(--style-radius-s, 3px);
-  background: var(--theme-elevation-0);
+  border: 1px solid var(--admin-edge, var(--theme-elevation-100));
+  border-radius: var(--admin-radius-panel, 10px);
+  background: var(--admin-panel, var(--theme-elevation-0));
 
   &__head {
     display: flex;
@@ -64,7 +64,7 @@
     transition: background-color 120ms ease;
 
     &:nth-child(even) {
-      background: var(--theme-elevation-50);
+      background: var(--admin-panel-muted, var(--theme-elevation-50));
     }
 
     &:hover {

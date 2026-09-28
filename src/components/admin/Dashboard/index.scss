@@ -54,9 +54,9 @@
     display: grid;
     grid-template-columns: repeat(auto-fit, minmax(11rem, 1fr));
     gap: 1px;
-    background: var(--theme-elevation-100);
-    border: 1px solid var(--theme-elevation-100);
-    border-radius: 10px;
+    background: var(--admin-edge, var(--theme-elevation-100));
+    border: 1px solid var(--admin-edge, var(--theme-elevation-100));
+    border-radius: var(--admin-radius-panel, 10px);
     overflow: hidden;
   }
 
@@ -65,7 +65,7 @@
     flex-direction: column;
     gap: 0.35rem;
     padding: 1.1rem 1.25rem;
-    background: var(--theme-elevation-0);
+    background: var(--admin-panel, var(--theme-elevation-0));
   }
 
   &__stat-label {
@@ -99,8 +99,8 @@
     gap: 0.5rem;
     padding: 1rem 1.15rem;
     border: 1px solid var(--theme-elevation-150);
-    border-radius: 10px;
-    background: var(--theme-elevation-50);
+    border-radius: var(--admin-radius-panel, 10px);
+    background: var(--admin-panel-muted, var(--theme-elevation-50));
 
     p {
       margin: 0;
@@ -116,10 +116,10 @@
   }
 
   &__panel {
-    border: 1px solid var(--theme-elevation-100);
-    border-radius: 10px;
+    border: 1px solid var(--admin-edge, var(--theme-elevation-100));
+    border-radius: var(--admin-radius-panel, 10px);
     padding: 1.15rem 1.25rem;
-    background: var(--theme-elevation-0);
+    background: var(--admin-panel, var(--theme-elevation-0));
   }
 
   &__panel-heading {

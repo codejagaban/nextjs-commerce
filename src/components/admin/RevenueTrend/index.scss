@@ -9,10 +9,10 @@
   --current: #7c3aed;
 
   margin: 0;
-  border: 1px solid var(--theme-elevation-100);
-  border-radius: 10px;
+  border: 1px solid var(--admin-edge, var(--theme-elevation-100));
+  border-radius: var(--admin-radius-panel, 10px);
   padding: 1.4rem 1.5rem 1rem;
-  background: var(--theme-elevation-0);
+  background: var(--admin-panel, var(--theme-elevation-0));
 
   &__head {
     display: flex;
@@ -68,7 +68,7 @@
     margin: 1rem 0 0.55rem;
     padding: 0.7rem 0;
     border-radius: var(--style-radius-s, 3px);
-    background: var(--theme-elevation-50);
+    background: var(--admin-panel-muted, var(--theme-elevation-50));
 
     dt {
       margin: 0 0 0.25rem;

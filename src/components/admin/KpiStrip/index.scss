@@ -2,9 +2,9 @@
 .kpi-strip {
   display: grid;
   grid-template-columns: repeat(auto-fit, minmax(13rem, 1fr));
-  border: 1px solid var(--theme-elevation-100);
-  border-radius: 10px;
-  background: var(--theme-elevation-0);
+  border: 1px solid var(--admin-edge, var(--theme-elevation-100));
+  border-radius: var(--admin-radius-panel, 10px);
+  background: var(--admin-panel, var(--theme-elevation-0));
   overflow: hidden;
 
   &__item {
@@ -12,7 +12,7 @@
     flex-direction: column;
     gap: 0.55rem;
     padding: 1.3rem 1.5rem;
-    border-left: 1px solid var(--theme-elevation-100);
+    border-left: 1px solid var(--admin-edge, var(--theme-elevation-100));
 
     &:first-child { border-left: 0; }
   }
