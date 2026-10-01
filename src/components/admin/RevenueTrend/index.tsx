@@ -90,7 +90,7 @@ const exactMoney = (minor: number, currency: string) =>
  * and the choice is remembered.
  */
 type Mode = 'line' | 'bars'
-const STORAGE_KEY = 'marisol-admin:revenue-chart-mode:v2'
+const STORAGE_KEY = 'marisol-admin:revenue-chart-mode:v3'
 
 export const RevenueTrend: React.FC<Props> = ({
   breakdown,
@@ -104,7 +104,7 @@ export const RevenueTrend: React.FC<Props> = ({
   comparisonLabel = 'vs previous period',
   title = 'Total revenue',
 }) => {
-  const [mode, setMode] = React.useState<Mode>('bars')
+  const [mode, setMode] = React.useState<Mode>('line')
   const [hover, setHover] = React.useState<number | null>(null)
   const svgRef = React.useRef<SVGSVGElement | null>(null)
 
@@ -268,6 +268,20 @@ export const RevenueTrend: React.FC<Props> = ({
 
         {mode === 'line' ? (
           <>
+            {current.points.map((v, i) => {
+              const w = Math.min(34, Math.max(0.8, (plotW / n) * 0.54))
+              return (
+                <rect
+                  className="revenue-trend__bar revenue-trend__bar--context"
+                  height={Math.max(v > 0 ? 1.5 : 0, PAD.top + plotH - y(v))}
+                  key={i}
+                  rx={Math.min(2, w / 2)}
+                  width={w}
+                  x={x(i) - w / 2}
+                  y={y(v)}
+                />
+              )
+            })}
             <path className="revenue-trend__line revenue-trend__line--current" d={path(current.points)} />
             {lastIdx >= 0 && (
               <circle className="revenue-trend__endpoint" cx={x(lastIdx)} cy={y(current.points[lastIdx])} r={4.5} />

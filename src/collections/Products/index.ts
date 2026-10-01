@@ -1,7 +1,7 @@
 import { CallToAction } from '@/blocks/CallToAction/config'
 import { Content } from '@/blocks/Content/config'
 import { MediaBlock } from '@/blocks/MediaBlock/config'
-import { slugField } from 'payload'
+import { type Field, slugField } from 'payload'
 import { generatePreviewPath } from '@/utilities/generatePreviewPath'
 import { CollectionOverride } from '@payloadcms/plugin-ecommerce/types'
 import {
@@ -22,10 +22,29 @@ import { DefaultDocumentIDType, Where } from 'payload'
 
 import { priceSelect } from '@/currencies'
 
-export const ProductsCollection: CollectionOverride = ({ defaultCollection }) => ({
+const named = (field: Field, name: string) => 'name' in field && field.name === name
+
+export const ProductsCollection: CollectionOverride = ({ defaultCollection }) => {
+  const defaults = defaultCollection.fields
+  const inventory = defaults.find((field) => named(field, 'inventory'))
+  const variantFields = defaults.filter((field) =>
+    ['enableVariants', 'variantTypes', 'variants'].some((name) => named(field, name)),
+  )
+  const priceFields = defaults.filter((field) => field.type === 'group')
+  const slug = slugField()
+  const slugFields = slug.type === 'row' ? slug.fields : []
+
+  return ({
   ...defaultCollection,
   admin: {
     ...defaultCollection?.admin,
+    components: {
+      ...defaultCollection?.admin?.components,
+      edit: {
+        ...defaultCollection?.admin?.components?.edit,
+        PublishButton: '@/components/admin/ProductPublishButton#ProductPublishButton',
+      },
+    },
     defaultColumns: ['title', 'enableVariants', '_status', 'variants.variants'],
     livePreview: {
       url: ({ data, req }) =>
@@ -56,12 +75,31 @@ export const ProductsCollection: CollectionOverride = ({ defaultCollection }) =>
     meta: true,
   },
   fields: [
-    { name: 'title', type: 'text', required: true },
     {
-      type: 'tabs',
-      tabs: [
+      name: 'publishingSummary',
+      type: 'ui',
+      admin: {
+        components: { Field: '@/components/admin/ProductPublishing#ProductPublishing' },
+        position: 'sidebar',
+      },
+    },
+    {
+      type: 'collapsible',
+      label: 'Basic information',
+      admin: { className: 'product-editor__section product-editor__basic', initCollapsed: false },
+      fields: [
         {
+          type: 'row',
           fields: [
+            { name: 'title', type: 'text', required: true, admin: { width: '50%' } },
+            ...slugFields.map((field): Field => {
+              if ('name' in field && field.name === 'slug') {
+                return { ...field, admin: { ...field.admin, width: '50%' } } as Field
+              }
+              return field
+            }),
+          ],
+        },
             {
               name: 'description',
               type: 'richText',
@@ -79,6 +117,13 @@ export const ProductsCollection: CollectionOverride = ({ defaultCollection }) =>
               label: false,
               required: false,
             },
+      ],
+    },
+    {
+      type: 'collapsible',
+      label: 'Media',
+      admin: { className: 'product-editor__section product-editor__media', initCollapsed: false },
+      fields: [
             {
               name: 'gallery',
               type: 'array',
@@ -133,18 +178,24 @@ export const ProductsCollection: CollectionOverride = ({ defaultCollection }) =>
                 },
               ],
             },
-
+      ],
+    },
+    {
+      type: 'collapsible',
+      label: 'Variants',
+      admin: { className: 'product-editor__section product-editor__variants', initCollapsed: false },
+      fields: variantFields,
+    },
+    {
+      type: 'collapsible',
+      label: 'Additional content',
+      admin: { className: 'product-editor__section product-editor__additional', initCollapsed: true },
+      fields: [
             {
               name: 'layout',
               type: 'blocks',
               blocks: [CallToAction, Content, MediaBlock],
             },
-          ],
-          label: 'Content',
-        },
-        {
-          fields: [
-            ...defaultCollection.fields,
             {
               name: 'relatedProducts',
               type: 'relationship',
@@ -167,12 +218,17 @@ export const ProductsCollection: CollectionOverride = ({ defaultCollection }) =>
               hasMany: true,
               relationTo: 'products',
             },
-          ],
-          label: 'Product Details',
-        },
+      ],
+    },
+    {
+      type: 'collapsible',
+      label: 'Search preview',
+      admin: { className: 'product-editor__section product-editor__seo', initCollapsed: true },
+      fields: [
         {
           name: 'meta',
           label: 'SEO',
+          type: 'group',
           fields: [
             OverviewField({
               titlePath: 'meta.title',
@@ -200,25 +256,57 @@ export const ProductsCollection: CollectionOverride = ({ defaultCollection }) =>
       ],
     },
     {
-      name: 'categories',
-      type: 'relationship',
+      type: 'collapsible',
+      label: 'Product organization',
       admin: {
+        className: 'product-editor__sidebar-card product-editor__organization',
+        initCollapsed: false,
         position: 'sidebar',
-        sortOptions: 'title',
       },
-      hasMany: true,
-      relationTo: 'categories',
+      fields: [
+        {
+          name: 'categories',
+          type: 'relationship',
+          admin: { sortOptions: 'title' },
+          hasMany: true,
+          relationTo: 'categories',
+        },
+        {
+          name: 'tags',
+          type: 'relationship',
+          admin: { sortOptions: 'group' },
+          hasMany: true,
+          relationTo: 'tags',
+        },
+      ],
     },
+    ...(inventory ? [{
+      type: 'collapsible' as const,
+      label: 'Inventory',
+      admin: {
+        className: 'product-editor__sidebar-card product-editor__inventory',
+        initCollapsed: false,
+        position: 'sidebar' as const,
+      },
+      fields: [
+        {
+          name: 'inventoryHint',
+          type: 'ui',
+          admin: { components: { Field: '@/components/admin/ProductInventoryHint#ProductInventoryHint' } },
+        },
+        inventory,
+      ],
+    }] : []),
     {
-      name: 'tags',
-      type: 'relationship',
+      type: 'collapsible',
+      label: 'Pricing',
       admin: {
+        className: 'product-editor__sidebar-card product-editor__pricing',
+        initCollapsed: false,
         position: 'sidebar',
-        sortOptions: 'group',
       },
-      hasMany: true,
-      relationTo: 'tags',
+      fields: priceFields,
     },
-    slugField(),
-  ],
-})
+  ] as Field[],
+  })
+}

@@ -1,8 +1,8 @@
 .recent-orders {
   padding: 1.15rem 1.25rem;
-  border: 1px solid var(--theme-elevation-100);
-  border-radius: var(--style-radius-s, 3px);
-  background: var(--theme-elevation-0);
+  border: 1px solid var(--admin-edge, var(--theme-elevation-100));
+  border-radius: var(--admin-radius-panel, 12px);
+  background: var(--admin-panel, var(--theme-elevation-0));
 
   &__head {
     display: flex;
@@ -43,8 +43,8 @@
   &__labels,
   &__row {
     display: grid;
-    grid-template-columns: 0.65fr minmax(8rem, 1.7fr) 0.9fr 1fr 1fr 0.8fr;
-    gap: 1rem;
+    grid-template-columns: 0.62fr minmax(6.5rem, 1.45fr) 0.8fr 0.9fr 0.9fr 0.65fr;
+    gap: 0.7rem;
     align-items: center;
   }
 
@@ -56,20 +56,16 @@
 
   &__row {
     min-width: 0;
-    padding: 0.68rem 0.7rem;
-    border-radius: var(--style-radius-s, 3px);
+    padding: 0.62rem 0;
+    border-bottom: 1px solid var(--admin-edge);
     color: var(--theme-elevation-700);
     font-size: 1rem;
     text-decoration: none;
     transition: background-color 120ms ease;
 
-    &:nth-child(even) {
-      background: var(--theme-elevation-50);
-    }
+    &:last-child { border-bottom: 0; }
 
-    &:hover {
-      background: var(--theme-elevation-100);
-    }
+    &:hover { color: var(--theme-elevation-900); background: var(--admin-panel-muted); }
 
     &:focus-visible {
       outline: 2px solid var(--theme-elevation-700);
@@ -97,10 +93,16 @@
   }
 
   &__status {
+    justify-self: start;
+    padding: 0.2rem 0.48rem;
+    border-radius: 999px;
+    background: var(--admin-panel-muted);
     color: var(--theme-elevation-650);
+    font-size: 0.82rem;
 
     &--succeeded {
       color: #16803b;
+      background: #e1f3e6;
     }
 
     &--failed {
@@ -110,14 +112,17 @@
     &--pending,
     &--processing {
       color: var(--theme-warning-600, #9a6700);
+      background: #fff1c8;
     }
 
     &--completed {
       color: #16803b;
+      background: #e1f3e6;
     }
 
     &--cancelled {
       color: #b42318;
+      background: #fbe4e1;
     }
 
     &--refunded {
@@ -209,4 +214,13 @@
   &--cancelled {
     color: #f87171;
   }
+
+  &--succeeded,
+  &--completed { background: rgb(34 197 94 / 0.14); }
+
+  &--pending,
+  &--processing { background: rgb(245 158 11 / 0.14); }
+
+  &--cancelled,
+  &--failed { background: rgb(239 68 68 / 0.14); }
 }

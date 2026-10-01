@@ -4,6 +4,7 @@ import React from 'react'
 
 import { AdminNavigationProgress } from '../AdminNavigationProgress'
 
+import './shell.scss'
 import './nav-icons.scss'
 import './fields.scss'
 import './media-grid.scss'

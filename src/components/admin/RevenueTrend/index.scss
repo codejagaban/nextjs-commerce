@@ -6,13 +6,13 @@
  */
 
 .revenue-trend {
-  --current: #7c3aed;
+  --current: #315f25;
 
   margin: 0;
-  border: 1px solid var(--theme-elevation-100);
-  border-radius: 10px;
-  padding: 1.4rem 1.5rem 1rem;
-  background: var(--theme-elevation-0);
+  border: 1px solid var(--admin-edge, var(--theme-elevation-100));
+  border-radius: var(--admin-radius-panel, 10px);
+  padding: 1.25rem 1.35rem 0.85rem;
+  background: var(--admin-panel, var(--theme-elevation-0));
 
   &__head {
     display: flex;
@@ -68,7 +68,7 @@
     margin: 1rem 0 0.55rem;
     padding: 0.7rem 0;
     border-radius: var(--style-radius-s, 3px);
-    background: var(--theme-elevation-50);
+    background: var(--admin-panel-muted, var(--theme-elevation-50));
 
     dt {
       margin: 0 0 0.25rem;
@@ -138,6 +138,10 @@
   &__bar {
     fill: var(--current);
     transition: opacity 0.12s ease;
+  }
+
+  &__bar--context {
+    fill: color-mix(in srgb, var(--current) 14%, transparent);
   }
 
   /* Reading a day dims the rest of the month so the read-out bar is unmistakable. */

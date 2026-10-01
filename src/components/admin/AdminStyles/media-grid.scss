@@ -56,9 +56,9 @@
     grid-template-rows: auto auto 1fr;
     min-width: 0;
     overflow: hidden;
-    border: 1px solid var(--theme-elevation-150);
-    border-radius: var(--style-radius-s);
-    background: var(--theme-elevation-0) !important;
+    border: 1px solid var(--admin-edge, var(--theme-elevation-150));
+    border-radius: var(--admin-radius-panel, 10px);
+    background: var(--admin-panel, var(--theme-elevation-0)) !important;
     transition: border-color 140ms ease, background-color 140ms ease;
 
     &:hover {

@@ -1,0 +1,638 @@
+/**
+ * Marisol admin shell.
+ *
+ * Payload remains responsible for every control and layout state. This layer
+ * gives those primitives one coherent visual system: a dark navigation plane,
+ * an inset workspace, and quieter tonal grouping inside that workspace.
+ */
+
+.template-default {
+  --admin-frame: #e8e8e4;
+  --admin-canvas: #fafaf8;
+  --admin-panel: #fff;
+  --admin-panel-muted: #f4f4f1;
+  --admin-edge: rgb(32 34 30 / 0.1);
+  --admin-edge-strong: rgb(32 34 30 / 0.16);
+  --admin-sidebar: #161714;
+  --admin-sidebar-active: #2a2b27;
+  --admin-sidebar-hover: #22231f;
+  --admin-sidebar-text: #e9e9e4;
+  --admin-sidebar-muted: #96988f;
+  --admin-radius-shell: 16px;
+  --admin-radius-panel: 12px;
+  --admin-radius-control: 8px;
+  --style-radius-s: var(--admin-radius-control);
+
+  min-height: 100vh;
+  gap: 8px;
+  padding: 8px;
+  background: var(--admin-frame);
+}
+
+:root[data-theme='dark'] .template-default {
+  --admin-frame: #090a09;
+  --admin-canvas: #131412;
+  --admin-panel: #191a18;
+  --admin-panel-muted: #20211e;
+  --admin-edge: rgb(255 255 248 / 0.09);
+  --admin-edge-strong: rgb(255 255 248 / 0.15);
+  --admin-sidebar: #0e0f0d;
+  --admin-sidebar-active: #292a26;
+  --admin-sidebar-hover: #20211e;
+  --admin-sidebar-text: #f0f0eb;
+  --admin-sidebar-muted: #92948b;
+}
+
+@media (min-width: 1025px) {
+  .template-default--nav-open,
+  .template-default:not(.template-default--nav-open) {
+    grid-template-columns: 248px minmax(0, 1fr) !important;
+  }
+
+  .template-default .nav {
+    width: 248px !important;
+    min-width: 248px !important;
+    opacity: 1 !important;
+    transform: none !important;
+    visibility: visible !important;
+  }
+
+  .template-default .custom-admin-nav {
+    display: flex !important;
+  }
+}
+
+.template-default__wrap {
+  min-width: 0;
+  min-height: calc(100vh - 16px);
+  overflow: clip;
+  border: 1px solid var(--admin-edge);
+  border-radius: var(--admin-radius-shell);
+  background: var(--admin-canvas);
+  box-shadow: 0 8px 20px rgb(28 30 26 / 0.08);
+  --gutter-h: clamp(1.5rem, 2.4vw, 2.75rem);
+}
+
+/* The dashboard is the admin home, so its content starts where the reference starts. */
+.template-default__wrap:has(.store-overview) .app-header {
+  display: none;
+}
+
+.template-default__wrap:has(.store-overview) > .gutter {
+  padding-top: 2rem;
+}
+
+:root[data-theme='dark'] .template-default__wrap {
+  box-shadow: 0 8px 22px rgb(0 0 0 / 0.22);
+}
+
+/* Navigation: one quiet plane, with state communicated by tone and weight. */
+.template-default .nav {
+  position: sticky;
+  top: 8px;
+  height: calc(100vh - 16px);
+  color: var(--admin-sidebar-text);
+  border-radius: var(--admin-radius-shell);
+  background: var(--admin-sidebar);
+}
+
+.template-default__nav-toggler-wrapper {
+  display: none;
+}
+
+.template-default__nav-toggler {
+  color: var(--admin-sidebar-text);
+  border: 1px solid rgb(255 255 255 / 0.14);
+  border-radius: var(--admin-radius-control);
+  background: rgb(255 255 255 / 0.06);
+}
+
+.template-default__nav-toggler .hamburger {
+  color: var(--admin-sidebar-text);
+  background: transparent;
+}
+
+.template-default__nav-toggler .stroke {
+  stroke: currentColor;
+}
+
+.template-default__nav-toggler:hover {
+  background: rgb(255 255 255 / 0.11);
+}
+
+/* Workspace chrome */
+.template-default .app-header {
+  min-height: 3.75rem;
+  background: transparent;
+}
+
+.template-default .app-header__bg {
+  border-bottom: 1px solid var(--admin-edge);
+  background: color-mix(in srgb, var(--admin-canvas) 92%, transparent);
+  backdrop-filter: blur(12px);
+}
+
+.template-default .app-header__content {
+  min-height: 3.75rem;
+}
+
+.template-default .app-header__account {
+  border-radius: 50%;
+}
+
+.template-default h1,
+.template-default .list-header__title {
+  letter-spacing: -0.025em;
+}
+
+.template-default .doc-header,
+.template-default .list-header {
+  padding-top: 1.2rem;
+}
+
+.template-default .doc-header__title,
+.template-default .list-header__title {
+  font-size: clamp(1.75rem, 2.5vw, 2.3rem);
+  font-weight: 650;
+  line-height: 1.08;
+}
+
+/* Controls: compact, tactile, and consistent without turning everything into pills. */
+.template-default .btn,
+.template-default .popup-button,
+.template-default button[class*='button'] {
+  border-radius: var(--admin-radius-control);
+}
+
+.template-default .btn--style-primary {
+  --bg-color: #30382a;
+  --hover-bg: #232a1f;
+  --color: #fff;
+}
+
+:root[data-theme='dark'] .template-default .btn--style-primary {
+  --bg-color: #d9dfcf;
+  --hover-bg: #eef2e8;
+  --color: #1b1d19;
+}
+
+.template-default .btn--style-subtle,
+.template-default .btn--style-tab,
+.template-default .popup-button--background {
+  --bg-color: var(--admin-panel-muted);
+  --hover-bg: color-mix(in srgb, var(--admin-panel-muted) 82%, var(--theme-text));
+}
+
+.template-default input:not([type='checkbox']):not([type='radio']),
+.template-default textarea,
+.template-default .rs__control {
+  border-radius: var(--admin-radius-control);
+  background: var(--admin-panel-muted);
+}
+
+.template-default input:not([type='checkbox']):not([type='radio']):focus,
+.template-default textarea:focus,
+.template-default .rs__control--is-focused {
+  outline: 2px solid color-mix(in srgb, #4c5a40 55%, transparent);
+  outline-offset: 1px;
+}
+
+.template-default .popup__content,
+.template-default .rs__menu {
+  border: 1px solid var(--admin-edge-strong);
+  border-radius: var(--admin-radius-control);
+  background: var(--admin-panel);
+  box-shadow: 0 8px 18px rgb(24 26 22 / 0.12);
+}
+
+/* Collection lists */
+.template-default .collection-list {
+  padding-bottom: 2rem;
+}
+
+.template-default .list-header__title-and-actions {
+  align-items: center;
+}
+
+.template-default .list-controls {
+  margin-top: 1.15rem;
+  padding: 0.45rem;
+  border: 1px solid var(--admin-edge);
+  border-radius: var(--admin-radius-panel);
+  background: var(--admin-panel);
+}
+
+.template-default .search-filter__input,
+.template-default .search-bar {
+  background: transparent;
+}
+
+.template-default .collection-list:not(.collection-list--media) .table-wrap {
+  overflow: auto;
+  margin-top: 0.9rem;
+  border: 1px solid var(--admin-edge);
+  border-radius: var(--admin-radius-panel);
+  background: var(--admin-panel);
+}
+
+.template-default .collection-list:not(.collection-list--media) .table table {
+  border-collapse: separate;
+  border-spacing: 0;
+}
+
+.template-default .collection-list:not(.collection-list--media) .table thead th {
+  padding-top: 0.9rem;
+  padding-bottom: 0.75rem;
+  color: var(--theme-elevation-500);
+  background: var(--admin-panel);
+}
+
+.template-default .collection-list:not(.collection-list--media) .table tbody tr td {
+  border-top: 1px solid var(--admin-edge);
+  background: var(--admin-panel) !important;
+  transition: background-color 140ms ease;
+}
+
+.template-default .collection-list:not(.collection-list--media) .table tbody tr:hover td {
+  background: var(--admin-panel-muted) !important;
+}
+
+.template-default .page-controls {
+  padding-top: 1rem;
+}
+
+/* Edit and global forms */
+.template-default .doc-controls {
+  border-block: 1px solid var(--admin-edge);
+  background: var(--admin-panel);
+}
+
+.template-default .doc-tabs {
+  background: transparent;
+}
+
+.template-default .document-fields__fields,
+.template-default .document-fields__sidebar-fields {
+  gap: 1.25rem;
+}
+
+.template-default .document-fields__sidebar-wrap {
+  border-radius: var(--admin-radius-panel);
+  background: var(--admin-panel-muted);
+}
+
+.template-default .collapsible--style-default,
+.template-default .array-field,
+.template-default .blocks-field {
+  border-color: var(--admin-edge);
+  border-radius: var(--admin-radius-panel);
+  background: var(--admin-panel);
+}
+
+.template-default .collapsible__header-wrap,
+.template-default .array-field__header-wrap,
+.template-default .blocks-field__header-wrap {
+  border-radius: var(--admin-radius-panel) var(--admin-radius-panel) 0 0;
+  background: var(--admin-panel-muted);
+}
+
+.template-default .array-field__row,
+.template-default .blocks-field__row {
+  border-color: var(--admin-edge);
+  border-radius: var(--admin-radius-control);
+}
+
+.template-default .upload-card,
+.template-default .file-details {
+  border-radius: var(--admin-radius-panel);
+}
+
+/* Product editor: the commerce-specific workspace mirrors the reference layout. */
+.template-default:has(.collection-edit--products) .doc-header__title {
+  font-size: 0;
+}
+
+.template-default:has(.collection-edit--products) .doc-header__title::before {
+  display: block;
+  color: var(--theme-elevation-950);
+  content: 'Edit Product';
+  font-size: clamp(1.8rem, 2.5vw, 2.35rem);
+  font-weight: 680;
+  letter-spacing: -0.035em;
+  line-height: 1.08;
+}
+
+.template-default:has(.collection-edit--products) .doc-header__title::after {
+  display: block;
+  margin-top: 0.35rem;
+  color: var(--theme-elevation-500);
+  content: 'Make changes to your product details, variants, and inventory.';
+  font-size: 0.96rem;
+  font-weight: 400;
+  letter-spacing: 0;
+  line-height: 1.4;
+}
+
+.template-default:has(.collection-edit--products) .doc-tabs,
+.collection-edit--products .doc-controls__meta,
+.collection-edit--products .live-preview-toggler {
+  display: none;
+}
+
+.template-default:has(.collection-edit--products) .doc-header__header {
+  align-items: flex-start;
+  padding-bottom: 1.15rem;
+}
+
+.collection-edit--products .doc-controls {
+  position: absolute;
+  z-index: 3;
+  top: 4.9rem;
+  right: var(--gutter-h);
+  width: auto;
+  border: 0;
+  background: transparent;
+}
+
+.collection-edit--products .doc-controls__wrapper,
+.collection-edit--products .doc-controls__content {
+  width: auto;
+  min-height: 0;
+  padding: 0;
+}
+
+.collection-edit--products .doc-controls__controls {
+  gap: 0.55rem;
+}
+
+.collection-edit--products .preview-btn,
+.collection-edit--products .doc-controls__popup .popup-button {
+  min-height: 2.55rem;
+  border: 1px solid var(--admin-edge-strong);
+  border-radius: var(--admin-radius-control);
+  background: var(--admin-panel);
+}
+
+.collection-edit--products .form-submit .btn {
+  min-height: 2.55rem;
+  padding-inline: 1.15rem;
+}
+
+.collection-edit--products .document-fields {
+  border-top: 1px solid var(--admin-edge);
+}
+
+.collection-edit--products .document-fields__main {
+  align-items: flex-start;
+}
+
+.collection-edit--products .document-fields__edit {
+  padding-top: 1.35rem;
+  padding-bottom: 2.5rem;
+}
+
+.collection-edit--products .document-fields__fields {
+  gap: 1rem;
+}
+
+.collection-edit--products .product-editor__section > .collapsible {
+  overflow: hidden;
+  border: 1px solid var(--admin-edge);
+  border-radius: var(--admin-radius-panel);
+  background: var(--admin-panel);
+}
+
+.collection-edit--products .product-editor__section .collapsible__header-wrap {
+  min-height: 3.15rem;
+  padding-inline: 1rem;
+  background: var(--admin-panel);
+}
+
+.collection-edit--products .product-editor__section .collapsible-field__row-label-wrap {
+  background: transparent;
+}
+
+.collection-edit--products .product-editor__section .collapsible__toggle-wrap,
+.collection-edit--products .product-editor__sidebar-card .collapsible__toggle-wrap {
+  background: var(--admin-panel);
+}
+
+.collection-edit--products .product-editor__section .row-label {
+  color: var(--theme-elevation-950);
+  font-size: 1.08rem;
+  font-weight: 650;
+}
+
+.collection-edit--products .product-editor__section > .collapsible > .rah-static > .collapsible__content {
+  padding: 0 1rem 1rem;
+}
+
+.collection-edit--products .product-editor__basic .rich-text-lexical__wrap {
+  min-height: 8.25rem;
+  border-color: var(--admin-edge-strong);
+  border-radius: var(--admin-radius-control);
+}
+
+.collection-edit--products .product-editor__basic .fixed-toolbar {
+  border-radius: var(--admin-radius-control) var(--admin-radius-control) 0 0;
+}
+
+.collection-edit--products .product-editor__media .array-field {
+  padding: 0;
+  border: 0;
+}
+
+.collection-edit--products .product-editor__media .array-field__header-wrap {
+  padding-inline: 0;
+  background: transparent;
+}
+
+.collection-edit--products .product-editor__media .array-field__draggable-rows {
+  display: grid;
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+  gap: 0.55rem;
+}
+
+.collection-edit--products .product-editor__media .array-field__row {
+  min-width: 0;
+  margin: 0;
+  overflow: hidden;
+  border: 1px solid var(--admin-edge);
+  border-radius: 9px;
+}
+
+.collection-edit--products .product-editor__media .array-field__row-header {
+  display: none;
+}
+
+.collection-edit--products .product-editor__media .array-field__row > .rah-static > .collapsible__content {
+  padding: 0;
+}
+
+.collection-edit--products .product-editor__media .array-field__fields {
+  gap: 0;
+  padding: 0;
+}
+
+.collection-edit--products .product-editor__media .field-type.upload > .field-label,
+.collection-edit--products .product-editor__media .field-type.relationship {
+  display: none;
+}
+
+.collection-edit--products .product-editor__media .upload-field-card {
+  min-height: 9.5rem;
+  border: 0;
+  border-radius: 0;
+  background: var(--admin-panel-muted);
+}
+
+.collection-edit--products .product-editor__media .upload-relationship-details__imageAndDetails {
+  display: block;
+  height: 9.5rem;
+}
+
+.collection-edit--products .product-editor__media .upload-relationship-details__thumbnail,
+.collection-edit--products .product-editor__media .thumbnail,
+.collection-edit--products .product-editor__media .thumbnail img {
+  width: 100%;
+  height: 100%;
+  max-width: none;
+  object-fit: cover;
+}
+
+.collection-edit--products .product-editor__media .upload-relationship-details__details {
+  display: none;
+}
+
+.collection-edit--products .product-editor__media .upload-relationship-details__actions {
+  position: absolute;
+  top: 0.35rem;
+  right: 0.35rem;
+  padding: 0.1rem;
+  border-radius: 7px;
+  background: color-mix(in srgb, var(--admin-panel) 90%, transparent);
+}
+
+.collection-edit--products .document-fields__sidebar-wrap {
+  border-left: 1px solid var(--admin-edge);
+  border-radius: 0;
+  background: var(--admin-canvas);
+}
+
+.collection-edit--products .document-fields__sidebar {
+  padding-top: 1.35rem;
+}
+
+.collection-edit--products .document-fields__sidebar-fields {
+  gap: 1rem;
+}
+
+.collection-edit--products .product-editor__sidebar-card > .collapsible {
+  overflow: hidden;
+  border: 1px solid var(--admin-edge);
+  border-radius: var(--admin-radius-panel);
+  background: var(--admin-panel);
+}
+
+.collection-edit--products .product-editor__sidebar-card .collapsible__header-wrap {
+  min-height: 3.2rem;
+  padding-inline: 1rem;
+  background: var(--admin-panel);
+}
+
+.collection-edit--products .product-editor__sidebar-card .collapsible-field__row-label-wrap {
+  background: transparent;
+}
+
+.collection-edit--products .product-editor__sidebar-card .row-label {
+  color: var(--theme-elevation-950);
+  font-size: 1.08rem;
+  font-weight: 650;
+}
+
+.collection-edit--products .product-editor__sidebar-card > .collapsible > .rah-static > .collapsible__content {
+  padding: 0 1rem 1rem;
+}
+
+.collection-edit--products .product-editor__sidebar-card .render-fields {
+  gap: 0.9rem;
+}
+
+.collection-edit--products .product-inventory-hint {
+  margin: 0;
+  color: var(--theme-elevation-500);
+  font-size: 0.9rem;
+  line-height: 1.45;
+}
+
+.collection-edit--products .product-editor__pricing .field-description {
+  display: none;
+}
+
+.collection-edit--products .product-editor__pricing .field-type.group {
+  padding-top: 0.8rem;
+  border-top: 1px solid var(--admin-edge);
+}
+
+.collection-edit--products .product-editor__pricing .field-type.group:first-child {
+  padding-top: 0;
+  border-top: 0;
+}
+
+@media (max-width: 1120px) {
+  .collection-edit--products .doc-controls { position: static; width: 100%; border-block: 1px solid var(--admin-edge); background: var(--admin-panel); }
+  .collection-edit--products .doc-controls__wrapper { width: 100%; padding: 0.65rem var(--gutter-h); }
+  .collection-edit--products .product-editor__media .array-field__draggable-rows { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+}
+
+@media (max-width: 760px) {
+  .collection-edit--products .product-editor__media .array-field__draggable-rows { grid-template-columns: minmax(0, 1fr); }
+  .collection-edit--products .product-editor__basic .row__fields { flex-direction: column; }
+  .collection-edit--products .product-editor__basic .row__fields > * { width: 100% !important; }
+}
+
+@media (max-width: 1024px) {
+  .template-default {
+    display: block;
+    gap: 0;
+    padding: 0;
+  }
+
+  .template-default__wrap {
+    width: 100%;
+    min-height: 100vh;
+    border: 0;
+    border-radius: 0;
+    box-shadow: none;
+  }
+
+  .template-default .nav {
+    top: 0;
+    height: 100vh;
+    border-radius: 0 var(--admin-radius-shell) var(--admin-radius-shell) 0;
+  }
+
+  .template-default__nav-toggler-wrapper {
+    display: block;
+    position: fixed;
+    top: 1rem;
+    right: auto;
+    left: 1rem;
+    width: 2.5rem;
+    height: 2.5rem;
+    z-index: 4;
+  }
+
+  .template-default__nav-toggler {
+    width: 2.5rem;
+    height: 2.5rem;
+    padding: 0.65rem;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .template-default .nav__link,
+  .template-default .collection-list .table tbody td {
+    transition: none;
+  }
+}

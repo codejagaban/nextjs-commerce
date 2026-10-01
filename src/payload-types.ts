@@ -301,6 +301,11 @@ export interface Order {
 export interface Product {
   id: number;
   title: string;
+  /**
+   * When enabled, the slug will auto-generate from the title field on save and autosave.
+   */
+  generateSlug?: boolean | null;
+  slug: string;
   description?: {
     root: {
       type: string;
@@ -323,8 +328,6 @@ export interface Product {
         id?: string | null;
       }[]
     | null;
-  layout?: (CallToActionBlock | ContentBlock | MediaBlock)[] | null;
-  inventory?: number | null;
   enableVariants?: boolean | null;
   variantTypes?: (number | VariantType)[] | null;
   variants?: {
@@ -332,12 +335,7 @@ export interface Product {
     hasNextPage?: boolean;
     totalDocs?: number;
   };
-  priceInUSDEnabled?: boolean | null;
-  priceInUSD?: number | null;
-  priceInEUREnabled?: boolean | null;
-  priceInEUR?: number | null;
-  priceInGBPEnabled?: boolean | null;
-  priceInGBP?: number | null;
+  layout?: (CallToActionBlock | ContentBlock | MediaBlock)[] | null;
   relatedProducts?: (number | Product)[] | null;
   meta?: {
     title?: string | null;
@@ -349,11 +347,13 @@ export interface Product {
   };
   categories?: (number | Category)[] | null;
   tags?: (number | Tag)[] | null;
-  /**
-   * When enabled, the slug will auto-generate from the title field on save and autosave.
-   */
-  generateSlug?: boolean | null;
-  slug: string;
+  inventory?: number | null;
+  priceInUSDEnabled?: boolean | null;
+  priceInUSD?: number | null;
+  priceInEUREnabled?: boolean | null;
+  priceInEUR?: number | null;
+  priceInGBPEnabled?: boolean | null;
+  priceInGBP?: number | null;
   updatedAt: string;
   createdAt: string;
   deletedAt?: string | null;
@@ -462,6 +462,30 @@ export interface VariantType {
   updatedAt: string;
   createdAt: string;
   deletedAt?: string | null;
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "variants".
+ */
+export interface Variant {
+  id: number;
+  /**
+   * Used for administrative purposes, not shown to customers. This is populated by default.
+   */
+  title?: string | null;
+  product: number | Product;
+  options: (number | VariantOption)[];
+  inventory?: number | null;
+  priceInUSDEnabled?: boolean | null;
+  priceInUSD?: number | null;
+  priceInEUREnabled?: boolean | null;
+  priceInEUR?: number | null;
+  priceInGBPEnabled?: boolean | null;
+  priceInGBP?: number | null;
+  updatedAt: string;
+  createdAt: string;
+  deletedAt?: string | null;
+  _status?: ('draft' | 'published') | null;
 }
 /**
  * This interface was referenced by `Config`'s JSON-Schema
@@ -940,30 +964,6 @@ export interface Form {
     | null;
   updatedAt: string;
   createdAt: string;
-}
-/**
- * This interface was referenced by `Config`'s JSON-Schema
- * via the `definition` "variants".
- */
-export interface Variant {
-  id: number;
-  /**
-   * Used for administrative purposes, not shown to customers. This is populated by default.
-   */
-  title?: string | null;
-  product: number | Product;
-  options: (number | VariantOption)[];
-  inventory?: number | null;
-  priceInUSDEnabled?: boolean | null;
-  priceInUSD?: number | null;
-  priceInEUREnabled?: boolean | null;
-  priceInEUR?: number | null;
-  priceInGBPEnabled?: boolean | null;
-  priceInGBP?: number | null;
-  updatedAt: string;
-  createdAt: string;
-  deletedAt?: string | null;
-  _status?: ('draft' | 'published') | null;
 }
 /**
  * This interface was referenced by `Config`'s JSON-Schema
@@ -1761,6 +1761,8 @@ export interface VariantOptionsSelect<T extends boolean = true> {
  */
 export interface ProductsSelect<T extends boolean = true> {
   title?: T;
+  generateSlug?: T;
+  slug?: T;
   description?: T;
   gallery?:
     | T
@@ -1769,6 +1771,9 @@ export interface ProductsSelect<T extends boolean = true> {
         variantOption?: T;
         id?: T;
       };
+  enableVariants?: T;
+  variantTypes?: T;
+  variants?: T;
   layout?:
     | T
     | {
@@ -1776,16 +1781,6 @@ export interface ProductsSelect<T extends boolean = true> {
         content?: T | ContentBlockSelect<T>;
         mediaBlock?: T | MediaBlockSelect<T>;
       };
-  inventory?: T;
-  enableVariants?: T;
-  variantTypes?: T;
-  variants?: T;
-  priceInUSDEnabled?: T;
-  priceInUSD?: T;
-  priceInEUREnabled?: T;
-  priceInEUR?: T;
-  priceInGBPEnabled?: T;
-  priceInGBP?: T;
   relatedProducts?: T;
   meta?:
     | T
@@ -1796,8 +1791,13 @@ export interface ProductsSelect<T extends boolean = true> {
       };
   categories?: T;
   tags?: T;
-  generateSlug?: T;
-  slug?: T;
+  inventory?: T;
+  priceInUSDEnabled?: T;
+  priceInUSD?: T;
+  priceInEUREnabled?: T;
+  priceInEUR?: T;
+  priceInGBPEnabled?: T;
+  priceInGBP?: T;
   updatedAt?: T;
   createdAt?: T;
   deletedAt?: T;

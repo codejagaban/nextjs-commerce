@@ -24,20 +24,22 @@ export const KpiStrip: React.FC<{ items: Kpi[] }> = ({ items }) => (
       const dir = k.delta === undefined ? null : k.delta > 0 ? 'up' : k.delta < 0 ? 'down' : 'flat'
       return (
         <div className="kpi-strip__item" key={k.label}>
-          <span className="kpi-strip__label">
+          <div className="kpi-strip__icon-wrap">
             {k.Icon && <k.Icon className="kpi-strip__icon" />}
-            {k.label}
-          </span>
-          <div className="kpi-strip__figure">
-            <span className="kpi-strip__value">{k.value}</span>
-            {dir && (
-              <span className={`kpi-strip__delta kpi-strip__delta--${dir}`}>
-                <span aria-hidden="true">{dir === 'up' ? '↑' : dir === 'down' ? '↓' : '→'}</span>
-                {Math.abs(k.delta as number).toFixed(k.delta === Math.round(k.delta as number) ? 0 : 1)}%
-              </span>
-            )}
           </div>
-          {k.compare && <span className="kpi-strip__compare">{k.compare}</span>}
+          <div className="kpi-strip__content">
+            <span className="kpi-strip__label">{k.label}</span>
+            <div className="kpi-strip__figure">
+              <span className="kpi-strip__value">{k.value}</span>
+              {dir && (
+                <span className={`kpi-strip__delta kpi-strip__delta--${dir}`}>
+                  <span aria-hidden="true">{dir === 'up' ? '↑' : dir === 'down' ? '↓' : '→'}</span>
+                  {Math.abs(k.delta as number).toFixed(k.delta === Math.round(k.delta as number) ? 0 : 1)}%
+                </span>
+              )}
+            </div>
+            {k.compare && <span className="kpi-strip__compare">{k.compare}</span>}
+          </div>
         </div>
       )
     })}

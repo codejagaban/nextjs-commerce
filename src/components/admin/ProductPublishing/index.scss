@@ -1,0 +1,15 @@
+.product-publishing {
+  padding: 1.15rem;
+  border: 1px solid var(--admin-edge);
+  border-radius: var(--admin-radius-panel);
+  background: var(--admin-panel);
+
+  h3 { margin: 0 0 0.85rem; font-size: 1.08rem; font-weight: 650; }
+  dl { display: flex; flex-direction: column; gap: 0.7rem; margin: 0; }
+  dl > div { display: grid; grid-template-columns: 6.5rem minmax(0, 1fr); align-items: center; gap: 0.75rem; }
+  dt { color: var(--theme-elevation-650); }
+  dd { display: flex; align-items: center; gap: 0.45rem; min-width: 0; margin: 0; color: var(--theme-elevation-850); font-variant-numeric: tabular-nums; }
+  .is-live, .is-draft { width: 0.55rem; height: 0.55rem; flex: 0 0 auto; border-radius: 50%; }
+  .is-live { background: #4f9a3b; }
+  .is-draft { background: #c89420; }
+}
