@@ -11,6 +11,8 @@
 playwright-report/
 playwright-report/index.html
 test-results/
+smoke-test-results/
+playwright-smoke-report/
 
 # next.js
 /.next/
