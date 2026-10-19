@@ -27,6 +27,9 @@ olive oil & Mediterranean pantry) so nothing looks like a generic starter.
 
 ## Quick start
 
+Use Node.js 24 LTS (the version used in CI). The dependency tree requires at
+least Node.js 20.19.0; Node.js 18 is no longer supported.
+
 ```bash
 pnpm install
 

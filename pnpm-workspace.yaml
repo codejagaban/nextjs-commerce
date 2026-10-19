@@ -1,6 +1,7 @@
 # Standalone project (not a monorepo). This file exists solely to approve
 # native post-install build scripts under pnpm 10+.
 allowBuilds:
+  '@parcel/watcher': true
   '@vercel/git-hooks': false
   esbuild: true
   sharp: true
@@ -10,3 +11,8 @@ allowBuilds:
 overrides:
   dompurify: 3.4.16
   '@esbuild-kit/core-utils>esbuild': 0.25.12
+  # Replace Sass's old Chokidar 3 path to braces (GHSA-vfj7-8cjw-p6xm).
+  'sass@1.77.4': 1.105.2
+  # This release declares find-node-modules but never imports it. Remove the
+  # unused globbing chain, not the advisory. Recheck when upgrading Payload.
+  '@payloadcms/plugin-cloud-storage@3.91.0>find-node-modules': '-'
