@@ -2,6 +2,7 @@ import config from '@payload-config'
 import { getPayload } from 'payload'
 import React from 'react'
 import Image from 'next/image'
+import { getMediaURL } from '@/utilities/getMediaURL'
 
 import { AnalyticsControls } from '../AnalyticsControls'
 import { AttentionQueue } from '../AttentionQueue'
@@ -292,7 +293,12 @@ export const Dashboard: React.FC<{
                 <div className={`${baseClass}__row`} key={`${row.title}-${i}`}>
                   <dt>
                     {row.image ? (
-                      <Image alt={row.alt || ''} height={40} src={row.image} width={40} />
+                      <Image
+                        alt={row.alt || ''}
+                        height={40}
+                        src={getMediaURL(row.image)}
+                        width={40}
+                      />
                     ) : (
                       <span aria-hidden="true" className={`${baseClass}__row-image`} />
                     )}

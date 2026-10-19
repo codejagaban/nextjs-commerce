@@ -7,6 +7,11 @@ test('admin can access the dashboard, switch charts, and open settings', async (
   await page.getByRole('button', { name: 'Login', exact: true }).click()
   await expect(page).toHaveURL('/admin')
   await expect(page.getByRole('link', { name: 'Dashboard', exact: true })).toBeVisible()
+  const stockImage = page.getByRole('img', { name: 'Test serum bottle', exact: true }).first()
+  await expect(stockImage).toBeVisible()
+  await expect
+    .poll(() => stockImage.evaluate((element: HTMLImageElement) => element.naturalWidth))
+    .toBeGreaterThan(0)
   await page.getByRole('button', { name: 'Line', exact: true }).click()
   await expect(page.getByRole('button', { name: 'Line', exact: true })).toHaveAttribute(
     'aria-pressed',
@@ -19,7 +24,7 @@ test('admin can access the dashboard, switch charts, and open settings', async (
   )
   const openMenu = page.getByRole('button', { name: 'Open Menu', exact: true })
   if (await openMenu.isVisible()) await openMenu.click()
-  await page.getByRole('link', { name: 'Store settings', exact: true }).click()
+  await page.getByRole('link', { name: 'Settings', exact: true }).click()
   await expect(page).toHaveURL('/admin/globals/settings')
   await expect(page.getByLabel('Store Name', { exact: false })).toHaveValue('Marisol')
 })

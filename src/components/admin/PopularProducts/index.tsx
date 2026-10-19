@@ -1,5 +1,6 @@
 import React from 'react'
 import Image from 'next/image'
+import { getMediaURL } from '@/utilities/getMediaURL'
 
 import { IconPopular } from '../icons'
 
@@ -40,7 +41,7 @@ export const PopularProducts: React.FC<{ data: PopularProduct[] }> = ({ data }) 
                   alt={d.alt || ''}
                   className="popular__image"
                   height={48}
-                  src={d.image}
+                  src={getMediaURL(d.image)}
                   width={48}
                 />
               ) : (
