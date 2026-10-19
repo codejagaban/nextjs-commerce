@@ -1,0 +1,50 @@
+name: Hosted commerce smoke
+
+# Manual only: this creates synthetic records and sends mail to the test mailbox.
+on:
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+concurrency:
+  group: hosted-commerce-smoke
+  cancel-in-progress: false
+
+jobs:
+  smoke:
+    runs-on: ubuntu-latest
+    timeout-minutes: 12
+    environment: commerce-smoke
+    env:
+      SMOKE_BASE_URL: ${{ vars.SMOKE_BASE_URL }}
+      SMOKE_MEDIA_ORIGIN: ${{ vars.SMOKE_MEDIA_ORIGIN }}
+      SMOKE_ADMIN_EMAIL: ${{ secrets.SMOKE_ADMIN_EMAIL }}
+      SMOKE_ADMIN_PASSWORD: ${{ secrets.SMOKE_ADMIN_PASSWORD }}
+      SMOKE_CUSTOMER_EMAIL: ${{ secrets.SMOKE_CUSTOMER_EMAIL }}
+      SMOKE_STRIPE_SECRET_KEY: ${{ secrets.SMOKE_STRIPE_SECRET_KEY }}
+      SMOKE_IMAP_HOST: ${{ secrets.SMOKE_IMAP_HOST }}
+      SMOKE_IMAP_PORT: ${{ vars.SMOKE_IMAP_PORT }}
+      SMOKE_IMAP_USER: ${{ secrets.SMOKE_IMAP_USER }}
+      SMOKE_IMAP_PASSWORD: ${{ secrets.SMOKE_IMAP_PASSWORD }}
+      SMOKE_IMAP_FOLDER: ${{ vars.SMOKE_IMAP_FOLDER }}
+    steps:
+      - uses: actions/checkout@v4
+      - uses: pnpm/action-setup@v4
+        with:
+          version: 12.3.4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 24
+          cache: pnpm
+      - run: pnpm install --frozen-lockfile
+      - run: pnpm exec playwright install --with-deps chromium
+      - run: pnpm test:smoke
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: commerce-smoke-results
+          path: |
+            playwright-smoke-report/
+            smoke-test-results/
+          retention-days: 3

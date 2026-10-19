@@ -45,6 +45,7 @@ jobs:
       - run: pnpm audit --prod
       - run: pnpm lint
       - run: pnpm typecheck
+      - run: pnpm test:unit
       - name: Build schema from migrations
         run: pnpm migrate
         env:
