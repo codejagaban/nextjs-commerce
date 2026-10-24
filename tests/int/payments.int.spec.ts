@@ -3,6 +3,7 @@ import { afterAll, beforeAll, describe, expect, it, vi } from 'vitest'
 import { createLocalReq, getPayload, type Payload } from 'payload'
 import type { Cart, User } from '@/payload-types'
 import Stripe from 'stripe'
+import { orderWorkflowHandler } from '@/orders/endpoint'
 
 // Only the external Stripe transport is replaced in CI. All Payload endpoints,
 // access checks, signatures, settlement transactions and inventory are real.
@@ -11,12 +12,24 @@ const intents = new Map<string, Stripe.PaymentIntent>()
 let payload: Payload
 let customer: User
 let outsider: User
+let admin: User
 const carts: number[] = []
 const products: number[] = []
 const sentEmails: Record<string, unknown>[] = []
 const runID = randomUUID()
 const signingSecret = process.env.STRIPE_WEBHOOKS_SIGNING_SECRET!
 const signing = new Stripe('sk_test_signatures_only')
+
+async function workflow(id: number, data: Record<string, unknown>, user: User | undefined = admin) {
+  const req = await createLocalReq(
+    {
+      ...(user ? { user: { ...user, collection: 'users' as const } } : {}),
+      req: { routeParams: { id: String(id) }, data },
+    },
+    payload,
+  )
+  return (await orderWorkflowHandler(req)) as Response
+}
 
 async function endpoint(path: string, data: Record<string, unknown>, user?: User) {
   const handler = payload.config.endpoints.find((e) => e.path === `/payments/stripe/${path}`)!
@@ -161,6 +174,14 @@ describe('Stripe settlement and webhooks', () => {
         roles: ['customer'],
       },
     })
+    admin = await payload.create({
+      collection: 'users',
+      data: {
+        email: `fulfillment-admin-${runID}@example.com`,
+        password: 'CommerceTest123!',
+        roles: ['admin'],
+      },
+    })
   })
   afterAll(async () => {
     if (!payload) return
@@ -180,7 +201,7 @@ describe('Stripe settlement and webhooks', () => {
       await payload.delete({ collection: 'carts', id: cart })
     }
     for (const id of products) await payload.delete({ collection: 'products', id })
-    for (const user of [customer, outsider])
+    for (const user of [customer, outsider, admin])
       if (user) await payload.delete({ collection: 'users', id: user.id })
     await payload.destroy()
     vi.restoreAllMocks()
@@ -308,6 +329,101 @@ describe('Stripe settlement and webhooks', () => {
       returnStatus: 'none',
       inventoryRestockedAt: null,
     })
+    expect((await payload.findByID({ collection: 'products', id: f.product.id })).inventory).toBe(8)
+  })
+
+  it('fulfills partial shipments, records tracking and delivery, and leaves payment and stock intact', async () => {
+    const f = await fixture()
+    f.intent.status = 'succeeded'
+    await webhook(f.intent)
+    let order = await verifySettlement(f.cart, f.product.id)
+    const send = async (action: string, extras = {}) => {
+      const response = await workflow(order.id, {
+        requestID: randomUUID(),
+        version: order.workflowVersion,
+        action,
+        notifyCustomer: false,
+        ...extras,
+      })
+      expect(response.status).toBe(200)
+      order = (await response.json()).order
+    }
+    await send('prepare')
+    expect(order.fulfillmentStatus).toBe('preparing')
+    await send('ship', {
+      carrier: 'Royal Mail',
+      trackingNumber: 'TEST-A',
+      trackingURL: 'https://tracking.example.com/TEST-A',
+      items: [{ orderItemID: order.items![0].id, quantity: 1 }],
+    })
+    expect(order.fulfillmentStatus).toBe('partially_fulfilled')
+    await send('deliver', { shipmentID: order.shipments![0].id })
+    expect(order.fulfillmentStatus).toBe('partially_fulfilled')
+    await send('ship', {
+      carrier: 'Royal Mail',
+      items: [{ orderItemID: order.items![0].id, quantity: 1 }],
+    })
+    expect(order.fulfillmentStatus).toBe('shipped')
+    await send('tracking', {
+      shipmentID: order.shipments![1].id,
+      carrier: 'Royal Mail',
+      trackingNumber: 'TEST-B',
+    })
+    await send('deliver', { shipmentID: order.shipments![1].id })
+    expect(order.fulfillmentStatus).toBe('delivered')
+    await send('complete')
+    expect(order.orderStatus).toBe('completed')
+    expect(order.paymentStatus).toBe('paid')
+    expect(order.workflowEvents).toHaveLength(7)
+    expect((await payload.findByID({ collection: 'products', id: f.product.id })).inventory).toBe(8)
+  })
+
+  it('rejects unauthorized, stale, duplicate-key and over-quantity fulfillment writes', async () => {
+    const f = await fixture()
+    f.intent.status = 'succeeded'
+    await webhook(f.intent)
+    const order = await verifySettlement(f.cart, f.product.id)
+    const command = {
+      requestID: randomUUID(),
+      version: order.workflowVersion,
+      action: 'ship',
+      notifyCustomer: false,
+      carrier: 'Royal Mail',
+      items: [{ orderItemID: order.items![0].id, quantity: 1 }],
+    }
+    expect((await workflow(order.id, command, outsider)).status).toBe(403)
+    expect(
+      (await workflow(order.id, { ...command, items: [{ orderItemID: 'foreign', quantity: 1 }] }))
+        .status,
+    ).toBe(409)
+    expect((await payload.findByID({ collection: 'orders', id: order.id })).workflowVersion).toBe(0)
+    const results = await Promise.all([
+      workflow(order.id, command),
+      workflow(order.id, { ...command, requestID: randomUUID() }),
+    ])
+    expect(results.map((r) => r.status).sort()).toEqual([200, 409])
+    const winner = await results.find((r) => r.status === 200)!.json()
+    const winningCommand =
+      winner.order.workflowEvents[0].requestID === command.requestID
+        ? command
+        : { ...command, requestID: winner.order.workflowEvents[0].requestID }
+    expect((await workflow(order.id, winningCommand)).status).toBe(200)
+    expect((await workflow(order.id, { ...winningCommand, carrier: 'Other' })).status).toBe(409)
+    const final = await payload.findByID({ collection: 'orders', id: order.id })
+    expect(final.shipments).toHaveLength(1)
+    await expect(
+      payload.update({ collection: 'orders', id: order.id, data: { shipments: [] } }),
+    ).rejects.toThrow('Use the order workflow')
+    expect(
+      (
+        await workflow(order.id, {
+          ...command,
+          requestID: randomUUID(),
+          version: final.workflowVersion,
+          action: 'cancel',
+        })
+      ).status,
+    ).toBe(409)
     expect((await payload.findByID({ collection: 'products', id: f.product.id })).inventory).toBe(8)
   })
 

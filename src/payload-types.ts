@@ -265,6 +265,31 @@ export interface Order {
   fulfillmentStatus: 'unfulfilled' | 'preparing' | 'partially_fulfilled' | 'shipped' | 'delivered' | 'fulfilled';
   returnStatus: 'none' | 'requested' | 'partially_returned' | 'returned';
   workflowVersion: number;
+  shipments?:
+    | {
+        carrier: string;
+        trackingNumber?: string | null;
+        trackingURL?: string | null;
+        shippedAt: string;
+        deliveredAt?: string | null;
+        items: {
+          orderItemID: string;
+          quantity: number;
+          id?: string | null;
+        }[];
+        id?: string | null;
+      }[]
+    | null;
+  workflowEvents?:
+    | {
+        action: string;
+        actor: number | User;
+        occurredAt: string;
+        requestID: string;
+        requestHash: string;
+        id?: string | null;
+      }[]
+    | null;
   /**
    * Product value before discounts, shipping, and tax.
    */
@@ -1865,6 +1890,33 @@ export interface OrdersSelect<T extends boolean = true> {
   fulfillmentStatus?: T;
   returnStatus?: T;
   workflowVersion?: T;
+  shipments?:
+    | T
+    | {
+        carrier?: T;
+        trackingNumber?: T;
+        trackingURL?: T;
+        shippedAt?: T;
+        deliveredAt?: T;
+        items?:
+          | T
+          | {
+              orderItemID?: T;
+              quantity?: T;
+              id?: T;
+            };
+        id?: T;
+      };
+  workflowEvents?:
+    | T
+    | {
+        action?: T;
+        actor?: T;
+        occurredAt?: T;
+        requestID?: T;
+        requestHash?: T;
+        id?: T;
+      };
   subtotal?: T;
   discountTotal?: T;
   shippingTotal?: T;

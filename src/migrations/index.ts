@@ -5,6 +5,7 @@ import * as migration_20260927_105055_store_timezone from './20260927_105055_sto
 import * as migration_20260927_110027_dashboard_reporting_indexes from './20260927_110027_dashboard_reporting_indexes';
 import * as migration_20260927_112155_inventory_restock_tracking from './20260927_112155_inventory_restock_tracking';
 import * as migration_20261024_221336_order_state_separation from './20261024_221336_order_state_separation';
+import * as migration_20261024_221726_order_shipments from './20261024_221726_order_shipments';
 
 export const migrations = [
   {
@@ -40,6 +41,11 @@ export const migrations = [
   {
     up: migration_20261024_221336_order_state_separation.up,
     down: migration_20261024_221336_order_state_separation.down,
-    name: '20261024_221336_order_state_separation'
+    name: '20261024_221336_order_state_separation',
+  },
+  {
+    up: migration_20261024_221726_order_shipments.up,
+    down: migration_20261024_221726_order_shipments.down,
+    name: '20261024_221726_order_shipments'
   },
 ];

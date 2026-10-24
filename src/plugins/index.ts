@@ -23,6 +23,8 @@ import { orderFinancialFields } from '@/fields/orderFinancialFields'
 import { restockTerminalOrder } from '@/inventory/restockOrder'
 import { orderStateFields } from '@/orders/fields'
 import { guardOrderStates, syncOrderPayment } from '@/orders/hooks'
+import { fulfillmentFields } from '@/orders/fulfillmentFields'
+import { orderWorkflowHandler } from '@/orders/endpoint'
 
 const generateTitle: GenerateTitle<Product | Page> = ({ doc }) => {
   const siteName = DEFAULT_STORE_NAME
@@ -135,6 +137,10 @@ export const plugins: Plugin[] = [
     orders: {
       ordersCollectionOverride: ({ defaultCollection }) => ({
         ...defaultCollection,
+        endpoints: [
+          ...(defaultCollection.endpoints || []),
+          { path: '/:id/workflow', method: 'post', handler: orderWorkflowHandler },
+        ],
         admin: {
           ...defaultCollection.admin,
           defaultColumns: [
@@ -161,6 +167,7 @@ export const plugins: Plugin[] = [
               : indexReportingFields(field),
           ),
           ...orderStateFields,
+          ...fulfillmentFields,
           ...orderFinancialFields,
           {
             name: 'accessToken',
