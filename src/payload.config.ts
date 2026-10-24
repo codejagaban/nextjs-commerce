@@ -21,6 +21,7 @@ import { Tags } from '@/collections/Tags'
 import { Media } from '@/collections/Media'
 import { Pages } from '@/collections/Pages'
 import { Users } from '@/collections/Users'
+import { ShipmentNotifications } from '@/collections/ShipmentNotifications'
 import { Footer } from '@/globals/Footer'
 import { Header } from '@/globals/Header'
 import { Settings } from '@/globals/Settings'
@@ -53,7 +54,7 @@ export default buildConfig({
     },
     user: Users.slug,
   },
-  collections: [Users, Pages, Categories, Tags, Media],
+  collections: [Users, Pages, Categories, Tags, Media, ShipmentNotifications],
   db: postgresAdapter({
     pool: {
       connectionString: process.env.DATABASE_URL || '',

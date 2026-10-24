@@ -4,6 +4,7 @@ import { createLocalReq, getPayload, type Payload } from 'payload'
 import type { Cart, User } from '@/payload-types'
 import Stripe from 'stripe'
 import { orderWorkflowHandler } from '@/orders/endpoint'
+import { sendShipmentNotification } from '@/email/shipmentNotification'
 
 // Only the external Stripe transport is replaced in CI. All Payload endpoints,
 // access checks, signatures, settlement transactions and inventory are real.
@@ -425,6 +426,45 @@ describe('Stripe settlement and webhooks', () => {
       ).status,
     ).toBe(409)
     expect((await payload.findByID({ collection: 'products', id: f.product.id })).inventory).toBe(8)
+  })
+
+  it('persists shipments when SMTP fails and retries the notification without shipping twice', async () => {
+    const f = await fixture(true)
+    f.intent.status = 'succeeded'
+    await webhook(f.intent)
+    const order = await verifySettlement(f.cart, f.product.id)
+    const before = sentEmails.length
+    vi.mocked(payload.sendEmail).mockRejectedValueOnce(new Error('SMTP unavailable'))
+    const command = {
+      requestID: randomUUID(),
+      version: order.workflowVersion,
+      action: 'ship',
+      carrier: 'Royal Mail',
+      trackingURL: 'https://tracking.example.com/TEST',
+      items: [{ orderItemID: order.items![0].id, quantity: 2 }],
+    }
+    const response = await workflow(order.id, command)
+    expect(response.status).toBe(200)
+    expect((await response.json()).notificationStatus).toBe('failed')
+    const entries = await payload.find({
+      collection: 'shipment-notifications',
+      where: { order: { equals: order.id } },
+    })
+    expect(entries.docs).toHaveLength(1)
+    expect(entries.docs[0].status).toBe('failed')
+    const sent = await Promise.all([
+      sendShipmentNotification(payload, entries.docs[0].id),
+      sendShipmentNotification(payload, entries.docs[0].id),
+    ])
+    expect(sent.sort()).toEqual(['sent', 'unchanged'])
+    expect(sentEmails).toHaveLength(before + 1)
+    expect(sentEmails.at(-1)?.text).toContain('Track shipment: https://tracking.example.com/TEST')
+    expect(sentEmails.at(-1)?.text).toContain('accessToken=')
+    expect((await workflow(order.id, command)).status).toBe(200)
+    expect((await payload.findByID({ collection: 'orders', id: order.id })).shipments).toHaveLength(
+      1,
+    )
+    expect(sentEmails).toHaveLength(before + 1)
   })
 
   it('keeps the order successful when email fails and retries delivery', async () => {

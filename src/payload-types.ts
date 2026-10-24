@@ -77,6 +77,7 @@ export interface Config {
     categories: Category;
     tags: Tag;
     media: Media;
+    'shipment-notifications': ShipmentNotification;
     forms: Form;
     'form-submissions': FormSubmission;
     addresses: Address;
@@ -111,6 +112,7 @@ export interface Config {
     categories: CategoriesSelect<false> | CategoriesSelect<true>;
     tags: TagsSelect<false> | TagsSelect<true>;
     media: MediaSelect<false> | MediaSelect<true>;
+    'shipment-notifications': ShipmentNotificationsSelect<false> | ShipmentNotificationsSelect<true>;
     forms: FormsSelect<false> | FormsSelect<true>;
     'form-submissions': FormSubmissionsSelect<false> | FormSubmissionsSelect<true>;
     addresses: AddressesSelect<false> | AddressesSelect<true>;
@@ -1140,6 +1142,21 @@ export interface Address {
 }
 /**
  * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "shipment-notifications".
+ */
+export interface ShipmentNotification {
+  id: number;
+  order: number | Order;
+  shipmentID: string;
+  eventKey: string;
+  kind: 'shipped' | 'tracking' | 'delivered';
+  status: 'pending' | 'sending' | 'sent' | 'failed' | 'skipped';
+  sentAt?: string | null;
+  updatedAt: string;
+  createdAt: string;
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
  * via the `definition` "form-submissions".
  */
 export interface FormSubmission {
@@ -1198,6 +1215,10 @@ export interface PayloadLockedDocument {
     | ({
         relationTo: 'media';
         value: number | Media;
+      } | null)
+    | ({
+        relationTo: 'shipment-notifications';
+        value: number | ShipmentNotification;
       } | null)
     | ({
         relationTo: 'forms';
@@ -1566,6 +1587,20 @@ export interface MediaSelect<T extends boolean = true> {
               filename?: T;
             };
       };
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "shipment-notifications_select".
+ */
+export interface ShipmentNotificationsSelect<T extends boolean = true> {
+  order?: T;
+  shipmentID?: T;
+  eventKey?: T;
+  kind?: T;
+  status?: T;
+  sentAt?: T;
+  updatedAt?: T;
+  createdAt?: T;
 }
 /**
  * This interface was referenced by `Config`'s JSON-Schema

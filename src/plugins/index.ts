@@ -25,6 +25,7 @@ import { orderStateFields } from '@/orders/fields'
 import { guardOrderStates, syncOrderPayment } from '@/orders/hooks'
 import { fulfillmentFields } from '@/orders/fulfillmentFields'
 import { orderWorkflowHandler } from '@/orders/endpoint'
+import { retryShipmentNotification } from '@/email/shipmentNotification'
 
 const generateTitle: GenerateTitle<Product | Page> = ({ doc }) => {
   const siteName = DEFAULT_STORE_NAME
@@ -140,6 +141,11 @@ export const plugins: Plugin[] = [
         endpoints: [
           ...(defaultCollection.endpoints || []),
           { path: '/:id/workflow', method: 'post', handler: orderWorkflowHandler },
+          {
+            path: '/:id/notifications/:notificationID/retry',
+            method: 'post',
+            handler: retryShipmentNotification,
+          },
         ],
         admin: {
           ...defaultCollection.admin,
@@ -154,6 +160,16 @@ export const plugins: Plugin[] = [
         },
         hooks: {
           ...defaultCollection.hooks,
+          beforeDelete: [
+            ...(defaultCollection.hooks?.beforeDelete ?? []),
+            async ({ id, req }) => {
+              await req.payload.delete({
+                collection: 'shipment-notifications',
+                req,
+                where: { order: { equals: id } },
+              })
+            },
+          ],
           beforeChange: [
             ...(defaultCollection.hooks?.beforeChange ?? []),
             guardOrderStates,

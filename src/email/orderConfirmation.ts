@@ -22,7 +22,7 @@ const formatMoney = (amount: number, currency: string) =>
     currency,
   }).format(amount / 100)
 
-const orderURL = (order: Order, recipient: string) => {
+export const orderURL = (order: Order, recipient: string) => {
   const url = new URL(`/orders/${order.id}`, getServerSideURL())
   if (order.customerEmail && order.accessToken) {
     url.searchParams.set('email', recipient)
@@ -44,7 +44,7 @@ const addressLines = (order: Order) => {
   ].filter((line): line is string => Boolean(line))
 }
 
-const recipientFor = async (payload: Payload, order: Order) => {
+export const recipientFor = async (payload: Payload, order: Order) => {
   if (order.customerEmail) return order.customerEmail
   if (typeof order.customer === 'object' && order.customer?.email) return order.customer.email
 

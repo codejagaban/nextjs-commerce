@@ -2,6 +2,7 @@ import { createHash, randomUUID } from 'node:crypto'
 import { commitTransaction, initTransaction, killTransaction, type PayloadHandler } from 'payload'
 import { isAdmin } from '@/access/isAdmin'
 import { applyWorkflowCommand, parseWorkflowCommand, WorkflowError } from './fulfillment'
+import { sendShipmentNotification } from '@/email/shipmentNotification'
 
 export const orderWorkflowHandler: PayloadHandler = async (req) => {
   if (!(await isAdmin({ req })))
@@ -48,7 +49,8 @@ export const orderWorkflowHandler: PayloadHandler = async (req) => {
       throw new WorkflowError('This order changed. Refresh it before trying again.', 409)
     order = await req.payload.findByID({ collection: 'orders', id, req, depth: 0 })
     const now = new Date().toISOString()
-    const changes = applyWorkflowCommand(order, command, now, randomUUID())
+    const shipmentID = command.action === 'ship' ? randomUUID() : command.shipmentID
+    const changes = applyWorkflowCommand(order, command, now, shipmentID ?? '')
     order = await req.payload.update({
       collection: 'orders',
       id,
@@ -69,9 +71,41 @@ export const orderWorkflowHandler: PayloadHandler = async (req) => {
         ],
       },
     })
+    const notification =
+      shipmentID && ['ship', 'tracking', 'deliver'].includes(command.action)
+        ? await req.payload.create({
+            collection: 'shipment-notifications',
+            req,
+            data: {
+              order: id,
+              shipmentID,
+              eventKey: `${id}:${command.requestID}`,
+              kind:
+                command.action === 'ship'
+                  ? 'shipped'
+                  : command.action === 'deliver'
+                    ? 'delivered'
+                    : 'tracking',
+              status: command.notifyCustomer ? 'pending' : 'skipped',
+            },
+          })
+        : null
     await commitTransaction(req)
     ownsTransaction = false
-    return Response.json({ order })
+    let notificationStatus: string | undefined
+    if (notification && command.notifyCustomer) {
+      try {
+        notificationStatus = await sendShipmentNotification(req.payload, notification.id)
+      } catch (error) {
+        notificationStatus = 'sending'
+        req.payload.logger.error({
+          err: error,
+          msg: 'Shipment saved; notification delivery needs reconciliation.',
+          notificationID: notification.id,
+        })
+      }
+    }
+    return Response.json({ order, notificationStatus })
   } catch (error) {
     if (ownsTransaction) await killTransaction(req)
     if (error instanceof WorkflowError)
