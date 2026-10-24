@@ -8,8 +8,6 @@ type InventoryTarget = {
   quantity: number
 }
 
-const terminalStatuses = new Set(['cancelled', 'refunded'])
-
 const relationshipID = (value: unknown): number | undefined => {
   const id = typeof value === 'object' && value !== null && 'id' in value ? value.id : value
   return typeof id === 'number' && Number.isFinite(id) ? id : undefined
@@ -41,9 +39,8 @@ export const inventoryTargetsFor = (items: Order['items']): InventoryTarget[] =>
 }
 
 /**
- * A paid order owns the stock decrement. Moving that order into a terminal
- * state returns the complete sold quantities once. Partial returns need their
- * own quantity ledger and are intentionally outside this full-order hook.
+ * Cancel an unshipped paid order: restore stock once. A refund is a money
+ * movement, not evidence of a physical return. Shipped goods need a returns ledger.
  */
 export const restockTerminalOrder: CollectionBeforeChangeHook<Order> = async ({
   data,
@@ -60,14 +57,17 @@ export const restockTerminalOrder: CollectionBeforeChangeHook<Order> = async ({
   // value unless this hook completes the inventory operation below.
   data.inventoryRestockedAt = originalDoc.inventoryRestockedAt
 
-  const nextStatus = data.status ?? originalDoc.status
+  const nextStatus = data.orderStatus ?? originalDoc.orderStatus
   if (
-    !nextStatus ||
-    !terminalStatuses.has(nextStatus) ||
-    terminalStatuses.has(originalDoc.status ?? '') ||
+    nextStatus !== 'cancelled' ||
+    originalDoc.orderStatus === 'cancelled' ||
     originalDoc.inventoryRestockedAt
   ) {
     return data
+  }
+
+  if (!['unfulfilled', 'preparing'].includes(originalDoc.fulfillmentStatus ?? 'unfulfilled')) {
+    throw new Error('Shipped orders must go through a return, not cancellation restocking.')
   }
 
   const transactionIDs = (originalDoc.transactions ?? [])

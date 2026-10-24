@@ -260,6 +260,11 @@ export interface Order {
   status?: OrderStatus;
   amount?: number | null;
   currency?: ('USD' | 'EUR' | 'GBP') | null;
+  orderStatus: 'open' | 'completed' | 'cancelled';
+  paymentStatus: 'not_recorded' | 'pending' | 'paid' | 'partially_refunded' | 'refunded' | 'failed' | 'cancelled';
+  fulfillmentStatus: 'unfulfilled' | 'preparing' | 'partially_fulfilled' | 'shipped' | 'delivered' | 'fulfilled';
+  returnStatus: 'none' | 'requested' | 'partially_returned' | 'returned';
+  workflowVersion: number;
   /**
    * Product value before discounts, shipping, and tax.
    */
@@ -381,8 +386,6 @@ export interface Media {
     };
     [k: string]: unknown;
   } | null;
-  prefix?: string | null;
-  _objectKey?: string | null;
   updatedAt: string;
   createdAt: string;
   url?: string | null;
@@ -1483,8 +1486,6 @@ export interface TagsSelect<T extends boolean = true> {
 export interface MediaSelect<T extends boolean = true> {
   alt?: T;
   caption?: T;
-  prefix?: T;
-  _objectKey?: T;
   updatedAt?: T;
   createdAt?: T;
   url?: T;
@@ -1859,6 +1860,11 @@ export interface OrdersSelect<T extends boolean = true> {
   status?: T;
   amount?: T;
   currency?: T;
+  orderStatus?: T;
+  paymentStatus?: T;
+  fulfillmentStatus?: T;
+  returnStatus?: T;
+  workflowVersion?: T;
   subtotal?: T;
   discountTotal?: T;
   shippingTotal?: T;

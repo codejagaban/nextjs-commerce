@@ -4,6 +4,7 @@ import * as migration_20260927_103909_order_financial_breakdown from './20260927
 import * as migration_20260927_105055_store_timezone from './20260927_105055_store_timezone';
 import * as migration_20260927_110027_dashboard_reporting_indexes from './20260927_110027_dashboard_reporting_indexes';
 import * as migration_20260927_112155_inventory_restock_tracking from './20260927_112155_inventory_restock_tracking';
+import * as migration_20261024_221336_order_state_separation from './20261024_221336_order_state_separation';
 
 export const migrations = [
   {
@@ -29,11 +30,16 @@ export const migrations = [
   {
     up: migration_20260927_110027_dashboard_reporting_indexes.up,
     down: migration_20260927_110027_dashboard_reporting_indexes.down,
-    name: '20260927_110027_dashboard_reporting_indexes'
+    name: '20260927_110027_dashboard_reporting_indexes',
   },
   {
     up: migration_20260927_112155_inventory_restock_tracking.up,
     down: migration_20260927_112155_inventory_restock_tracking.down,
-    name: '20260927_112155_inventory_restock_tracking'
+    name: '20260927_112155_inventory_restock_tracking',
+  },
+  {
+    up: migration_20261024_221336_order_state_separation.up,
+    down: migration_20261024_221336_order_state_separation.down,
+    name: '20261024_221336_order_state_separation'
   },
 ];

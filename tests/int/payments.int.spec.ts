@@ -100,6 +100,12 @@ async function verifySettlement(cart: Cart, productID: number) {
   expect(orders.docs).toHaveLength(1)
   expect(orders.docs[0].amount).toBe(5000)
   expect(orders.docs[0].currency).toBe('USD')
+  expect(orders.docs[0]).toMatchObject({
+    orderStatus: 'open',
+    paymentStatus: 'paid',
+    fulfillmentStatus: 'unfulfilled',
+    returnStatus: 'none',
+  })
   expect(transaction.order).toBe(orders.docs[0].id)
   expect((await payload.findByID({ collection: 'products', id: productID })).inventory).toBe(8)
   const purchasedCart = await payload.findByID({ collection: 'carts', id: cart.id })
@@ -238,7 +244,9 @@ describe('Stripe settlement and webhooks', () => {
     expect((await webhook(f.intent)).status).toBe(200)
     const order = await verifySettlement(f.cart, f.product.id)
 
-    await payload.update({ collection: 'orders', id: order.id, data: { status: 'completed' } })
+    await expect(
+      payload.update({ collection: 'orders', id: order.id, data: { status: 'completed' } }),
+    ).rejects.toThrow('Use the order workflow')
     expect((await payload.findByID({ collection: 'products', id: f.product.id })).inventory).toBe(8)
     await payload.update({
       collection: 'orders',
@@ -250,20 +258,57 @@ describe('Stripe settlement and webhooks', () => {
     ).toBeNull()
 
     await Promise.all([
-      payload.update({ collection: 'orders', id: order.id, data: { status: 'cancelled' } }),
-      payload.update({ collection: 'orders', id: order.id, data: { status: 'refunded' } }),
+      payload.update({
+        collection: 'orders',
+        id: order.id,
+        context: { orderWorkflow: true },
+        data: { orderStatus: 'cancelled' },
+      }),
+      payload.update({
+        collection: 'orders',
+        id: order.id,
+        context: { orderWorkflow: true },
+        data: { orderStatus: 'cancelled' },
+      }),
     ])
 
     const terminalOrder = await payload.findByID({ collection: 'orders', id: order.id })
     expect(terminalOrder.inventoryRestockedAt).toBeTruthy()
+    expect(terminalOrder.paymentStatus).toBe('paid')
     expect((await payload.findByID({ collection: 'products', id: f.product.id })).inventory).toBe(
       10,
     )
 
-    await payload.update({ collection: 'orders', id: order.id, data: { status: 'refunded' } })
+    await payload.update({
+      collection: 'orders',
+      id: order.id,
+      context: { orderWorkflow: true },
+      data: { orderStatus: 'cancelled' },
+    })
     expect((await payload.findByID({ collection: 'products', id: f.product.id })).inventory).toBe(
       10,
     )
+  })
+
+  it('does not restock or change fulfillment when a payment is refunded', async () => {
+    const f = await fixture()
+    f.intent.status = 'succeeded'
+    await webhook(f.intent)
+    const order = await verifySettlement(f.cart, f.product.id)
+    const transactionID = order.transactions![0] as number
+    await payload.update({
+      collection: 'transactions',
+      id: transactionID,
+      data: { status: 'refunded' },
+    })
+    expect(await payload.findByID({ collection: 'orders', id: order.id })).toMatchObject({
+      orderStatus: 'open',
+      paymentStatus: 'refunded',
+      fulfillmentStatus: 'unfulfilled',
+      returnStatus: 'none',
+      inventoryRestockedAt: null,
+    })
+    expect((await payload.findByID({ collection: 'products', id: f.product.id })).inventory).toBe(8)
   })
 
   it('keeps the order successful when email fails and retries delivery', async () => {

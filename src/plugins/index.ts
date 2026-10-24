@@ -21,6 +21,8 @@ import { DEFAULT_STORE_NAME } from '@/brand'
 import { orderEmailPlugin } from '@/email/orderEmailPlugin'
 import { orderFinancialFields } from '@/fields/orderFinancialFields'
 import { restockTerminalOrder } from '@/inventory/restockOrder'
+import { orderStateFields } from '@/orders/fields'
+import { guardOrderStates, syncOrderPayment } from '@/orders/hooks'
 
 const generateTitle: GenerateTitle<Product | Page> = ({ doc }) => {
   const siteName = DEFAULT_STORE_NAME
@@ -133,12 +135,32 @@ export const plugins: Plugin[] = [
     orders: {
       ordersCollectionOverride: ({ defaultCollection }) => ({
         ...defaultCollection,
+        admin: {
+          ...defaultCollection.admin,
+          defaultColumns: [
+            'id',
+            'customer',
+            'amount',
+            'orderStatus',
+            'paymentStatus',
+            'fulfillmentStatus',
+          ],
+        },
         hooks: {
           ...defaultCollection.hooks,
-          beforeChange: [...(defaultCollection.hooks?.beforeChange ?? []), restockTerminalOrder],
+          beforeChange: [
+            ...(defaultCollection.hooks?.beforeChange ?? []),
+            guardOrderStates,
+            restockTerminalOrder,
+          ],
         },
         fields: [
-          ...defaultCollection.fields.map(indexReportingFields),
+          ...defaultCollection.fields.map((field) =>
+            field.type === 'select' && field.name === 'status'
+              ? { ...field, admin: { ...field.admin, hidden: true, readOnly: true } }
+              : indexReportingFields(field),
+          ),
+          ...orderStateFields,
           ...orderFinancialFields,
           {
             name: 'accessToken',
@@ -187,6 +209,10 @@ export const plugins: Plugin[] = [
       transactionsCollectionOverride: ({ defaultCollection }) => ({
         ...defaultCollection,
         fields: defaultCollection.fields.map(indexReportingFields),
+        hooks: {
+          ...defaultCollection.hooks,
+          afterChange: [...(defaultCollection.hooks?.afterChange ?? []), syncOrderPayment],
+        },
       }),
     },
     payments: {

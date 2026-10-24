@@ -13,6 +13,7 @@
  */
 import { getPayload } from 'payload'
 import config from '@payload-config'
+import { legacyOrderStates } from '@/orders/states'
 
 const DAYS = 90
 const KEEP = process.argv.includes('--keep')
@@ -121,6 +122,9 @@ for (let dayOffset = DAYS - 1; dayOffset >= 0; dayOffset--) {
         customerEmail: `${first.toLowerCase()}.${last.toLowerCase()}@example.com`,
         items,
         status,
+        ...legacyOrderStates(status),
+        paymentStatus: 'not_recorded',
+        workflowVersion: 0,
         shippingAddress: {
           firstName: first,
           lastName: last,
