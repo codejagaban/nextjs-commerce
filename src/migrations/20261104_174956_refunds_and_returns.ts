@@ -4,43 +4,43 @@ export async function up({ db }: MigrateUpArgs): Promise<void> {
   await db.execute(sql`
    CREATE TYPE "public"."enum_order_refunds_status" AS ENUM('submitting', 'pending', 'requires_action', 'succeeded', 'failed', 'canceled', 'needs_review');
   CREATE TABLE "order_refunds" (
-  	"id" serial PRIMARY KEY NOT NULL,
-  	"order_id" integer NOT NULL,
-  	"transaction_id" integer NOT NULL,
-  	"request_i_d" varchar NOT NULL,
-  	"request_hash" varchar NOT NULL,
-  	"actor_id" integer NOT NULL,
-  	"reason" varchar NOT NULL,
-  	"payment_intent_i_d" varchar NOT NULL,
-  	"provider_refund_i_d" varchar,
-  	"currency" varchar NOT NULL,
-  	"product_amount" numeric NOT NULL,
-  	"shipping_amount" numeric NOT NULL,
-  	"tax_amount" numeric NOT NULL,
-  	"amount" numeric NOT NULL,
-  	"status" "enum_order_refunds_status" DEFAULT 'submitting' NOT NULL,
-  	"updated_at" timestamp(3) with time zone DEFAULT now() NOT NULL,
-  	"created_at" timestamp(3) with time zone DEFAULT now() NOT NULL
+    "id" serial PRIMARY KEY NOT NULL,
+    "order_id" integer NOT NULL,
+    "transaction_id" integer NOT NULL,
+    "request_i_d" varchar NOT NULL,
+    "request_hash" varchar NOT NULL,
+    "actor_id" integer NOT NULL,
+    "reason" varchar NOT NULL,
+    "payment_intent_i_d" varchar NOT NULL,
+    "provider_refund_i_d" varchar,
+    "currency" varchar NOT NULL,
+    "product_amount" numeric NOT NULL,
+    "shipping_amount" numeric NOT NULL,
+    "tax_amount" numeric NOT NULL,
+    "amount" numeric NOT NULL,
+    "status" "enum_order_refunds_status" DEFAULT 'submitting' NOT NULL,
+    "updated_at" timestamp(3) with time zone DEFAULT now() NOT NULL,
+    "created_at" timestamp(3) with time zone DEFAULT now() NOT NULL
   );
-  
+
   CREATE TABLE "orders_returns_items" (
-  	"_order" integer NOT NULL,
-  	"_parent_id" varchar NOT NULL,
-  	"id" varchar PRIMARY KEY NOT NULL,
-  	"order_item_i_d" varchar NOT NULL,
-  	"quantity" numeric NOT NULL,
-  	"received" numeric DEFAULT 0 NOT NULL,
-  	"restocked" numeric DEFAULT 0 NOT NULL
+    "_order" integer NOT NULL,
+    "_parent_id" varchar NOT NULL,
+    "id" varchar PRIMARY KEY NOT NULL,
+    "order_item_i_d" varchar NOT NULL,
+    "quantity" numeric NOT NULL,
+    "received" numeric DEFAULT 0 NOT NULL,
+    "restocked" numeric DEFAULT 0 NOT NULL
   );
-  
+
   CREATE TABLE "orders_returns" (
-  	"_order" integer NOT NULL,
-  	"_parent_id" integer NOT NULL,
-  	"id" varchar PRIMARY KEY NOT NULL,
-  	"reason" varchar NOT NULL,
-  	"requested_at" timestamp(3) with time zone NOT NULL
+    "_order" integer NOT NULL,
+    "_parent_id" integer NOT NULL,
+    "id" varchar PRIMARY KEY NOT NULL,
+    "reason" varchar NOT NULL,
+    "requested_at" timestamp(3) with time zone NOT NULL
   );
-  
+
   ALTER TABLE "payload_locked_documents_rels" ADD COLUMN "order_refunds_id" integer;
   ALTER TABLE "order_refunds" ADD CONSTRAINT "order_refunds_order_id_orders_id_fk" FOREIGN KEY ("order_id") REFERENCES "public"."orders"("id") ON DELETE set null ON UPDATE no action;
   ALTER TABLE "order_refunds" ADD CONSTRAINT "order_refunds_transaction_id_transactions_id_fk" FOREIGN KEY ("transaction_id") REFERENCES "public"."transactions"("id") ON DELETE set null ON UPDATE no action;
@@ -71,7 +71,7 @@ export async function down({ db }: MigrateDownArgs): Promise<void> {
   DROP TABLE "order_refunds" CASCADE;
   DROP TABLE "orders_returns_items" CASCADE;
   DROP TABLE "orders_returns" CASCADE;
-  
+
   DROP INDEX "payload_locked_documents_rels_order_refunds_id_idx";
   ALTER TABLE "payload_locked_documents_rels" DROP COLUMN "order_refunds_id";
   DROP TYPE "public"."enum_order_refunds_status";`)
