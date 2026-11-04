@@ -326,6 +326,7 @@ describe('Stripe settlement and webhooks', () => {
     expect(await payload.findByID({ collection: 'orders', id: order.id })).toMatchObject({
       orderStatus: 'open',
       paymentStatus: 'refunded',
+      productRefundTotal: 5000,
       fulfillmentStatus: 'unfulfilled',
       returnStatus: 'none',
       inventoryRestockedAt: null,
@@ -412,6 +413,9 @@ describe('Stripe settlement and webhooks', () => {
     expect((await workflow(order.id, { ...winningCommand, carrier: 'Other' })).status).toBe(409)
     const final = await payload.findByID({ collection: 'orders', id: order.id })
     expect(final.shipments).toHaveLength(1)
+    await expect(
+      payload.update({ collection: 'orders', id: order.id, data: { items: null } }),
+    ).rejects.toThrow('Purchased items cannot be changed')
     await expect(
       payload.update({ collection: 'orders', id: order.id, data: { shipments: [] } }),
     ).rejects.toThrow('Use the order workflow')

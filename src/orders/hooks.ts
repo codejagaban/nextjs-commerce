@@ -36,13 +36,14 @@ export const guardOrderStates: CollectionBeforeChangeHook<Order> = ({
     }
   }
   // Shipment line IDs and purchased quantities are immutable snapshots.
-  if (operation === 'update' && data.items && originalDoc) {
-    const itemSnapshot = (items: Order['items']) => (items ?? []).map((item) => ({
-      id: item.id,
-      product: typeof item.product === 'object' ? item.product?.id : item.product,
-      variant: (typeof item.variant === 'object' ? item.variant?.id : item.variant) ?? null,
-      quantity: item.quantity,
-    }))
+  if (operation === 'update' && data.items !== undefined && originalDoc) {
+    const itemSnapshot = (items: Order['items']) =>
+      (items ?? []).map((item) => ({
+        id: item.id,
+        product: typeof item.product === 'object' ? item.product?.id : item.product,
+        variant: (typeof item.variant === 'object' ? item.variant?.id : item.variant) ?? null,
+        quantity: item.quantity,
+      }))
     if (!isDeepStrictEqual(itemSnapshot(data.items), itemSnapshot(originalDoc.items))) {
       throw new APIError('Purchased items cannot be changed. Use the fulfillment workflow.', 400)
     }
@@ -76,7 +77,19 @@ export const syncOrderPayment: CollectionAfterChangeHook<Transaction> = async ({
       id: orderID,
       req,
       context: { orderWorkflow: true },
-      data: { paymentStatus },
+      data: {
+        paymentStatus,
+        ...(paymentStatus === 'refunded'
+          ? {
+              productRefundTotal: Math.max(
+                0,
+                (order.subtotal ?? order.amount ?? 0) - (order.discountTotal ?? 0),
+              ),
+              shippingRefundTotal: order.shippingTotal ?? 0,
+              taxRefundTotal: order.taxTotal ?? 0,
+            }
+          : {}),
+      },
     })
   }
   return doc
