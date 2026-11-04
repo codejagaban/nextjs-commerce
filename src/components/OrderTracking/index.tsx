@@ -26,6 +26,41 @@ export function OrderTracking({ order }: { order: Order }) {
           This order has been cancelled. A refund has not yet been recorded.
         </p>
       )}
+      {(order.productRefundTotal ?? 0) +
+        (order.shippingRefundTotal ?? 0) +
+        (order.taxRefundTotal ?? 0) >
+        0 && (
+        <p className="text-sm">
+          Refunded:{' '}
+          {new Intl.NumberFormat('en-GB', {
+            style: 'currency',
+            currency: order.currency ?? 'USD',
+          }).format(
+            ((order.productRefundTotal ?? 0) +
+              (order.shippingRefundTotal ?? 0) +
+              (order.taxRefundTotal ?? 0)) /
+              100,
+          )}{' '}
+          to your original payment method.
+        </p>
+      )}
+      {order.returns?.map((row, index) => (
+        <article key={row.id} className="rounded-lg bg-background p-4 text-sm">
+          <h3 className="font-medium">Return {index + 1}</h3>
+          <ul className="mt-2 space-y-1">
+            {row.items.map((line) => (
+              <li key={line.orderItemID}>
+                {orderItemTitle(
+                  order.items?.find((item) => item.id === line.orderItemID) ?? {
+                    quantity: line.quantity,
+                  },
+                )}
+                : {line.received} of {line.quantity} received
+              </li>
+            ))}
+          </ul>
+        </article>
+      ))}
       {!order.shipments?.length && order.orderStatus !== 'cancelled' && (
         <p className="text-sm text-muted-foreground">
           {order.fulfillmentStatus === 'fulfilled'

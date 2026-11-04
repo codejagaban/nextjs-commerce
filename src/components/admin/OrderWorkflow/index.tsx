@@ -9,6 +9,7 @@ import { remainingItems, safeTrackingURL, type WorkflowCommand } from '@/orders/
 import { stateLabel } from '@/orders/states'
 import { orderItemTitle as productName } from '@/orders/itemTitle'
 import './index.scss'
+import { RefundReturns } from './RefundReturns'
 
 type Fields = {
   carrier: string
@@ -25,6 +26,20 @@ const actionLabel: Record<string, string> = {
   deliver: 'Shipment marked delivered',
   complete: 'Order completed',
   cancel: 'Order cancelled',
+  refund_requested: 'Refund requested',
+  refund_succeeded: 'Refund succeeded',
+  refund_failed: 'Refund failed at provider',
+  return_request: 'Return requested',
+  return_receive: 'Returned goods received',
+}
+function receiptLines(
+  value: unknown,
+): { orderItemID: string; quantity: number; restock: boolean }[] {
+  if (!value || typeof value !== 'object' || !('items' in value) || !Array.isArray(value.items))
+    return []
+  return value.items.filter(
+    (line) => line && typeof line.orderItemID === 'string' && typeof line.quantity === 'number',
+  )
 }
 const date = (value: string) =>
   new Date(value).toLocaleString(undefined, { dateStyle: 'medium', timeStyle: 'short' })
@@ -563,6 +578,7 @@ function SavedOrderWorkflow({ id }: { id: number | string }) {
                 ))}
             </article>
           ))}
+          <RefundReturns order={order} disabled={disabled} onChange={refresh} />
           {!!order.workflowEvents?.length && (
             <details className="order-workflow__history">
               <summary>Activity ({order.workflowEvents.length})</summary>
@@ -570,6 +586,21 @@ function SavedOrderWorkflow({ id }: { id: number | string }) {
                 {[...order.workflowEvents].reverse().map((event) => (
                   <li key={event.id}>
                     <strong>{actionLabel[event.action] || stateLabel(event.action)}</strong>
+                    {receiptLines(event.details).map((line) => (
+                      <span key={line.orderItemID}>
+                        {productName(
+                          order.items?.find((item) => item.id === line.orderItemID) ?? {
+                            quantity: line.quantity,
+                          },
+                        )}{' '}
+                        × {line.quantity}
+                        {event.action === 'return_receive'
+                          ? line.restock
+                            ? ' · Restocked'
+                            : ' · Not restocked'
+                          : ''}
+                      </span>
+                    ))}
                     <span>
                       {date(event.occurredAt)} ·{' '}
                       {event.actor && typeof event.actor === 'object'
