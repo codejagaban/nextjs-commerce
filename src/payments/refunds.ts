@@ -54,19 +54,22 @@ export async function reconcileRefund(
     if (!['pending', 'requires_action', 'succeeded', 'failed', 'canceled'].includes(providerStatus))
       throw new Error('Unsupported provider refund status.')
     const status = providerStatus as OrderRefund['status']
-    if (current.status === 'succeeded' && status !== 'succeeded')
-      throw new Error('Succeeded refund cannot regress. Reconcile with the provider.')
     const updated = await payload.update({
       collection: 'order-refunds',
       id: operation.id,
       req,
       data: { providerRefundID: refund.id, status },
     })
-    if (status === 'succeeded' && current.status !== 'succeeded') {
+    const contribution = Number(status === 'succeeded') - Number(current.status === 'succeeded')
+    if (contribution !== 0) {
       const order = await payload.findByID({ collection: 'orders', id: orderID, req, depth: 0 })
-      const productRefundTotal = (order.productRefundTotal ?? 0) + current.productAmount
-      const shippingRefundTotal = (order.shippingRefundTotal ?? 0) + current.shippingAmount
-      const taxRefundTotal = (order.taxRefundTotal ?? 0) + current.taxAmount
+      const productRefundTotal =
+        (order.productRefundTotal ?? 0) + contribution * current.productAmount
+      const shippingRefundTotal =
+        (order.shippingRefundTotal ?? 0) + contribution * current.shippingAmount
+      const taxRefundTotal = (order.taxRefundTotal ?? 0) + contribution * current.taxAmount
+      if ([productRefundTotal, shippingRefundTotal, taxRefundTotal].some((amount) => amount < 0))
+        throw new Error('Refund reconciliation would produce negative totals.')
       if (productRefundTotal + shippingRefundTotal + taxRefundTotal > (order.amount ?? 0))
         throw new Error(
           'Refund totals exceed the recorded payment. Manual reconciliation required.',
@@ -83,14 +86,16 @@ export async function reconcileRefund(
           paymentStatus:
             productRefundTotal + shippingRefundTotal + taxRefundTotal >= (order.amount ?? 0)
               ? 'refunded'
-              : 'partially_refunded',
+              : productRefundTotal + shippingRefundTotal + taxRefundTotal > 0
+                ? 'partially_refunded'
+                : 'paid',
           workflowEvents: [
             ...(order.workflowEvents ?? []),
             {
-              action: 'refund_succeeded',
+              action: `refund_${status}`,
               actor: relationID(current.actor),
               occurredAt: new Date().toISOString(),
-              requestID: `refund:${current.requestID}`,
+              requestID: `refund:${status}:${current.requestID}`,
               requestHash: current.requestHash,
             },
           ],
@@ -118,6 +123,11 @@ export async function executeRefund(payload: Payload, operation: OrderRefund) {
   const providerRefunds = await stripe.refunds
     .list({ payment_intent: operation.paymentIntentID, limit: 100 })
     .autoPagingToArray({ limit: 10000 })
+  if (providerRefunds.length >= 10000)
+    throw new WorkflowError(
+      'Refund history exceeds the automatic reconciliation limit. Reconcile with Stripe manually.',
+      409,
+    )
   const existing = providerRefunds.find(
     (row) => row.metadata?.commerce_refund === operation.requestID,
   )

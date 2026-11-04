@@ -7,6 +7,7 @@ import { orderWorkflowHandler } from '@/orders/endpoint'
 import { sendShipmentNotification } from '@/email/shipmentNotification'
 import { orderRefundHandler, reconcileRefundHandler } from '@/orders/refundEndpoint'
 import { orderReturnHandler } from '@/orders/returnEndpoint'
+import { syncStripeRefund } from '@/payments/refunds'
 
 // Only the external Stripe transport is replaced in CI. All Payload endpoints,
 // access checks, signatures, settlement transactions and inventory are real.
@@ -711,6 +712,105 @@ describe('Stripe settlement and webhooks', () => {
     })
   })
 
+  it('corrects a refund that later fails at the provider without touching goods', async () => {
+    const f = await fixture()
+    f.intent.status = 'succeeded'
+    await webhook(f.intent)
+    const order = await verifySettlement(f.cart, f.product.id)
+    const response = await operation(orderRefundHandler, order.id, {
+      requestID: randomUUID(),
+      version: order.workflowVersion,
+      productAmount: 1000,
+      shippingAmount: 0,
+      taxAmount: 0,
+      reason: 'Late failure',
+    })
+    expect(response.status).toBe(200)
+    const op = (await response.json()).refund
+    refunds.get(op.providerRefundID)!.status = 'failed'
+    await syncStripeRefund(payload, op.providerRefundID)
+    await syncStripeRefund(payload, op.providerRefundID)
+    expect(await payload.findByID({ collection: 'orders', id: order.id })).toMatchObject({
+      productRefundTotal: 0,
+      paymentStatus: 'paid',
+      fulfillmentStatus: 'unfulfilled',
+    })
+    expect((await payload.findByID({ collection: 'products', id: f.product.id })).inventory).toBe(8)
+  })
+
+  it('never reissues an ambiguous request after the safe provider retry window', async () => {
+    const f = await fixture()
+    f.intent.status = 'succeeded'
+    await webhook(f.intent)
+    const order = await verifySettlement(f.cart, f.product.id)
+    const op = await payload.create({
+      collection: 'order-refunds',
+      data: {
+        order: order.id,
+        transaction: order.transactions![0] as number,
+        actor: admin.id,
+        requestID: randomUUID(),
+        requestHash: 'old-reservation',
+        reason: 'Old uncertain attempt',
+        paymentIntentID: f.intent.id,
+        currency: 'USD',
+        productAmount: 1000,
+        shippingAmount: 0,
+        taxAmount: 0,
+        amount: 1000,
+        status: 'submitting',
+      },
+    })
+    await payload.db.updateOne({
+      collection: 'order-refunds',
+      id: op.id,
+      data: { createdAt: new Date(Date.now() - 25 * 60 * 60 * 1000).toISOString() },
+    })
+    const calls = vi.mocked(signing.refunds.create).mock.calls.length
+    expect(
+      (await operation(reconcileRefundHandler, order.id, {}, admin, { refundID: String(op.id) }))
+        .status,
+    ).toBe(409)
+    expect(vi.mocked(signing.refunds.create).mock.calls).toHaveLength(calls)
+    expect((await payload.findByID({ collection: 'order-refunds', id: op.id })).status).toBe(
+      'needs_review',
+    )
+    expect(
+      (await operation(reconcileRefundHandler, order.id, {}, outsider, { refundID: String(op.id) }))
+        .status,
+    ).toBe(403)
+  })
+
+  it('blocks new money movement when Stripe contains an unallocated external refund', async () => {
+    const f = await fixture()
+    f.intent.status = 'succeeded'
+    await webhook(f.intent)
+    const order = await verifySettlement(f.cart, f.product.id)
+    const id = `re_external_${randomUUID()}`
+    refunds.set(id, {
+      id,
+      payment_intent: f.intent.id,
+      amount: 500,
+      currency: 'usd',
+      status: 'succeeded',
+      metadata: {},
+    } as Stripe.Refund)
+    const calls = vi.mocked(signing.refunds.create).mock.calls.length
+    const response = await operation(orderRefundHandler, order.id, {
+      requestID: randomUUID(),
+      version: order.workflowVersion,
+      productAmount: 1000,
+      shippingAmount: 0,
+      taxAmount: 0,
+      reason: 'External reconciliation required',
+    })
+    expect(response.status).toBe(409)
+    expect(vi.mocked(signing.refunds.create).mock.calls).toHaveLength(calls)
+    expect(
+      (await payload.findByID({ collection: 'orders', id: order.id })).productRefundTotal,
+    ).toBe(0)
+  })
+
   it('receives returns and restores selected stock exactly once independently of payment', async () => {
     const f = await fixture()
     f.intent.status = 'succeeded'
@@ -759,6 +859,9 @@ describe('Stripe settlement and webhooks', () => {
       returnStatus: 'partially_returned',
       paymentStatus: 'paid',
       fulfillmentStatus: 'shipped',
+    })
+    expect(order.workflowEvents!.at(-1)!.details).toMatchObject({
+      items: [{ quantity: 1, restock: true }],
     })
     expect((await payload.findByID({ collection: 'products', id: f.product.id })).inventory).toBe(9)
     expect(
