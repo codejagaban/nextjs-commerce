@@ -12,6 +12,16 @@ const managedFields = [
   'workflowVersion',
   'shipments',
   'workflowEvents',
+  'returns',
+  'productRefundTotal',
+  'shippingRefundTotal',
+  'taxRefundTotal',
+  'amount',
+  'currency',
+  'subtotal',
+  'discountTotal',
+  'shippingTotal',
+  'taxTotal',
 ] as const
 
 /** REST/GraphQL/admin field edits cannot bypass the workflow or fabricate payment. */
@@ -28,6 +38,10 @@ export const guardOrderStates: CollectionBeforeChangeHook<Order> = ({
     })
     data.shipments = []
     data.workflowEvents = []
+    data.returns = []
+    data.productRefundTotal = 0
+    data.shippingRefundTotal = 0
+    data.taxRefundTotal = 0
   } else if (!context.orderWorkflow) {
     for (const key of managedFields) {
       if (data[key] !== undefined && !isDeepStrictEqual(data[key], originalDoc?.[key])) {

@@ -25,6 +25,9 @@ import { orderStateFields } from '@/orders/fields'
 import { guardOrderStates, syncOrderPayment } from '@/orders/hooks'
 import { fulfillmentFields } from '@/orders/fulfillmentFields'
 import { orderWorkflowHandler } from '@/orders/endpoint'
+import { returnFields } from '@/orders/returnFields'
+import { orderReturnHandler } from '@/orders/returnEndpoint'
+import { orderRefundHandler, reconcileRefundHandler } from '@/orders/refundEndpoint'
 import { retryShipmentNotification } from '@/email/shipmentNotification'
 
 const generateTitle: GenerateTitle<Product | Page> = ({ doc }) => {
@@ -141,6 +144,13 @@ export const plugins: Plugin[] = [
         endpoints: [
           ...(defaultCollection.endpoints || []),
           { path: '/:id/workflow', method: 'post', handler: orderWorkflowHandler },
+          { path: '/:id/returns', method: 'post', handler: orderReturnHandler },
+          { path: '/:id/refunds', method: 'post', handler: orderRefundHandler },
+          {
+            path: '/:id/refunds/:refundID/reconcile',
+            method: 'post',
+            handler: reconcileRefundHandler,
+          },
           {
             path: '/:id/notifications/:notificationID/retry',
             method: 'post',
@@ -163,6 +173,14 @@ export const plugins: Plugin[] = [
           beforeDelete: [
             ...(defaultCollection.hooks?.beforeDelete ?? []),
             async ({ id, req }) => {
+              const refunds = await req.payload.find({
+                collection: 'order-refunds',
+                req,
+                limit: 1,
+                where: { order: { equals: id } },
+              })
+              if (refunds.docs.length)
+                throw new Error('Orders with refund history cannot be deleted.')
               await req.payload.delete({
                 collection: 'shipment-notifications',
                 req,
@@ -189,6 +207,7 @@ export const plugins: Plugin[] = [
           ),
           ...orderStateFields,
           ...fulfillmentFields,
+          ...returnFields,
           ...orderFinancialFields,
           {
             name: 'accessToken',

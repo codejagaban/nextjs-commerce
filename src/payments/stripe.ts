@@ -4,6 +4,7 @@ import type { PaymentAdapter } from '@payloadcms/plugin-ecommerce/types'
 import { createLocalReq } from 'payload'
 
 import { withOrderFinancialSnapshot } from './orderFinancials'
+import { syncStripeRefund } from './refunds'
 
 type StripeAdapterArgs = Parameters<typeof stripeAdapter>[0]
 type WebhookHandler = NonNullable<StripeAdapterArgs['webhooks']>[string]
@@ -68,7 +69,23 @@ export const settleStripePayment: WebhookHandler = async ({ event, req }) => {
 export const storeStripeAdapter = (options: StripeAdapterArgs): PaymentAdapter => {
   const base = stripeAdapter({
     ...options,
-    webhooks: { ...options.webhooks, 'payment_intent.succeeded': settleStripePayment },
+    webhooks: {
+      ...options.webhooks,
+      'payment_intent.succeeded': settleStripePayment,
+      ...Object.fromEntries(
+        ['refund.created', 'refund.updated', 'refund.failed'].map((name) => [
+          name,
+          (async ({ event, req }) => {
+            if (
+              event.type === 'refund.created' ||
+              event.type === 'refund.updated' ||
+              event.type === 'refund.failed'
+            )
+              await syncStripeRefund(req.payload, event.data.object.id)
+          }) satisfies WebhookHandler,
+        ]),
+      ),
+    },
   })
   return {
     ...base,
