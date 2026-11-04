@@ -1,10 +1,56 @@
 # Dependency security
 
-Reviewed on 2026-10-19. Run `pnpm audit --prod` for the deployable dependency
+Reviewed on 2026-11-04. Run `pnpm audit --prod` for the deployable dependency
 tree and `pnpm audit` for the entire development environment. The production
 audit remains a required CI gate. No advisory is ignored or suppressed.
 
-## Security updates
+## Current release status
+
+The fresh production audit reported **23 findings: 3 critical, 8 high, 8 moderate,
+and 4 low**. The updates below reduce that to **one low-severity finding**, with
+zero critical, high, or moderate production findings. **The production audit
+still exits unsuccessfully and blocks merging.**
+
+| Dependency | Previous | Updated |
+| --- | --- | --- |
+| Next.js and matching ESLint packages | 16.3.8 | 16.4.5 |
+| Payload and all first-party adapters/plugins | 3.91.0 | 3.93.0 |
+| DOMPurify | 3.4.16 | 3.4.17 |
+| Undici, through Payload | 7.29.1 | 7.30.1 |
+| Happy DOM, scoped to Lexical headless 0.50.0 | 20.14.0 | 21.0.4 |
+| fast-uri | 3.1.8 | 3.1.9 |
+| qs, scoped to Stripe 18.5.0 | 6.16.0 | 6.16.1 |
+
+The remaining production finding is
+[deepmerge prototype poisoning, GHSA-gcqx-w48m-w2h4](https://github.com/advisories/GHSA-gcqx-w48m-w2h4).
+Payload 3.93.0 still depends on deepmerge 4.3.1. The advisory lists no patched
+release, and 4.3.1 is the latest published version at this review. It is retained
+in the audit; there is no ignore list, audit-threshold change, or merge bypass.
+Do not downgrade to an older merge implementation or replace this dependency
+without a separate compatibility and security review.
+
+The **full development audit reports 20 findings** (8 high, 10 moderate, 2 low),
+including Vite, Zod, development copies of Undici/Happy DOM, minimatch, and
+Tailwind typography's selector parser. Those are separate from the single
+production finding; this update does not claim a clean development audit.
+
+The cloud-storage removal is re-scoped to 3.93.0 after inspecting all 32 shipped
+JavaScript files and confirming no `find-node-modules` import. Its version guard
+is updated. The Happy DOM override intentionally adopts v21's disabled-by-default
+iframe and CSS fetching; a regression test exercises actual Lexical HTML
+import/export and confirms those network-loading settings remain disabled.
+
+Frozen-lockfile installation, typechecking, 33 unit tests, 21 integration tests,
+and all 11 production-build storefront/admin browser tests passed with these
+updates. Lint has zero errors and 110 existing warnings. The
+strict production audit gate remains failing until the upstream issue is fixed
+or the project owner explicitly approves a documented policy exception.
+
+## Historical review: 2026-10-19
+
+The following records the previous security pass, before the new advisories above.
+
+### Security updates
 
 | Dependency                                      | Previous       | Updated         |
 | ----------------------------------------------- | -------------- | --------------- |
@@ -24,7 +70,7 @@ provides the supported Nodemailer 10 and Undici updates, avoiding a forced
 cross-major mail-adapter override. Sharp fixes its
 [vulnerable librsvg dependency](https://github.com/advisories/GHSA-wq5f-xc86-pv6w).
 
-## Removing production paths to braces
+### Removing production paths to braces
 
 `braces` has [no published fix](https://github.com/advisories/GHSA-vfj7-8cjw-p6xm).
 Instead of hiding that finding, the version-scoped overrides in
@@ -43,7 +89,7 @@ CI. Its optional native Parcel watcher has an explicitly approved build script.
 Keep the production build, admin browser checks, and R2 upload/derivative/delete
 smoke test in the verification path for future changes to these overrides.
 
-## Remaining development-only findings
+### Remaining development-only findings at that review
 
 - **High: braces 3.0.3**, through `lint-staged → micromatch` and the Next.js
   ESLint plugin's `fast-glob → micromatch`. No upstream patched version exists.
@@ -60,7 +106,7 @@ A clean production audit does not mean the full development audit is clean, nor
 does it prove the absence of unknown vulnerabilities. Re-run both audits after
 dependency changes and retain the lockfile in review.
 
-## Verification
+### Verification at that review
 
 - `pnpm install --frozen-lockfile`: passed.
 - `pnpm audit --prod`: **0 findings**, down from 25, including 8 high-severity findings.
