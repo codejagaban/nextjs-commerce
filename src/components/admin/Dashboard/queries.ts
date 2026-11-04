@@ -101,7 +101,7 @@ export const recentOrdersFrom = (result: unknown): RecentOrder[] =>
     createdAt: new Date(row.created_at).toISOString(),
     currency: row.currency || 'USD',
     customer: row.customer || 'Guest customer',
-    fulfillmentStatus: row.fulfillment_status || 'processing',
+    fulfillmentStatus: row.fulfillment_status || 'unfulfilled',
     id: row.id,
     paymentStatus: row.payment_status || 'not_recorded',
     total: amount(row.amount),
@@ -150,7 +150,7 @@ export async function getDashboardOrderData({
     WITH report_orders AS (
       SELECT
         "created_at",
-        "status",
+        "payment_status",
         COALESCE("subtotal", "amount", 0) AS "subtotal",
         COALESCE("discount_total", 0) AS "discount_total",
         COALESCE("shipping_total", 0) AS "shipping_total",
@@ -164,7 +164,8 @@ export async function getDashboardOrderData({
           OR ("created_at" >= ${priorStart} AND "created_at" < ${priorEnd})
         )
         AND ("currency" = ${currency} OR "currency" IS NULL)
-        AND "status" IS DISTINCT FROM 'cancelled'
+        AND ("payment_status" IN ('paid', 'partially_refunded', 'refunded')
+          OR ("payment_status" = 'not_recorded' AND "order_status" <> 'cancelled'))
     )
     SELECT
       CASE
@@ -187,7 +188,7 @@ export async function getDashboardOrderData({
       ) AS "total_sales",
       COUNT(*) FILTER (
         WHERE NOT (
-          "status" = 'refunded'
+          "payment_status" = 'refunded'
           AND GREATEST(0, "subtotal" - "discount_total" - "product_refund_total") = 0
         )
       ) AS "net_orders"
@@ -198,15 +199,17 @@ export async function getDashboardOrderData({
 
   const [statusResult, attentionResult, popularResult, recentResult] = await Promise.all([
     payload.db.drizzle.execute(sql`
-      SELECT COALESCE("status"::text, 'processing') AS "status", COUNT(*) AS "count"
+      SELECT CASE WHEN "order_status" = 'open' THEN 'processing' ELSE "order_status"::text END AS "status", COUNT(*) AS "count"
       FROM "orders"
       WHERE "created_at" >= ${start} AND "created_at" < ${end}
         AND ("currency" = ${currency} OR "currency" IS NULL)
-      GROUP BY "status"
+      GROUP BY "order_status"
     `),
     payload.db.drizzle.execute(sql`
       SELECT
-        (SELECT COUNT(*) FROM "orders" WHERE "status" = 'processing') AS "processing_orders",
+        (SELECT COUNT(*) FROM "orders" WHERE "order_status" = 'open'
+          AND "payment_status" IN ('paid', 'partially_refunded')
+          AND "fulfillment_status" IN ('unfulfilled', 'preparing', 'partially_fulfilled')) AS "processing_orders",
         (
           SELECT COUNT(*) FROM "transactions"
           WHERE "status" = 'failed' AND "created_at" >= NOW() - INTERVAL '24 hours'
@@ -255,7 +258,8 @@ export async function getDashboardOrderData({
       WHERE "orders"."created_at" >= ${start}
         AND "orders"."created_at" < ${end}
         AND ("orders"."currency" = ${currency} OR "orders"."currency" IS NULL)
-        AND ("orders"."status" IN ('processing', 'completed') OR "orders"."status" IS NULL)
+        AND "orders"."order_status" <> 'cancelled'
+        AND "orders"."payment_status" IN ('paid', 'partially_refunded', 'not_recorded')
         AND "items"."product_id" IS NOT NULL
       GROUP BY "items"."product_id"
       ORDER BY "units" DESC
@@ -272,18 +276,11 @@ export async function getDashboardOrderData({
         ) AS "customer",
         COALESCE("orders"."amount", 0) AS "amount",
         COALESCE("orders"."currency"::text, ${currency}) AS "currency",
-        COALESCE("orders"."status"::text, 'processing') AS "fulfillment_status",
-        "latest_transaction"."status"::text AS "payment_status",
+        "orders"."fulfillment_status"::text AS "fulfillment_status",
+        "orders"."payment_status"::text AS "payment_status",
         "orders"."created_at"
       FROM "orders"
       LEFT JOIN "users" ON "users"."id" = "orders"."customer_id"
-      LEFT JOIN LATERAL (
-        SELECT "transactions"."status"
-        FROM "transactions"
-        WHERE "transactions"."order_id" = "orders"."id"
-        ORDER BY "transactions"."updated_at" DESC, "transactions"."id" DESC
-        LIMIT 1
-      ) AS "latest_transaction" ON TRUE
       ORDER BY "orders"."created_at" DESC, "orders"."id" DESC
       LIMIT 5
     `),

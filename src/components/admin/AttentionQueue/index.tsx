@@ -35,7 +35,13 @@ export const AttentionQueue: React.FC<Props> = ({ adminPath, counts }) => {
       count: counts.processingOrders,
       detail: 'Paid orders waiting to be handled',
       href: filteredHref(adminPath, 'orders', [
-        { field: 'status', operator: 'equals', value: 'processing' },
+        { field: 'orderStatus', operator: 'equals', value: 'open' },
+        { field: 'paymentStatus', operator: 'in', value: 'paid,partially_refunded' },
+        {
+          field: 'fulfillmentStatus',
+          operator: 'in',
+          value: 'unfulfilled,preparing,partially_fulfilled',
+        },
       ]),
       Icon: IconFulfilment,
       label: 'Orders to process',
@@ -94,7 +100,9 @@ export const AttentionQueue: React.FC<Props> = ({ adminPath, counts }) => {
       label: 'Variants out of stock',
       tone: 'warning',
     },
-  ].filter((item) => item.count > 0).slice(0, 3)
+  ]
+    .filter((item) => item.count > 0)
+    .slice(0, 3)
   const total = items.reduce((sum, item) => sum + item.count, 0)
 
   return (
@@ -120,7 +128,9 @@ export const AttentionQueue: React.FC<Props> = ({ adminPath, counts }) => {
               href={item.href}
               key={item.label}
             >
-              <span className={`attention-queue__item-icon attention-queue__item-icon--${item.tone || 'neutral'}`}>
+              <span
+                className={`attention-queue__item-icon attention-queue__item-icon--${item.tone || 'neutral'}`}
+              >
                 <item.Icon />
               </span>
               <span className="attention-queue__copy">

@@ -3,6 +3,7 @@ import React from 'react'
 
 import type { RecentOrder } from '../Dashboard/queries'
 import { IconOrders } from '../icons'
+import { stateLabel } from '@/orders/states'
 
 import './index.scss'
 
@@ -16,17 +17,7 @@ const money = (minor: number, currency: string) =>
   new Intl.NumberFormat('en-US', { style: 'currency', currency }).format(minor / 100)
 
 const words = (value: string) =>
-  value
-    .replaceAll('_', ' ')
-    .replace(/\b\w/g, (letter) => letter.toUpperCase())
-
-const fulfillmentLabel = (status: string) => {
-  if (status === 'processing') return 'Unfulfilled'
-  if (status === 'completed') return 'Fulfilled'
-  if (status === 'refunded') return 'Refunded'
-  if (status === 'cancelled') return 'Cancelled'
-  return words(status)
-}
+  value.replaceAll('_', ' ').replace(/\b\w/g, (letter) => letter.toUpperCase())
 
 export const RecentOrders: React.FC<Props> = ({ adminPath, orders, timeZone }) => (
   <section className="recent-orders">
@@ -58,9 +49,7 @@ export const RecentOrders: React.FC<Props> = ({ adminPath, orders, timeZone }) =
           >
             <strong>#{order.id}</strong>
             <span className="recent-orders__customer">{order.customer}</span>
-            <span className="recent-orders__money">
-              {money(order.total, order.currency)}
-            </span>
+            <span className="recent-orders__money">{money(order.total, order.currency)}</span>
             <span
               className={`recent-orders__status recent-orders__status--payment recent-orders__status--${order.paymentStatus}`}
             >
@@ -69,7 +58,7 @@ export const RecentOrders: React.FC<Props> = ({ adminPath, orders, timeZone }) =
             <span
               className={`recent-orders__status recent-orders__status--fulfilment recent-orders__status--${order.fulfillmentStatus}`}
             >
-              {fulfillmentLabel(order.fulfillmentStatus)}
+              {stateLabel(order.fulfillmentStatus)}
             </span>
             <time dateTime={order.createdAt}>
               {new Date(order.createdAt).toLocaleDateString('en-US', {

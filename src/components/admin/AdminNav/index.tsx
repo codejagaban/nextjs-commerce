@@ -12,12 +12,7 @@ import './index.scss'
 type IconProps = { className?: string }
 
 const Icon = ({ children, className }: React.PropsWithChildren<IconProps>) => (
-  <svg
-    aria-hidden="true"
-    className={className}
-    fill="none"
-    viewBox="0 0 24 24"
-  >
+  <svg aria-hidden="true" className={className} fill="none" viewBox="0 0 24 24">
     {children}
   </svg>
 )
@@ -122,7 +117,9 @@ const mainLinks = [
 const initialsFor = (name?: null | string, email?: null | string) => {
   const source = name?.trim() || email?.split('@')[0] || 'Admin'
   const parts = source.split(/\s+/).filter(Boolean)
-  return (parts.length > 1 ? `${parts[0][0]}${parts.at(-1)?.[0]}` : source.slice(0, 2)).toUpperCase()
+  return (
+    parts.length > 1 ? `${parts[0][0]}${parts.at(-1)?.[0]}` : source.slice(0, 2)
+  ).toUpperCase()
 }
 
 export const AdminNav: React.FC = () => {
@@ -140,9 +137,12 @@ export const AdminNav: React.FC = () => {
   useEffect(() => {
     const controller = new AbortController()
 
-    void fetch('/api/orders?limit=1&depth=0&where[status][equals]=processing', {
-      signal: controller.signal,
-    })
+    void fetch(
+      '/api/orders?limit=1&depth=0&where[orderStatus][equals]=open&where[paymentStatus][in]=paid,partially_refunded&where[fulfillmentStatus][in]=unfulfilled,preparing,partially_fulfilled',
+      {
+        signal: controller.signal,
+      },
+    )
       .then((response) => (response.ok ? response.json() : null))
       .then((data) => {
         if (typeof data?.totalDocs === 'number') setOrderCount(data.totalDocs)
@@ -251,9 +251,7 @@ export const AdminNav: React.FC = () => {
         </Link>
 
         <Link className="custom-admin-nav__account" href="/admin/account" onClick={closeMobileNav}>
-          <span className="custom-admin-nav__avatar">
-            {initialsFor(user?.name, user?.email)}
-          </span>
+          <span className="custom-admin-nav__avatar">{initialsFor(user?.name, user?.email)}</span>
           <span className="custom-admin-nav__identity">
             <strong>{displayName}</strong>
             <small>Admin</small>

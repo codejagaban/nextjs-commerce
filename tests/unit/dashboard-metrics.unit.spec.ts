@@ -6,6 +6,32 @@ const start = new Date('2026-09-01T00:00:00.000Z')
 const end = new Date('2026-10-01T00:00:00.000Z')
 
 describe('dashboard sales metrics', () => {
+  it('keeps money received on cancelled-but-not-refunded orders and excludes unpaid orders', () => {
+    const result = summarizeOrderSales({
+      currency: 'USD',
+      days: 30,
+      start,
+      end,
+      orders: [
+        {
+          amount: 5000,
+          createdAt: '2026-09-02T12:00:00.000Z',
+          currency: 'USD',
+          orderStatus: 'cancelled',
+          paymentStatus: 'paid',
+        },
+        {
+          amount: 7000,
+          createdAt: '2026-09-02T12:00:00.000Z',
+          currency: 'USD',
+          orderStatus: 'open',
+          paymentStatus: 'pending',
+        },
+      ],
+    })
+    expect(result.netSales).toBe(5000)
+    expect(result.netOrders).toBe(1)
+  })
   it('separates gross sales, refunds, and net sales', () => {
     const result = summarizeOrderSales({
       currency: 'USD',

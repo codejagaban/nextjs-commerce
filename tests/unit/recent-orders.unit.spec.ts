@@ -49,7 +49,7 @@ describe('recent dashboard orders', () => {
     ).toMatchObject({
       currency: 'USD',
       customer: 'Guest customer',
-      fulfillmentStatus: 'processing',
+      fulfillmentStatus: 'unfulfilled',
       paymentStatus: 'not_recorded',
       total: 0,
     })

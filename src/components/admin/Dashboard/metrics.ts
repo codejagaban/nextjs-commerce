@@ -1,4 +1,4 @@
-import type { OrderStatus } from '@/payload-types'
+import type { Order, OrderStatus } from '@/payload-types'
 import { dayKeysFrom, zonedDateKey } from '@/utilities/storeTime'
 
 type SalesOrder = {
@@ -10,6 +10,8 @@ type SalesOrder = {
   shippingRefundTotal?: number | null
   shippingTotal?: number | null
   status?: OrderStatus
+  orderStatus?: Order['orderStatus']
+  paymentStatus?: Order['paymentStatus']
   subtotal?: number | null
   taxRefundTotal?: number | null
   taxTotal?: number | null
@@ -34,10 +36,8 @@ type SalesSummary = {
 /**
  * Summarize the value the store actually kept during one reporting window.
  *
- * An order marked refunded still belongs in gross sales because a sale happened,
- * but the same amount is removed again as a refund. Cancelled orders were never
- * sales. The current ecommerce model only supports whole-order refunds, so this
- * intentionally does not pretend that partial-refund data exists.
+ * Cancellation and refund are independent: cancelling an order does not make
+ * received money disappear. Legacy imports retain their historical fallback.
  */
 export function summarizeOrderSales({
   currency,
@@ -71,7 +71,13 @@ export function summarizeOrderSales({
     if (order.currency && order.currency !== currency) continue
 
     const status = order.status ?? 'processing'
-    if (status === 'cancelled') continue
+    if (order.paymentStatus) {
+      if (
+        !['paid', 'partially_refunded', 'refunded'].includes(order.paymentStatus) &&
+        !(order.paymentStatus === 'not_recorded' && order.orderStatus !== 'cancelled')
+      )
+        continue
+    } else if (status === 'cancelled') continue
 
     const amount = typeof order.amount === 'number' ? order.amount : 0
     const subtotal = typeof order.subtotal === 'number' ? order.subtotal : amount
@@ -81,7 +87,7 @@ export function summarizeOrderSales({
     const productRefundTotal =
       typeof order.productRefundTotal === 'number'
         ? order.productRefundTotal
-        : status === 'refunded'
+        : (order.paymentStatus ?? status) === 'refunded'
           ? amount
           : 0
     const shippingRefundTotal =
@@ -97,7 +103,7 @@ export function summarizeOrderSales({
     productRefunds += productRefundTotal
 
     const orderNetSales = Math.max(0, subtotal - discountTotal - productRefundTotal)
-    if (status === 'refunded' && orderNetSales === 0) continue
+    if ((order.paymentStatus ?? status) === 'refunded' && orderNetSales === 0) continue
 
     netOrders += 1
     const index = dayIndex.get(zonedDateKey(placed, timeZone))

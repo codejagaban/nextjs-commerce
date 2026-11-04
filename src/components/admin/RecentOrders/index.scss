@@ -182,6 +182,17 @@
   }
 }
 
+.recent-orders__status {
+  &--paid, &--fulfilled, &--delivered { color: #166534; background: #dcf0df; }
+  &--unfulfilled, &--preparing, &--partially_fulfilled { color: #78530b; background: #f9edcb; }
+  &--shipped { color: #285c74; background: #e2eef3; }
+}
+:root[data-theme='dark'] .recent-orders__status {
+  &--paid, &--fulfilled, &--delivered { color: #8bd5a1; background: #23362b; }
+  &--unfulfilled, &--preparing, &--partially_fulfilled { color: #e6c67f; background: #383021; }
+  &--shipped { color: #a0ccd9; background: #24343a; }
+}
+
 @media (prefers-color-scheme: dark) {
   :root:where(:not([data-theme='light'])) .recent-orders__status {
     &--succeeded,
