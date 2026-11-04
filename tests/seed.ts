@@ -104,6 +104,69 @@ try {
       },
     })
   }
+  // Synthetic already-paid order for browser-only fulfillment checks. No Stripe
+  // call or email is made, and no application database is used by this runner.
+  const workflowOrders = await payload.find({
+    collection: 'orders',
+    where: { customerEmail: { equals: 'fulfillment-browser@commerce-test.example' } },
+  })
+  for (const order of workflowOrders.docs) {
+    await payload.delete({ collection: 'transactions', where: { order: { equals: order.id } } })
+    await payload.delete({ collection: 'orders', id: order.id })
+  }
+  const fixtureProduct = (
+    await payload.find({
+      collection: 'products',
+      where: { slug: { equals: 'test-vitamin-c-serum' } },
+    })
+  ).docs[0]
+  const fixtureVariant = (
+    await payload.find({
+      collection: 'variants',
+      where: { product: { equals: fixtureProduct.id } },
+      limit: 1,
+    })
+  ).docs[0]
+  const fixtureCustomer = (
+    await payload.find({
+      collection: 'users',
+      where: { email: { equals: 'customer@commerce-test.example' } },
+    })
+  ).docs[0]
+  const fixtureAmount = (fixtureVariant.priceInUSD ?? fixtureProduct.priceInUSD ?? 0) * 2
+  const workflowOrder = await payload.create({
+    collection: 'orders',
+    data: {
+      customer: fixtureCustomer.id,
+      customerEmail: 'fulfillment-browser@commerce-test.example',
+      amount: fixtureAmount,
+      currency: 'USD',
+      subtotal: fixtureAmount,
+      items: [{ product: fixtureProduct.id, variant: fixtureVariant.id, quantity: 2 }],
+      orderStatus: 'open',
+      paymentStatus: 'not_recorded',
+      fulfillmentStatus: 'unfulfilled',
+      returnStatus: 'none',
+      workflowVersion: 0,
+    },
+  })
+  const fixtureTransaction = await payload.create({
+    collection: 'transactions',
+    data: {
+      order: workflowOrder.id,
+      customer: fixtureCustomer.id,
+      amount: fixtureAmount,
+      currency: 'USD',
+      paymentMethod: 'stripe',
+      status: 'succeeded',
+      items: [{ product: fixtureProduct.id, variant: fixtureVariant.id, quantity: 2 }],
+    },
+  })
+  await payload.update({
+    collection: 'orders',
+    id: workflowOrder.id,
+    data: { transactions: [fixtureTransaction.id] },
+  })
   console.log('Browser fixtures ready.')
 } finally {
   await payload.destroy()
