@@ -14,9 +14,16 @@ pnpm lint
 pnpm typecheck
 pnpm test:unit
 pnpm audit --prod
+pnpm test:migrations
 pnpm test:int
 pnpm test:e2e
 ```
+
+`pnpm test:migrations` requires a fresh test database with no existing orders
+table. It migrates synthetic historical orders, verifies that their financial
+totals and items survive, and rehearses rollback/reapply for the order workflow
+migrations. It leaves the current schema ready for the integration and browser
+suites. CI runs this check against its new PostgreSQL service.
 
 `pnpm test:e2e` seeds its own catalogue and accounts, builds the application, and
 starts the production server on port **3002**. It refuses to reuse an existing
