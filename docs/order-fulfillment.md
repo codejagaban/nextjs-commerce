@@ -23,7 +23,7 @@ Open an order in Payload and use **Fulfillment & tracking**:
 
 Customer account and guest order pages display the separate states, shipment quantities, tracking links, and delivery dates. Existing order ownership and guest access-token checks still apply. Only administrators can mutate fulfillment or retry its emails. Activity records identify the staff member and time for each action.
 
-Shipping labels, carrier API synchronization, shipping-rate calculations, issuing refunds, and accepting returns are separate future workflows. Delivery updates in this version are recorded by staff.
+Delivery updates are recorded by staff. For issuing refunds and accepting physical returns, see [Refunds and returns](./refunds-and-returns.md). Shipping labels, carrier API synchronization, and shipping-rate calculations remain separate workflows.
 
 ## Concurrency and retries
 
