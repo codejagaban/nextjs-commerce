@@ -1,6 +1,6 @@
 import { MigrateUpArgs, MigrateDownArgs, sql } from '@payloadcms/db-postgres'
 
-export async function up({ db, payload, req }: MigrateUpArgs): Promise<void> {
+export async function up({ db }: MigrateUpArgs): Promise<void> {
   await db.execute(sql`
    CREATE TYPE "public"."enum_shipment_notifications_kind" AS ENUM('shipped', 'tracking', 'delivered');
   CREATE TYPE "public"."enum_shipment_notifications_status" AS ENUM('pending', 'sending', 'sent', 'failed', 'skipped');
@@ -26,11 +26,11 @@ export async function up({ db, payload, req }: MigrateUpArgs): Promise<void> {
   CREATE INDEX "payload_locked_documents_rels_shipment_notifications_id_idx" ON "payload_locked_documents_rels" USING btree ("shipment_notifications_id");`)
 }
 
-export async function down({ db, payload, req }: MigrateDownArgs): Promise<void> {
+export async function down({ db }: MigrateDownArgs): Promise<void> {
   await db.execute(sql`
    ALTER TABLE "shipment_notifications" DISABLE ROW LEVEL SECURITY;
-  DROP TABLE "shipment_notifications" CASCADE;
   ALTER TABLE "payload_locked_documents_rels" DROP CONSTRAINT "payload_locked_documents_rels_shipment_notifications_fk";
+  DROP TABLE "shipment_notifications" CASCADE;
   
   DROP INDEX "payload_locked_documents_rels_shipment_notifications_id_idx";
   ALTER TABLE "payload_locked_documents_rels" DROP COLUMN "shipment_notifications_id";

@@ -3,12 +3,13 @@ import { testEnvironment } from '../tests/environment.mjs'
 
 const commands = {
   integration: ['exec', 'vitest', 'run', '--config', 'vitest.config.mts'],
+  migrations: ['exec', 'tsx', 'tests/migrations/order-workflow.ts'],
   seed: ['exec', 'tsx', 'tests/seed.ts'],
   build: ['build'],
   e2e: ['exec', 'playwright', 'test'],
 }
 const command = commands[process.argv[2]]
-if (!command) throw new Error('Expected integration, seed, build, or e2e.')
+if (!command) throw new Error('Expected integration, migrations, seed, build, or e2e.')
 const env = testEnvironment()
 let child
 for (const signal of ['SIGINT', 'SIGTERM']) process.on(signal, () => child?.kill(signal))
