@@ -2,14 +2,32 @@
 
 Reviewed on 2026-11-04. Run `pnpm audit --prod` for the deployable dependency
 tree and `pnpm audit` for the entire development environment. The production
-audit remains a required CI gate. No advisory is ignored or suppressed.
+audit remains a required CI gate. Raw `pnpm audit --prod` continues to report every finding.
+
+## Owner-approved temporary exception
+
+Approved by the project owner on 2026-11-04 for **GHSA-gcqx-w48m-w2h4 only**, in
+**deepmerge 4.3.1** through Payload. This accepts the residual low-severity risk
+of prototype poisoning in returned merged objects; it does not establish that
+every call site is unexploitable. No patched upstream release is available.
+
+The release command is `pnpm audit:production`. It reads the unfiltered audit,
+prints the accepted finding explicitly, and blocks every other finding. The
+exception expires **2026-12-04 at 00:00 UTC** and also stops applying if severity
+increases, the installed version changes, or the advisory publishes a patched
+version. Missing reports and registry failures fail closed. Regression tests
+verify these conditions. No severity-wide threshold or global ignore is used.
+
+Review the upstream advisory during dependency upgrades and before expiry.
+Once a compatible patch is available, upgrade and remove the policy exception.
+Expiry requires a new owner decision if a fix remains unavailable.
 
 ## Current release status
 
 The fresh production audit reported **23 findings: 3 critical, 8 high, 8 moderate,
 and 4 low**. The updates below reduce that to **one low-severity finding**, with
 zero critical, high, or moderate production findings. **The production audit
-still exits unsuccessfully and blocks merging.**
+still exits unsuccessfully; the approved release policy accepts only the finding below.**
 
 | Dependency | Previous | Updated |
 | --- | --- | --- |
@@ -25,7 +43,7 @@ The remaining production finding is
 [deepmerge prototype poisoning, GHSA-gcqx-w48m-w2h4](https://github.com/advisories/GHSA-gcqx-w48m-w2h4).
 Payload 3.93.0 still depends on deepmerge 4.3.1. The advisory lists no patched
 release, and 4.3.1 is the latest published version at this review. It is retained
-in the audit; there is no ignore list, audit-threshold change, or merge bypass.
+in the raw audit and governed by the temporary exception above.
 Do not downgrade to an older merge implementation or replace this dependency
 without a separate compatibility and security review.
 
@@ -43,8 +61,8 @@ import/export and confirms those network-loading settings remain disabled.
 Frozen-lockfile installation, typechecking, 33 unit tests, 21 integration tests,
 and all 11 production-build storefront/admin browser tests passed with these
 updates. Lint has zero errors and 110 existing warnings. The
-strict production audit gate remains failing until the upstream issue is fixed
-or the project owner explicitly approves a documented policy exception.
+production release gate now applies the documented owner-approved exception;
+the underlying raw audit remains nonzero.
 
 ## Historical review: 2026-10-19
 
