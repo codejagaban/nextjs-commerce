@@ -3,7 +3,7 @@ import type { Order, Setting, ShipmentNotification } from '@/payload-types'
 import { isAdmin } from '@/access/isAdmin'
 import { DEFAULT_STORE_NAME } from '@/brand'
 import { orderURL, recipientFor } from './orderConfirmation'
-import { emailBodyFontFamily, escapeHTML } from './template'
+import { emailBodyFontFamily, emailFontStyles, escapeHTML } from './template'
 import { safeTrackingURL } from '@/orders/fulfillment'
 
 export const renderShipmentEmail = (
@@ -37,7 +37,7 @@ export const renderShipmentEmail = (
     ...(tracking ? [`Track shipment: ${tracking}`] : []),
     `View order: ${link}`,
   ].join('\n\n')
-  const html = `<!doctype html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"></head><body style="margin:0;padding:24px;background:#f5f0ec;color:#28211e;font-family:${emailBodyFontFamily}"><main style="max-width:620px;margin:auto;padding:28px;background:#fffaf6"><p>${escapeHTML(settings.storeName || DEFAULT_STORE_NAME)}</p><h1 style="font-family:Georgia,serif;font-weight:400;font-size:28px">${escapeHTML(title)}</h1><p>Order #${order.id}</p><ul>${lines.map((line) => `<li style="margin:12px 0">${escapeHTML(line)}</li>`).join('')}</ul><p>Carrier: ${escapeHTML(shipment.carrier)}</p>${shipment.trackingNumber ? `<p>Tracking: ${escapeHTML(shipment.trackingNumber)}</p>` : ''}${tracking ? `<p><a style="color:#28211e" href="${escapeHTML(tracking)}">Track shipment</a></p>` : ''}<p><a style="color:#28211e" href="${escapeHTML(link)}">View order</a></p></main></body></html>`
+  const html = `<!doctype html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><style>${emailFontStyles}</style></head><body style="margin:0;padding:24px;background:#f5f0ec;color:#28211e;font-family:${emailBodyFontFamily}"><main style="max-width:620px;margin:auto;padding:28px;background:#fffaf6"><p>${escapeHTML(settings.storeName || DEFAULT_STORE_NAME)}</p><h1 style="font-family:Georgia,serif;font-weight:400;font-size:28px">${escapeHTML(title)}</h1><p>Order #${order.id}</p><ul>${lines.map((line) => `<li style="margin:12px 0">${escapeHTML(line)}</li>`).join('')}</ul><p>Carrier: ${escapeHTML(shipment.carrier)}</p>${shipment.trackingNumber ? `<p>Tracking: ${escapeHTML(shipment.trackingNumber)}</p>` : ''}${tracking ? `<p><a style="color:#28211e" href="${escapeHTML(tracking)}">Track shipment</a></p>` : ''}<p><a style="color:#28211e" href="${escapeHTML(link)}">View order</a></p></main></body></html>`
   return {
     to: recipient,
     subject: `Order #${order.id}: ${kind === 'delivered' ? 'shipment delivered' : kind === 'tracking' ? 'tracking updated' : 'shipment dispatched'}`,
