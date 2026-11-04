@@ -42,9 +42,23 @@ export const orderReturnHandler: PayloadHandler = async (req) => {
       quantity: line.quantity,
     }))
     const targets = inventoryTargetsFor(items)
+    if (items.some((item) => inventoryTargetsFor([item]).length !== 1))
+      throw new WorkflowError('A returned product or variant is unavailable for restocking.', 409)
     if (items.length && !targets.length)
       throw new WorkflowError('Returned product is unavailable for restocking.', 409)
     for (const target of targets) {
+      const stock = await req.payload.findByID({
+        collection: target.collection,
+        id: target.id,
+        req,
+        depth: 0,
+        disableErrors: true,
+      })
+      if (!stock || !Number.isFinite(stock.inventory))
+        throw new WorkflowError(
+          'Returned inventory is unavailable. Restore the product before restocking.',
+          409,
+        )
       const updated = await req.payload.db.updateOne({
         collection: target.collection,
         id: target.id,
@@ -69,6 +83,11 @@ export const orderReturnHandler: PayloadHandler = async (req) => {
             occurredAt: now,
             requestID: command.requestID,
             requestHash: hash,
+            details: {
+              returnID: command.returnID ?? changes.returns.at(-1)?.id,
+              reason: command.reason,
+              items: command.items,
+            },
           },
         ],
       },

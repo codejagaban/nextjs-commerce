@@ -291,6 +291,15 @@ export interface Order {
         occurredAt: string;
         requestID: string;
         requestHash: string;
+        details?:
+          | {
+              [k: string]: unknown;
+            }
+          | unknown[]
+          | string
+          | number
+          | boolean
+          | null;
         id?: string | null;
       }[]
     | null;
@@ -2015,6 +2024,7 @@ export interface OrdersSelect<T extends boolean = true> {
         occurredAt?: T;
         requestID?: T;
         requestHash?: T;
+        details?: T;
         id?: T;
       };
   returns?:

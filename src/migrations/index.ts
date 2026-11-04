@@ -8,6 +8,7 @@ import * as migration_20261024_221336_order_state_separation from './20261024_22
 import * as migration_20261024_221726_order_shipments from './20261024_221726_order_shipments';
 import * as migration_20261024_221914_shipment_notifications from './20261024_221914_shipment_notifications';
 import * as migration_20261104_174956_refunds_and_returns from './20261104_174956_refunds_and_returns';
+import * as migration_20261104_192554_return_receipt_audit from './20261104_192554_return_receipt_audit';
 
 export const migrations = [
   {
@@ -58,6 +59,11 @@ export const migrations = [
   {
     up: migration_20261104_174956_refunds_and_returns.up,
     down: migration_20261104_174956_refunds_and_returns.down,
-    name: '20261104_174956_refunds_and_returns'
+    name: '20261104_174956_refunds_and_returns',
+  },
+  {
+    up: migration_20261104_192554_return_receipt_audit.up,
+    down: migration_20261104_192554_return_receipt_audit.down,
+    name: '20261104_192554_return_receipt_audit'
   },
 ];
