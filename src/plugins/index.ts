@@ -177,6 +177,11 @@ export const plugins: Plugin[] = [
           ],
         },
         fields: [
+          {
+            name: 'orderWorkflow',
+            type: 'ui',
+            admin: { components: { Field: '@/components/admin/OrderWorkflow#OrderWorkflow' } },
+          },
           ...defaultCollection.fields.map((field) =>
             field.type === 'select' && field.name === 'status'
               ? { ...field, admin: { ...field.admin, hidden: true, readOnly: true } }

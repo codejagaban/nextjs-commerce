@@ -25,6 +25,7 @@ import { ProductPublishing as ProductPublishing_2e09d0ed302e9b72a91fa96d8b38a01d
 import { HorizontalRuleFeatureClient as HorizontalRuleFeatureClient_e70f5e05f09f93e00b997edb1ef0c864 } from '@payloadcms/richtext-lexical/client'
 import { ProductInventoryHint as ProductInventoryHint_545506debe207e4feb643fee5c5d7763 } from '@/components/admin/ProductInventoryHint'
 import { ProductPublishButton as ProductPublishButton_98537d810be5839e22cd240d7c917c4f } from '@/components/admin/ProductPublishButton'
+import { OrderWorkflow as OrderWorkflow_8924a1612676ea062ffdb24967bd4567 } from '@/components/admin/OrderWorkflow'
 import { AdminNav as AdminNav_2623bc737c612ce9420322f2210a7f19 } from '@/components/admin/AdminNav'
 import { BeforeLogin as BeforeLogin_8a7ab0eb7ab5c511aba12e68480bfe5e } from '@/components/BeforeLogin'
 import { AdminStyles as AdminStyles_340cf3538fa47d0416e0abd461790ca4 } from '@/components/admin/AdminStyles'
@@ -61,6 +62,7 @@ export const importMap = {
   "@payloadcms/richtext-lexical/client#HorizontalRuleFeatureClient": HorizontalRuleFeatureClient_e70f5e05f09f93e00b997edb1ef0c864,
   "@/components/admin/ProductInventoryHint#ProductInventoryHint": ProductInventoryHint_545506debe207e4feb643fee5c5d7763,
   "@/components/admin/ProductPublishButton#ProductPublishButton": ProductPublishButton_98537d810be5839e22cd240d7c917c4f,
+  "@/components/admin/OrderWorkflow#OrderWorkflow": OrderWorkflow_8924a1612676ea062ffdb24967bd4567,
   "@/components/admin/AdminNav#AdminNav": AdminNav_2623bc737c612ce9420322f2210a7f19,
   "@/components/BeforeLogin#BeforeLogin": BeforeLogin_8a7ab0eb7ab5c511aba12e68480bfe5e,
   "@/components/admin/AdminStyles#AdminStyles": AdminStyles_340cf3538fa47d0416e0abd461790ca4,
