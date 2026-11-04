@@ -8,11 +8,48 @@ allowBuilds:
   unrs-resolver: true
 
 # Security patches for dependencies pinned by upstream tooling.
+minimumReleaseAgeExclude:
+  - '@next/env@16.4.5'
+  - '@next/eslint-plugin-next@16.4.5'
+  - '@next/swc-darwin-arm64@16.4.5'
+  - '@next/swc-darwin-x64@16.4.5'
+  - '@next/swc-linux-arm64-gnu@16.4.5'
+  - '@next/swc-linux-arm64-musl@16.4.5'
+  - '@next/swc-linux-x64-gnu@16.4.5'
+  - '@next/swc-linux-x64-musl@16.4.5'
+  - '@next/swc-win32-arm64-msvc@16.4.5'
+  - '@next/swc-win32-x64-msvc@16.4.5'
+  - '@payloadcms/admin-bar@3.93.0'
+  - '@payloadcms/db-postgres@3.93.0'
+  - '@payloadcms/drizzle@3.93.0'
+  - '@payloadcms/email-nodemailer@3.93.0'
+  - '@payloadcms/email-resend@3.93.0'
+  - '@payloadcms/graphql@3.93.0'
+  - '@payloadcms/live-preview-react@3.93.0'
+  - '@payloadcms/live-preview@3.93.0'
+  - '@payloadcms/next@3.93.0'
+  - '@payloadcms/plugin-cloud-storage@3.93.0'
+  - '@payloadcms/plugin-ecommerce@3.93.0'
+  - '@payloadcms/plugin-form-builder@3.93.0'
+  - '@payloadcms/plugin-seo@3.93.0'
+  - '@payloadcms/richtext-lexical@3.93.0'
+  - '@payloadcms/storage-s3@3.93.0'
+  - '@payloadcms/translations@3.93.0'
+  - '@payloadcms/ui@3.93.0'
+  - eslint-config-next@16.4.5
+  - next@16.4.5
+  - payload@3.93.0
+
 overrides:
-  dompurify: 3.4.16
+  dompurify: 3.4.17
+  fast-uri: 3.1.9
+  'stripe@18.5.0>qs': 6.16.1
+  # Lexical's HTML conversion needs DOM APIs, not remote iframe/CSS loading.
+  # v21 disables those fetches by default and fixes the host-code-execution issue.
+  '@lexical/headless@0.50.0>happy-dom': 21.0.4
   '@esbuild-kit/core-utils>esbuild': 0.25.12
   # Replace Sass's old Chokidar 3 path to braces (GHSA-vfj7-8cjw-p6xm).
   'sass@1.77.4': 1.105.2
   # This release declares find-node-modules but never imports it. Remove the
   # unused globbing chain, not the advisory. Recheck when upgrading Payload.
-  '@payloadcms/plugin-cloud-storage@3.91.0>find-node-modules': '-'
+  '@payloadcms/plugin-cloud-storage@3.93.0>find-node-modules': '-'
