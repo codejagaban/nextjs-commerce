@@ -78,6 +78,7 @@ export interface Config {
     tags: Tag;
     media: Media;
     'shipment-notifications': ShipmentNotification;
+    'order-refunds': OrderRefund;
     forms: Form;
     'form-submissions': FormSubmission;
     addresses: Address;
@@ -113,6 +114,7 @@ export interface Config {
     tags: TagsSelect<false> | TagsSelect<true>;
     media: MediaSelect<false> | MediaSelect<true>;
     'shipment-notifications': ShipmentNotificationsSelect<false> | ShipmentNotificationsSelect<true>;
+    'order-refunds': OrderRefundsSelect<false> | OrderRefundsSelect<true>;
     forms: FormsSelect<false> | FormsSelect<true>;
     'form-submissions': FormSubmissionsSelect<false> | FormSubmissionsSelect<true>;
     addresses: AddressesSelect<false> | AddressesSelect<true>;
@@ -289,6 +291,20 @@ export interface Order {
         occurredAt: string;
         requestID: string;
         requestHash: string;
+        id?: string | null;
+      }[]
+    | null;
+  returns?:
+    | {
+        reason: string;
+        requestedAt: string;
+        items: {
+          orderItemID: string;
+          quantity: number;
+          received: number;
+          restocked: number;
+          id?: string | null;
+        }[];
         id?: string | null;
       }[]
     | null;
@@ -1157,6 +1173,29 @@ export interface ShipmentNotification {
 }
 /**
  * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "order-refunds".
+ */
+export interface OrderRefund {
+  id: number;
+  order: number | Order;
+  transaction: number | Transaction;
+  requestID: string;
+  requestHash: string;
+  actor: number | User;
+  reason: string;
+  paymentIntentID: string;
+  providerRefundID?: string | null;
+  currency: string;
+  productAmount: number;
+  shippingAmount: number;
+  taxAmount: number;
+  amount: number;
+  status: 'submitting' | 'pending' | 'requires_action' | 'succeeded' | 'failed' | 'canceled' | 'needs_review';
+  updatedAt: string;
+  createdAt: string;
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
  * via the `definition` "form-submissions".
  */
 export interface FormSubmission {
@@ -1219,6 +1258,10 @@ export interface PayloadLockedDocument {
     | ({
         relationTo: 'shipment-notifications';
         value: number | ShipmentNotification;
+      } | null)
+    | ({
+        relationTo: 'order-refunds';
+        value: number | OrderRefund;
       } | null)
     | ({
         relationTo: 'forms';
@@ -1604,6 +1647,28 @@ export interface ShipmentNotificationsSelect<T extends boolean = true> {
 }
 /**
  * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "order-refunds_select".
+ */
+export interface OrderRefundsSelect<T extends boolean = true> {
+  order?: T;
+  transaction?: T;
+  requestID?: T;
+  requestHash?: T;
+  actor?: T;
+  reason?: T;
+  paymentIntentID?: T;
+  providerRefundID?: T;
+  currency?: T;
+  productAmount?: T;
+  shippingAmount?: T;
+  taxAmount?: T;
+  amount?: T;
+  status?: T;
+  updatedAt?: T;
+  createdAt?: T;
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
  * via the `definition` "forms_select".
  */
 export interface FormsSelect<T extends boolean = true> {
@@ -1950,6 +2015,22 @@ export interface OrdersSelect<T extends boolean = true> {
         occurredAt?: T;
         requestID?: T;
         requestHash?: T;
+        id?: T;
+      };
+  returns?:
+    | T
+    | {
+        reason?: T;
+        requestedAt?: T;
+        items?:
+          | T
+          | {
+              orderItemID?: T;
+              quantity?: T;
+              received?: T;
+              restocked?: T;
+              id?: T;
+            };
         id?: T;
       };
   subtotal?: T;

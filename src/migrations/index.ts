@@ -7,6 +7,7 @@ import * as migration_20260927_112155_inventory_restock_tracking from './2026092
 import * as migration_20261024_221336_order_state_separation from './20261024_221336_order_state_separation';
 import * as migration_20261024_221726_order_shipments from './20261024_221726_order_shipments';
 import * as migration_20261024_221914_shipment_notifications from './20261024_221914_shipment_notifications';
+import * as migration_20261104_174956_refunds_and_returns from './20261104_174956_refunds_and_returns';
 
 export const migrations = [
   {
@@ -52,6 +53,11 @@ export const migrations = [
   {
     up: migration_20261024_221914_shipment_notifications.up,
     down: migration_20261024_221914_shipment_notifications.down,
-    name: '20261024_221914_shipment_notifications'
+    name: '20261024_221914_shipment_notifications',
+  },
+  {
+    up: migration_20261104_174956_refunds_and_returns.up,
+    down: migration_20261104_174956_refunds_and_returns.down,
+    name: '20261104_174956_refunds_and_returns'
   },
 ];
