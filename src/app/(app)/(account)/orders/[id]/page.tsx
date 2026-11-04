@@ -14,6 +14,7 @@ import configPromise from '@payload-config'
 import { getPayload } from 'payload'
 import { OrderStatus } from '@/components/OrderStatus'
 import { AddressItem } from '@/components/addresses/AddressItem'
+import { OrderTracking } from '@/components/OrderTracking'
 
 export const dynamic = 'force-dynamic'
 
@@ -85,6 +86,7 @@ export default async function Order({ params, searchParams }: PageProps) {
         fulfillmentStatus: true,
         returnStatus: true,
         workflowVersion: true,
+        shipments: true,
         createdAt: true,
         updatedAt: true,
         shippingAddress: true,
@@ -159,7 +161,9 @@ export default async function Order({ params, searchParams }: PageProps) {
               <p className="mb-1 text-xs uppercase tracking-[0.12em] text-muted-foreground">
                 Status
               </p>
-              <OrderStatus status={order.status} />
+              <OrderStatus
+                status={order.orderStatus === 'cancelled' ? 'cancelled' : order.fulfillmentStatus}
+              />
             </div>
           )}
         </div>
@@ -196,7 +200,9 @@ export default async function Order({ params, searchParams }: PageProps) {
           </section>
         )}
 
-        {order.shippingAddress && (
+        <OrderTracking order={order} />
+
+        {order.shippingAddress?.addressLine1 && (
           <section aria-label="Shipping address">
             <h2 className="mb-2 font-display text-lg text-foreground">Shipping address</h2>
 

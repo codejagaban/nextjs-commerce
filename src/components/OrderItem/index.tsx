@@ -21,7 +21,9 @@ export const OrderItem: React.FC<Props> = ({ order }) => {
               {formatDateTime({ date: order.createdAt, format: 'MMMM dd, yyyy' })}
             </time>
           </p>
-          {order.status && <OrderStatus status={order.status} />}
+          <OrderStatus
+            status={order.orderStatus === 'cancelled' ? 'cancelled' : order.fulfillmentStatus}
+          />
         </div>
 
         <p className="flex items-center gap-2 text-sm text-muted-foreground">

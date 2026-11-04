@@ -1,8 +1,8 @@
-import { OrderStatus as StatusOptions } from '@/payload-types'
+import { stateLabel } from '@/orders/states'
 import { cn } from '@/utilities/cn'
 
 type Props = {
-  status: StatusOptions
+  status: string
   className?: string
 }
 
@@ -13,12 +13,14 @@ export const OrderStatus: React.FC<Props> = ({ status, className }) => {
         'w-fit rounded-full px-3 py-1 text-xs font-medium capitalize',
         {
           'bg-secondary text-secondary-foreground': status === 'processing',
-          'bg-primary text-primary-foreground': status === 'completed',
+          'bg-primary text-primary-foreground': ['completed', 'delivered', 'fulfilled'].includes(
+            status,
+          ),
         },
         className,
       )}
     >
-      {status}
+      {stateLabel(status)}
     </div>
   )
 }
