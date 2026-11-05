@@ -179,3 +179,17 @@
     }
   }
 }
+
+.refund-returns {
+  margin-top: 2rem;
+  padding-top: 1rem;
+  &__reason {
+    display: flex;
+    flex-direction: column;
+    gap: 0.4rem;
+    margin: 1rem 0;
+  }
+  &__line {
+    margin: 0.75rem 0;
+  }
+}

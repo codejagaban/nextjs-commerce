@@ -29,13 +29,18 @@ export const fulfillmentFields: Field[] = [
     name: 'workflowEvents',
     type: 'array',
     admin: { hidden: true },
-    access: { create: () => false, update: () => false, read: ({ req }) => isAdmin({ req }) === true },
+    access: {
+      create: () => false,
+      update: () => false,
+      read: ({ req }) => isAdmin({ req }) === true,
+    },
     fields: [
       { name: 'action', type: 'text', required: true },
       { name: 'actor', type: 'relationship', relationTo: 'users', required: true },
       { name: 'occurredAt', type: 'date', required: true },
       { name: 'requestID', type: 'text', required: true },
       { name: 'requestHash', type: 'text', required: true },
+      { name: 'details', type: 'json' },
     ],
   },
 ]
